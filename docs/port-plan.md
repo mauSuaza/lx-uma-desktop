@@ -1,0 +1,109 @@
+# Porting LX_UMA to the LXR desktop: plan, and Phase 0 (spec)
+
+Status: **draft for review** (2026-11-12). The plan for bringing LX_UMA, custom firmware for the LXR Eurorack module
+(release 0.34, `mauSuaza/LX_UMA`), to the LXR desktop drum machine, starting from Erica Synths' open-source desktop
+firmware (`erica-synths/lxr-desktop-app`, v1.7). Phase 0 is specified in detail; the later phases are outlined, each
+to get its own spec before code.
+
+## 1. Decided so far
+
+- **A separate repository**, this fork, so the desktop and the Eurorack firmware can each follow their own hardware.
+  Public; commits use the GitHub noreply address.
+- **No prk engine** on the desktop: the RAM it needs (about 85 KB) is what the desktop's sequencer uses.
+  mdk and Plaits' drum models cover similar ground.
+- **Everything else comes:** FM Drum and FM Tone (Drum 1–3), mdk and Plaits on every voice, the quantizer, envelopes,
+  low-pass gate, wavefolder, randomise, the mod matrix, LFO B, Turing Machines, kit morph, and the 0.34 card files
+  (DX7 banks, wavetables, terrains) with the Plaits sub.
+- **Port in phases with a module test after each**, not engine by engine (the engines are finished and tested on
+  the Mac) and not only at the end (memory, kits and the sequencer must work first).
+
+## 2. What we start from (measured 2026-11-12)
+
+Both firmwares run on the same chip (STM32F765, Cortex-M7 at 216 MHz) with the same memory map and the same
+32 KB bootloader at 0x08000000. Of the desktop's 156 source files, 142 are in the Eurorack firmware too; the sound
+engine files are almost identical (`DrumVoice.c` differs in 25 lines). What the desktop adds: the step sequencer
+(`Sequencer/`), Euclidean patterns, USB MIDI, trigger outputs, a different front panel (buttons, LEDs). What only
+the Eurorack has: the CV mod matrix (`ModMatrix_Processor.c`, 108 lines) and the trigger jacks.
+
+| Build | Flash (code + data) | Main RAM (`.bss`) | DTCM | ITCM (16 KB) |
+|---|---|---|---|---|
+| Eurorack stock (v1.51) | 228 KB | 48 KB | 105 KB | 12.1 KB |
+| **Desktop stock (v1.7)** | **274 KB** | **263 KB** (of 384) | 105 KB (of 128) | **14.6 KB** |
+| LX_UMA 0.34 (Eurorack) | 718 KB | 347 KB | 110 KB | 15.7 KB |
+
+The desktop's RAM goes on its patterns: `seq_patternSet` alone is 228 KB.
+
+What LX_UMA adds on the Eurorack, by part:
+
+| Part | Flash | RAM | On the desktop |
+|---|---|---|---|
+| Plaits (12 models) | 177 KB | 42 KB | yes |
+| FM Drum + FM Tone | 165 KB (120 KB of it the operator waveform tables) | 4 KB | yes |
+| mdk | 112 KB | 5 KB | yes |
+| prk | 16 KB | ~85 KB | **no** |
+| Card files (pool of 10 × 4 KB) | 2 KB | 44 KB | yes, maybe 6 slots (24 KB) |
+| UMA core: mod, Turing Machines, LFO B, quantizer, envelopes | 23 KB | 32 KB | yes |
+| Menus and pages | ~38 KB | (kit cache, below) | yes, redone |
+| Kit cache: the Eurorack keeps all 64 kits in RAM (144 KB with UMA's settings) | — | 106 KB more than stock | **no**: the desktop doesn't keep all kits |
+
+### The budget, estimated (Phase 0 measures it)
+
+- **RAM:** desktop 263 KB + Plaits 42 + core 32 + card files 24 (6 slots) + FM, mdk 9 + bigger kits in the desktop's
+  own kit buffers (UMA's settings: roughly 3× the desktop's 15 KB `mainParameters`, so +30 KB) ≈ **400 KB** of 384 KB
+  main RAM, with about 20 KB of DTCM free. **Tight: within reach, not certain.** Room if needed: the card files in
+  fewer slots or installed into flash, the Plaits work areas in DTCM, smaller Turing Machine and LFO state.
+- **Flash:** desktop 274 KB + Plaits 177 + FM 165 + mdk 112 + core and menus ~60 ≈ **790 KB**. Against the
+  **736 KB cap** the Eurorack's bootloader turned out to have (it doesn't erase sector 7; see LX_UMA's
+  `plaits-engine.md`, 0.33l), that's ~55 KB over. **Shrinking the FM operator waveform tables** (fewer, shorter
+  band-limited tables, ~30 KB instead of 120) brings it to about 700 KB. The desktop's update tool claims the full
+  992 KB, as the Eurorack's does too, so Phase 0 tests it on the hardware.
+- **ITCM:** 14.6 KB + UMA's 3.6 KB = 18.2 KB of 16. Some of the desktop's or UMA's ITCM functions move to flash
+  (small CPU cost, measured).
+- **CPU:** the desktop also runs the sequencer, and its FX bus as the Eurorack does. To measure with Plaits and FM
+  voices playing a pattern.
+
+## 3. What carries over, what's redone
+
+| | How |
+|---|---|
+| **Sound engines** (FmDrum, FmWaves, MdDrum + mnmd/, PlaitsDrum + mi/, uma_sdfiles) | Copied unchanged; the Mac tests (`tools/fmtest`) come too and must give the same results |
+| **UMA core** (uma_mod, uma_turing, uma_lfo, uma_quant, uma_env, uma_vel, uma_random, uma_voice*) | Copied; adapted where they touch the Eurorack's jacks or mod matrix |
+| **Settings, kits** (`Parameters.h`, `presetManager.c`) | Redone on the desktop's files: its kit and pattern files must keep loading, and stock desktop kits must still load |
+| **Menus** (`menu.c`, `menuPages.h`, `MenuText.h`) | Redone on the desktop's menu code (it differs from the Eurorack's by ~950 lines in `menu.c`) |
+| **Eurorack-only** | CV inputs and their calibration, trigger-jack gates (the 6-op's held key, `fmt` legato), accent jacks, MIDI and clock on the OP HH jack: dropped or replaced by the desktop's own (MIDI notes held = the gate; DIN and USB MIDI) |
+| **Desktop-only, new work** | The sequencer's parameter automation and MIDI CC/NRPN reaching UMA's settings (numbered above 255, past the stock limit); patterns staying compatible |
+
+## 4. Phases
+
+| Phase | What | Module test |
+|---|---|---|
+| **0. Will it fit?** | Below | Boots; the flash cap; CPU and memory with the engines in |
+| **1. Foundation + FM** | Settings and kit format; the menu framework (extra screens, value types); the modulation layer; FM Drum and FM Tone on Drum 1–3, with the smaller waveform tables | Stock kits and patterns unchanged; the FM engines sound as on the Eurorack; kits save and load |
+| **2. All engines, all voices** | mdk and Plaits on every voice (engine choice on the snare, cymbal, hi-hat); quantizer; envelopes, LPG, folder; randomise | Each engine against the Eurorack with the same settings; CPU with a pattern running |
+| **3. Modulation + sequencer** | Mod slots, LFO B, Turing Machines, velocity, MIDI CC sources, kit morph; the sequencer's automation and MIDI reaching UMA's settings | Automation and modulation move UMA settings in time |
+| **4. Card files + release** | DX7, WAVES, TERRAIN and the Plaits sub; the desktop manual; release | As LX_UMA 0.34's checks |
+
+## 5. Phase 0, in detail
+
+Goal: before porting any UI, know whether everything fits and what has to give.
+
+| Build | What | Mac | Module |
+|---|---|---|---|
+| **0.0a** | Stock desktop firmware, renamed (update file `LXR_V2_UMA_V0.0a.img`: the updater looks for `LXR*.img`; the start-up screen says it's LX_UMA), plus LX_UMA's **CPU readout** (peak and average load on a global page, as in Eurorack 0.2) | builds | Installs and boots; **CPU of the stock desktop** with a busy pattern and the FX on: the headroom we have |
+| **0.0b** | **The flash cap test:** the same build padded so the image reaches into sector 7 (0x080C0000+), with a known pattern at its end that the firmware checks at start-up and reports on the screen ("S7 ok" / "S7 bad") | builds; the image's end address checked | Installs or fails ("flash write error" as on the Eurorack): **is the cap 736 KB or 992 KB?** |
+| **0.0c** | **The engines in, without menus:** FmDrum + FmWaves, MdDrum, PlaitsDrum and uma_sdfiles linked in, behind a compile-time switch three voices play them with fixed settings (Drum 1 FM Tone, Drum 2 Plaits wavetable, Drum 3 mdk kick), the rest stock | the linker's memory report: flash, RAM, DTCM, ITCM | Boots; the three voices sound (from the sequencer); **CPU** with a pattern; RAM left for the stack |
+
+**Out of Phase 0, decided with the user:**
+- the flash budget: with the waveform tables shrunk or not, and anything else to trim;
+- the RAM budget: the card files' slots (6, or installed into flash), where the Plaits work areas live;
+- which ITCM functions move;
+- whether the CPU allows Plaits and FM on every voice with the sequencer running, or a limit (as on the Eurorack's
+  CPU guidance).
+
+**To answer before 0.0a:**
+1. **Your LXR desktop for testing:** every build is checked on the hardware. How does its SD card show up on the
+   Mac (the card's name), and is there anything on it to keep (kits, patterns)?
+2. **Names:** the update file `LXR_V2_UMA_V<version>.img` and versions from 0.0a (Phase 0) and 0.1 (the first
+   release with FM)? The start-up screen says "LX_UMA" and that it's modified firmware.
+3. **Keeping the engines in step** with the Eurorack repo: copy the engine files over at each port and record the
+   LX_UMA commit they came from (simple), or a shared repository later if the two keep changing together.
