@@ -62,7 +62,8 @@ def main(wanted):
         for kind, n in (('short', sh), ('cat', ca), ('long', lo)):
             s = eu[kind + 'Str'][eu[kind][n]]
             if n in de[kind]:
-                assert de[kind + 'Str'][de[kind][n]] == s, (n, s)
+                if de[kind + 'Str'][de[kind][n]] != s:	# the desktop's own text stays (e.g. CAT_LFO "LFO" / "LFO A")
+                    print(f'note: {n} is "{de[kind + "Str"][de[kind][n]]}" here, "{s}" on the Eurorack: kept')
             elif n not in [x for x, _ in new[kind]]:
                 new[kind].append((n, s))
         entries.append((t, sh, ca, lo))

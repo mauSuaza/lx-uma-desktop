@@ -344,6 +344,55 @@ enum NamesEnum
 	TEXT_UMA_OCT,
 	TEXT_UMA_KEY,
 	TEXT_UMA_SCALE,
+	TEXT_1VOCT,
+	TEXT_MORPH,
+	TEXT_UMA_LFOA_FOLD,
+	TEXT_UMA_LFOB_FOLD,
+	TEXT_UMA_LFOB_FREQ,
+	TEXT_UMA_LFOB_OFS,
+	TEXT_UMA_LFOB_RTG,
+	TEXT_UMA_LFOB_SYNC,
+	TEXT_UMA_LFOB_WAVE,
+	TEXT_UMA_T_ALGO,
+	TEXT_UMA_T_ATK_A,
+	TEXT_UMA_T_ATK_B,
+	TEXT_UMA_T_ATK_B2,
+	TEXT_UMA_T_DEC_A,
+	TEXT_UMA_T_DEC_B,
+	TEXT_UMA_T_DEC_B2,
+	TEXT_UMA_T_END_A,
+	TEXT_UMA_T_END_B,
+	TEXT_UMA_T_END_B2,
+	TEXT_UMA_T_FEEDBACK,
+	TEXT_UMA_T_MD_PAL,
+	TEXT_UMA_T_MOD_A,
+	TEXT_UMA_T_MOD_B,
+	TEXT_UMA_T_MOD_B2,
+	TEXT_UMA_T_PRK_ALG,
+	TEXT_UMA_T_PRK_P1,
+	TEXT_UMA_T_PRK_P2,
+	TEXT_UMA_T_PRK_PAL,
+	TEXT_UMA_T_PRK_VAR,
+	TEXT_UMA_T_RATIO_A,
+	TEXT_UMA_T_RATIO_B,
+	TEXT_UMA_T_RND_ENV,
+	TEXT_UMA_T_RND_FINE,
+	TEXT_UMA_T_RND_SEED,
+	TEXT_UMA_T_RND_SWEEP,
+	TEXT_UMA_T_RND_TONE,
+	TEXT_UMA_VEL,
+	TEXT_UMA_T_SLOT_AMT1,
+	TEXT_UMA_T_SLOT_AMT2,
+	TEXT_UMA_T_SLOT_AMT3,
+	TEXT_UMA_T_SLOT_AMT4,
+	TEXT_UMA_T_SLOT_AMT5,
+	TEXT_UMA_T_SLOT_AMT6,
+	TEXT_UMA_T_SLOT_AMT7,
+	TEXT_UMA_T_SLOT_AMT8,
+	TEXT_CV_SRC,
+	TEXT_CV_AMT,
+	TEXT_CV_DEST,
+	TEXT_UMA_SLOT_POL,
 	NUM_NAMES
 };
 //-----------------------------------------------------------------
@@ -513,6 +562,52 @@ enum shortNamesEnum
 	SHORT_UMA_OCT,
 	SHORT_UMA_KEY,
 	SHORT_UMA_SCALE,
+	SHORT_1VOCT,
+	SHORT_UMA_LFO_FD_A,
+	SHORT_UMA_LFO_FD_B,
+	SHORT_UMA_LFO_FR_B,
+	SHORT_UMA_LFO_OF_B,
+	SHORT_UMA_LFO_RT_B,
+	SHORT_UMA_LFO_SN_B,
+	SHORT_UMA_LFO_WV_B,
+	SHORT_UMA_T_ALGO,
+	SHORT_UMA_T_ATK_A,
+	SHORT_UMA_T_ATK_B,
+	SHORT_UMA_T_ATK_B2,
+	SHORT_UMA_T_DEC_A,
+	SHORT_UMA_T_DEC_B,
+	SHORT_UMA_T_DEC_B2,
+	SHORT_UMA_T_END_A,
+	SHORT_UMA_T_END_B,
+	SHORT_UMA_T_END_B2,
+	SHORT_UMA_T_FEEDBACK,
+	SHORT_UMA_T_MD_PAL,
+	SHORT_UMA_T_MOD_A,
+	SHORT_UMA_T_MOD_B,
+	SHORT_UMA_MOD_B2,
+	SHORT_UMA_T_PRK_ALG,
+	SHORT_UMA_T_PRK_P1,
+	SHORT_UMA_T_PRK_P2,
+	SHORT_UMA_T_PRK_PAL,
+	SHORT_UMA_T_PRK_VAR,
+	SHORT_UMA_T_RATIO_A,
+	SHORT_UMA_T_RATIO_B,
+	SHORT_UMA_T_RND_ENV,
+	SHORT_UMA_T_RND_FINE,
+	SHORT_UMA_T_RND_SEED,
+	SHORT_UMA_T_RND_SWEEP,
+	SHORT_UMA_T_RND_TONE,
+	SHORT_UMA_T_SLOT_AMT1,
+	SHORT_UMA_VEL,
+	SHORT_UMA_T_SLOT_AMT2,
+	SHORT_UMA_T_SLOT_AMT3,
+	SHORT_UMA_T_SLOT_AMT4,
+	SHORT_UMA_T_SLOT_AMT5,
+	SHORT_UMA_T_SLOT_AMT6,
+	SHORT_UMA_T_SLOT_AMT7,
+	SHORT_UMA_T_SLOT_AMT8,
+	SHORT_SRC,
+	SHORT_UMA_SLOT_POL,
 };
 //-----------------------------------------------------------------
 // These correspond with catNames in MenuText.h
@@ -557,6 +652,10 @@ enum catNamesEnum
 	CAT_UMA_RANDOM,
 	CAT_UMA_MD,
 	CAT_UMA_PLA,
+	CAT_MOD,
+	CAT_UMA_LFO_B,
+	CAT_UMA_PRK,
+	CAT_UMA_MOD_SLOT,
 };
 //-----------------------------------------------------------------
 // these must correspond with longNames in MenuText.h
@@ -701,6 +800,21 @@ enum longNamesEnum
 	LONG_UMA_PLA_KMD,
 	LONG_UMA_KEY,
 	LONG_UMA_SCALE,
+	LONG_1VOCT,
+	LONG_UMA_PARAM1,
+	LONG_UMA_PARAM2,
+	LONG_UMA_VARIATION,
+	LONG_UMA_AMOUNT1,
+	LONG_UMA_VELOCITY,
+	LONG_UMA_AMOUNT2,
+	LONG_UMA_AMOUNT3,
+	LONG_UMA_AMOUNT4,
+	LONG_UMA_AMOUNT5,
+	LONG_UMA_AMOUNT6,
+	LONG_UMA_AMOUNT7,
+	LONG_UMA_AMOUNT8,
+	LONG_SRC,
+	LONG_UMA_POLARITY,
 };
 
 //enum for the save category parameter
@@ -796,6 +910,7 @@ enum Datatypes
 	DTYPE_0B15,		//0-15
 	DTYPE_1B64,		//1-64
 	DTYPE_0B100,	// 0-100
+	DTYPE_UMA_TARGET,	// LX_UMA: a mod slot's destination, an index into its voice's list (umaModTargets.c)
 	//mööp - only 8 bit available, the others are used for menu :-/
 	//DTYPE_BPM,		// 0=EXT then 1 to 255
 
@@ -812,6 +927,8 @@ extern uint8_t *morphParameters;
 
 extern const Page menuPages[NUM_PAGES][NUM_SUB_PAGES];
 const Page* menu_getPage(uint8_t page, uint8_t sub);	// LX_UMA: the page shown (Drum 1-3: by their engine)
+void menu_umaModViewToggle(void);	// LX_UMA: SHIFT + select 7: the mod view on / off
+uint8_t menu_umaModViewOn(void);
 
 
 // **AUTOM declare modTargets array

@@ -53,6 +53,7 @@ typedef struct LfoStruct
 	float 		freq;
 	ModulationNode modTarget;
 	float		modNodeValue;
+	float		value;		// LX_UMA: the last value, 0..1 (a mod matrix source, LFO A)
 } Lfo;
 //-------------------------------------------------------------
 void lfo_init(Lfo *lfo);

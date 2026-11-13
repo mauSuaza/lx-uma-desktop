@@ -65,6 +65,7 @@ typedef struct OscStruct
 	uint8_t umaScale;		// 0 off
 	int16_t umaHeld;		// the quantizer's last note (its hysteresis)
 	float umaBase;			// the quantized frequency before the pitch EG (with fine tune), when on
+	float umaVoct;			// LX_UMA: v/o, semitones up (a mod target, PAR_UMA_DSK_VOCT); 0 = none
 } OscInfo;
 //-----------------------------------------------------------
 

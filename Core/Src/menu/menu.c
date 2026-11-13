@@ -33,6 +33,9 @@
 #include "Soundengine/Sequencer/sequencer.h"
 #include "Soundengine/Soundengine.h"
 #include "uma_voice.h" // LX_UMA
+#include "uma_modmatrix.h" // LX_UMA: the mod slots
+#include "menu/umaModTargets.h" // LX_UMA
+#include "uma_turing.h" // LX_UMA: the sources' numbers
 #include "uma_quant.h" // LX_UMA: the pitch screen
 #include "Soundengine/DSPAudio/PlaitsDrum.h" // LX_UMA: the Plaits models' names
 #include "Soundengine/DSPAudio/MdDrum.h" // LX_UMA: the drum machines' names
@@ -329,6 +332,55 @@ const Name valueNames[NUM_NAMES] =
 		{SHORT_UMA_OCT, CAT_OSC, LONG_UMA_OCTAVE},/*TEXT_UMA_OCT*/
 		{SHORT_UMA_KEY, CAT_OSC, LONG_UMA_KEY},/*TEXT_UMA_KEY*/
 		{SHORT_UMA_SCALE, CAT_OSC, LONG_UMA_SCALE},/*TEXT_UMA_SCALE*/
+		{SHORT_1VOCT, CAT_MOD, LONG_1VOCT},/*TEXT_1VOCT*/
+		{SHORT_MORPH, CAT_SOUND, LONG_MORPH},/*TEXT_MORPH*/
+		{SHORT_UMA_LFO_FD_A, CAT_LFO, LONG_UMA_FOLD},/*TEXT_UMA_LFOA_FOLD*/
+		{SHORT_UMA_LFO_FD_B, CAT_UMA_LFO_B, LONG_UMA_FOLD},/*TEXT_UMA_LFOB_FOLD*/
+		{SHORT_UMA_LFO_FR_B, CAT_UMA_LFO_B, LONG_FREQ},/*TEXT_UMA_LFOB_FREQ*/
+		{SHORT_UMA_LFO_OF_B, CAT_UMA_LFO_B, LONG_OFFSET},/*TEXT_UMA_LFOB_OFS*/
+		{SHORT_UMA_LFO_RT_B, CAT_UMA_LFO_B, LONG_RETRIGGER},/*TEXT_UMA_LFOB_RTG*/
+		{SHORT_UMA_LFO_SN_B, CAT_UMA_LFO_B, LONG_CLOCKSYNC},/*TEXT_UMA_LFOB_SYNC*/
+		{SHORT_UMA_LFO_WV_B, CAT_UMA_LFO_B, LONG_WAVE},/*TEXT_UMA_LFOB_WAVE*/
+		{SHORT_UMA_T_ALGO, CAT_FM, LONG_UMA_ALGO},/*TEXT_UMA_T_ALGO*/
+		{SHORT_UMA_T_ATK_A, CAT_UMA_OP_A, LONG_ATTACK},/*TEXT_UMA_T_ATK_A*/
+		{SHORT_UMA_T_ATK_B, CAT_UMA_OP_B, LONG_ATTACK},/*TEXT_UMA_T_ATK_B*/
+		{SHORT_UMA_T_ATK_B2, CAT_UMA_OP_B2, LONG_ATTACK},/*TEXT_UMA_T_ATK_B2*/
+		{SHORT_UMA_T_DEC_A, CAT_UMA_OP_A, LONG_DECAY},/*TEXT_UMA_T_DEC_A*/
+		{SHORT_UMA_T_DEC_B, CAT_UMA_OP_B, LONG_DECAY},/*TEXT_UMA_T_DEC_B*/
+		{SHORT_UMA_T_DEC_B2, CAT_UMA_OP_B2, LONG_DECAY},/*TEXT_UMA_T_DEC_B2*/
+		{SHORT_UMA_T_END_A, CAT_UMA_OP_A, LONG_UMA_END},/*TEXT_UMA_T_END_A*/
+		{SHORT_UMA_T_END_B, CAT_UMA_OP_B, LONG_UMA_END},/*TEXT_UMA_T_END_B*/
+		{SHORT_UMA_T_END_B2, CAT_UMA_OP_B2, LONG_UMA_END},/*TEXT_UMA_T_END_B2*/
+		{SHORT_UMA_T_FEEDBACK, CAT_FM, LONG_UMA_FEEDBACK},/*TEXT_UMA_T_FEEDBACK*/
+		{SHORT_UMA_T_MD_PAL, CAT_UMA_RANDOM, LONG_UMA_PALETTE},/*TEXT_UMA_T_MD_PAL*/
+		{SHORT_UMA_T_MOD_A, CAT_UMA_OP_A, LONG_UMA_MOD},/*TEXT_UMA_T_MOD_A*/
+		{SHORT_UMA_T_MOD_B, CAT_UMA_OP_B, LONG_UMA_MOD},/*TEXT_UMA_T_MOD_B*/
+		{SHORT_UMA_MOD_B2, CAT_UMA_OP_B2, LONG_UMA_MOD},/*TEXT_UMA_T_MOD_B2*/
+		{SHORT_UMA_T_PRK_ALG, CAT_UMA_PRK, LONG_UMA_ALGO},/*TEXT_UMA_T_PRK_ALG*/
+		{SHORT_UMA_T_PRK_P1, CAT_UMA_PRK, LONG_UMA_PARAM1},/*TEXT_UMA_T_PRK_P1*/
+		{SHORT_UMA_T_PRK_P2, CAT_UMA_PRK, LONG_UMA_PARAM2},/*TEXT_UMA_T_PRK_P2*/
+		{SHORT_UMA_T_PRK_PAL, CAT_UMA_RANDOM, LONG_UMA_PALETTE},/*TEXT_UMA_T_PRK_PAL*/
+		{SHORT_UMA_T_PRK_VAR, CAT_UMA_PRK, LONG_UMA_VARIATION},/*TEXT_UMA_T_PRK_VAR*/
+		{SHORT_UMA_T_RATIO_A, CAT_UMA_OP_A, LONG_UMA_RATIO},/*TEXT_UMA_T_RATIO_A*/
+		{SHORT_UMA_T_RATIO_B, CAT_UMA_OP_B, LONG_UMA_RATIO},/*TEXT_UMA_T_RATIO_B*/
+		{SHORT_UMA_T_RND_ENV, CAT_UMA_RANDOM, LONG_UMA_ENV},/*TEXT_UMA_T_RND_ENV*/
+		{SHORT_UMA_T_RND_FINE, CAT_UMA_RANDOM, LONG_FINE},/*TEXT_UMA_T_RND_FINE*/
+		{SHORT_UMA_T_RND_SEED, CAT_UMA_RANDOM, LONG_UMA_SEED},/*TEXT_UMA_T_RND_SEED*/
+		{SHORT_UMA_T_RND_SWEEP, CAT_UMA_RANDOM, LONG_UMA_SWEEP},/*TEXT_UMA_T_RND_SWEEP*/
+		{SHORT_UMA_T_RND_TONE, CAT_UMA_RANDOM, LONG_TONE},/*TEXT_UMA_T_RND_TONE*/
+		{SHORT_UMA_VEL, CAT_VOICE, LONG_UMA_VELOCITY},/*TEXT_UMA_VEL*/
+		{SHORT_UMA_T_SLOT_AMT1, CAT_UMA_MOD_SLOT, LONG_UMA_AMOUNT1},/*TEXT_UMA_T_SLOT_AMT1*/
+		{SHORT_UMA_T_SLOT_AMT2, CAT_UMA_MOD_SLOT, LONG_UMA_AMOUNT2},/*TEXT_UMA_T_SLOT_AMT2*/
+		{SHORT_UMA_T_SLOT_AMT3, CAT_UMA_MOD_SLOT, LONG_UMA_AMOUNT3},/*TEXT_UMA_T_SLOT_AMT3*/
+		{SHORT_UMA_T_SLOT_AMT4, CAT_UMA_MOD_SLOT, LONG_UMA_AMOUNT4},/*TEXT_UMA_T_SLOT_AMT4*/
+		{SHORT_UMA_T_SLOT_AMT5, CAT_UMA_MOD_SLOT, LONG_UMA_AMOUNT5},/*TEXT_UMA_T_SLOT_AMT5*/
+		{SHORT_UMA_T_SLOT_AMT6, CAT_UMA_MOD_SLOT, LONG_UMA_AMOUNT6},/*TEXT_UMA_T_SLOT_AMT6*/
+		{SHORT_UMA_T_SLOT_AMT7, CAT_UMA_MOD_SLOT, LONG_UMA_AMOUNT7},/*TEXT_UMA_T_SLOT_AMT7*/
+		{SHORT_UMA_T_SLOT_AMT8, CAT_UMA_MOD_SLOT, LONG_UMA_AMOUNT8},/*TEXT_UMA_T_SLOT_AMT8*/
+		{SHORT_SRC, CAT_MOD, LONG_SRC},/*TEXT_CV_SRC*/
+		{SHORT_AMNT, CAT_MOD, LONG_AMOUNT},/*TEXT_CV_AMT*/
+		{SHORT_DEST, CAT_MOD, LONG_DEST_PARAM},/*TEXT_CV_DEST*/
+		{SHORT_UMA_SLOT_POL, CAT_MOD, LONG_UMA_POLARITY},/*TEXT_UMA_SLOT_POL*/
 };
 
 //---------------------------------------------------------------
@@ -866,96 +918,96 @@ const enum Datatypes PROGMEM parameter_dtypes[PAR_UMA_END] = {	// LX_UMA: + the 
 		/*PAR_UMA_LFOB6_OFS*/	DTYPE_0B127,
 		/*PAR_UMA_LFOB6_WAVE*/	DTYPE_0B127,
 		/*PAR_UMA_LFOB6_RTG*/	DTYPE_MENU | (MENU_RETRIGGER<<8),
-		/*PAR_UMA_MS1_4_SRC*/	DTYPE_0B255 /*LX_UMA: a mod slot source, Phase 3*/,
+		/*PAR_UMA_MS1_4_SRC*/	DTYPE_MENU | (MENU_UMA_SRC<<8),
 		/*PAR_UMA_MS1_4_AMT*/	DTYPE_0B100,
-		/*PAR_UMA_MS1_4_DEST*/	DTYPE_0B255 /*LX_UMA: a mod slot target, Phase 3*/,
-		/*PAR_UMA_MS1_5_SRC*/	DTYPE_0B255 /*LX_UMA: a mod slot source, Phase 3*/,
+		/*PAR_UMA_MS1_4_DEST*/	DTYPE_UMA_TARGET,
+		/*PAR_UMA_MS1_5_SRC*/	DTYPE_MENU | (MENU_UMA_SRC<<8),
 		/*PAR_UMA_MS1_5_AMT*/	DTYPE_0B100,
-		/*PAR_UMA_MS1_5_DEST*/	DTYPE_0B255 /*LX_UMA: a mod slot target, Phase 3*/,
-		/*PAR_UMA_MS1_6_SRC*/	DTYPE_0B255 /*LX_UMA: a mod slot source, Phase 3*/,
+		/*PAR_UMA_MS1_5_DEST*/	DTYPE_UMA_TARGET,
+		/*PAR_UMA_MS1_6_SRC*/	DTYPE_MENU | (MENU_UMA_SRC<<8),
 		/*PAR_UMA_MS1_6_AMT*/	DTYPE_0B100,
-		/*PAR_UMA_MS1_6_DEST*/	DTYPE_0B255 /*LX_UMA: a mod slot target, Phase 3*/,
-		/*PAR_UMA_MS1_7_SRC*/	DTYPE_0B255 /*LX_UMA: a mod slot source, Phase 3*/,
+		/*PAR_UMA_MS1_6_DEST*/	DTYPE_UMA_TARGET,
+		/*PAR_UMA_MS1_7_SRC*/	DTYPE_MENU | (MENU_UMA_SRC<<8),
 		/*PAR_UMA_MS1_7_AMT*/	DTYPE_0B100,
-		/*PAR_UMA_MS1_7_DEST*/	DTYPE_0B255 /*LX_UMA: a mod slot target, Phase 3*/,
-		/*PAR_UMA_MS1_8_SRC*/	DTYPE_0B255 /*LX_UMA: a mod slot source, Phase 3*/,
+		/*PAR_UMA_MS1_7_DEST*/	DTYPE_UMA_TARGET,
+		/*PAR_UMA_MS1_8_SRC*/	DTYPE_MENU | (MENU_UMA_SRC<<8),
 		/*PAR_UMA_MS1_8_AMT*/	DTYPE_0B100,
-		/*PAR_UMA_MS1_8_DEST*/	DTYPE_0B255 /*LX_UMA: a mod slot target, Phase 3*/,
-		/*PAR_UMA_MS2_4_SRC*/	DTYPE_0B255 /*LX_UMA: a mod slot source, Phase 3*/,
+		/*PAR_UMA_MS1_8_DEST*/	DTYPE_UMA_TARGET,
+		/*PAR_UMA_MS2_4_SRC*/	DTYPE_MENU | (MENU_UMA_SRC<<8),
 		/*PAR_UMA_MS2_4_AMT*/	DTYPE_0B100,
-		/*PAR_UMA_MS2_4_DEST*/	DTYPE_0B255 /*LX_UMA: a mod slot target, Phase 3*/,
-		/*PAR_UMA_MS2_5_SRC*/	DTYPE_0B255 /*LX_UMA: a mod slot source, Phase 3*/,
+		/*PAR_UMA_MS2_4_DEST*/	DTYPE_UMA_TARGET,
+		/*PAR_UMA_MS2_5_SRC*/	DTYPE_MENU | (MENU_UMA_SRC<<8),
 		/*PAR_UMA_MS2_5_AMT*/	DTYPE_0B100,
-		/*PAR_UMA_MS2_5_DEST*/	DTYPE_0B255 /*LX_UMA: a mod slot target, Phase 3*/,
-		/*PAR_UMA_MS2_6_SRC*/	DTYPE_0B255 /*LX_UMA: a mod slot source, Phase 3*/,
+		/*PAR_UMA_MS2_5_DEST*/	DTYPE_UMA_TARGET,
+		/*PAR_UMA_MS2_6_SRC*/	DTYPE_MENU | (MENU_UMA_SRC<<8),
 		/*PAR_UMA_MS2_6_AMT*/	DTYPE_0B100,
-		/*PAR_UMA_MS2_6_DEST*/	DTYPE_0B255 /*LX_UMA: a mod slot target, Phase 3*/,
-		/*PAR_UMA_MS2_7_SRC*/	DTYPE_0B255 /*LX_UMA: a mod slot source, Phase 3*/,
+		/*PAR_UMA_MS2_6_DEST*/	DTYPE_UMA_TARGET,
+		/*PAR_UMA_MS2_7_SRC*/	DTYPE_MENU | (MENU_UMA_SRC<<8),
 		/*PAR_UMA_MS2_7_AMT*/	DTYPE_0B100,
-		/*PAR_UMA_MS2_7_DEST*/	DTYPE_0B255 /*LX_UMA: a mod slot target, Phase 3*/,
-		/*PAR_UMA_MS2_8_SRC*/	DTYPE_0B255 /*LX_UMA: a mod slot source, Phase 3*/,
+		/*PAR_UMA_MS2_7_DEST*/	DTYPE_UMA_TARGET,
+		/*PAR_UMA_MS2_8_SRC*/	DTYPE_MENU | (MENU_UMA_SRC<<8),
 		/*PAR_UMA_MS2_8_AMT*/	DTYPE_0B100,
-		/*PAR_UMA_MS2_8_DEST*/	DTYPE_0B255 /*LX_UMA: a mod slot target, Phase 3*/,
-		/*PAR_UMA_MS3_4_SRC*/	DTYPE_0B255 /*LX_UMA: a mod slot source, Phase 3*/,
+		/*PAR_UMA_MS2_8_DEST*/	DTYPE_UMA_TARGET,
+		/*PAR_UMA_MS3_4_SRC*/	DTYPE_MENU | (MENU_UMA_SRC<<8),
 		/*PAR_UMA_MS3_4_AMT*/	DTYPE_0B100,
-		/*PAR_UMA_MS3_4_DEST*/	DTYPE_0B255 /*LX_UMA: a mod slot target, Phase 3*/,
-		/*PAR_UMA_MS3_5_SRC*/	DTYPE_0B255 /*LX_UMA: a mod slot source, Phase 3*/,
+		/*PAR_UMA_MS3_4_DEST*/	DTYPE_UMA_TARGET,
+		/*PAR_UMA_MS3_5_SRC*/	DTYPE_MENU | (MENU_UMA_SRC<<8),
 		/*PAR_UMA_MS3_5_AMT*/	DTYPE_0B100,
-		/*PAR_UMA_MS3_5_DEST*/	DTYPE_0B255 /*LX_UMA: a mod slot target, Phase 3*/,
-		/*PAR_UMA_MS3_6_SRC*/	DTYPE_0B255 /*LX_UMA: a mod slot source, Phase 3*/,
+		/*PAR_UMA_MS3_5_DEST*/	DTYPE_UMA_TARGET,
+		/*PAR_UMA_MS3_6_SRC*/	DTYPE_MENU | (MENU_UMA_SRC<<8),
 		/*PAR_UMA_MS3_6_AMT*/	DTYPE_0B100,
-		/*PAR_UMA_MS3_6_DEST*/	DTYPE_0B255 /*LX_UMA: a mod slot target, Phase 3*/,
-		/*PAR_UMA_MS3_7_SRC*/	DTYPE_0B255 /*LX_UMA: a mod slot source, Phase 3*/,
+		/*PAR_UMA_MS3_6_DEST*/	DTYPE_UMA_TARGET,
+		/*PAR_UMA_MS3_7_SRC*/	DTYPE_MENU | (MENU_UMA_SRC<<8),
 		/*PAR_UMA_MS3_7_AMT*/	DTYPE_0B100,
-		/*PAR_UMA_MS3_7_DEST*/	DTYPE_0B255 /*LX_UMA: a mod slot target, Phase 3*/,
-		/*PAR_UMA_MS3_8_SRC*/	DTYPE_0B255 /*LX_UMA: a mod slot source, Phase 3*/,
+		/*PAR_UMA_MS3_7_DEST*/	DTYPE_UMA_TARGET,
+		/*PAR_UMA_MS3_8_SRC*/	DTYPE_MENU | (MENU_UMA_SRC<<8),
 		/*PAR_UMA_MS3_8_AMT*/	DTYPE_0B100,
-		/*PAR_UMA_MS3_8_DEST*/	DTYPE_0B255 /*LX_UMA: a mod slot target, Phase 3*/,
-		/*PAR_UMA_MS4_4_SRC*/	DTYPE_0B255 /*LX_UMA: a mod slot source, Phase 3*/,
+		/*PAR_UMA_MS3_8_DEST*/	DTYPE_UMA_TARGET,
+		/*PAR_UMA_MS4_4_SRC*/	DTYPE_MENU | (MENU_UMA_SRC<<8),
 		/*PAR_UMA_MS4_4_AMT*/	DTYPE_0B100,
-		/*PAR_UMA_MS4_4_DEST*/	DTYPE_0B255 /*LX_UMA: a mod slot target, Phase 3*/,
-		/*PAR_UMA_MS4_5_SRC*/	DTYPE_0B255 /*LX_UMA: a mod slot source, Phase 3*/,
+		/*PAR_UMA_MS4_4_DEST*/	DTYPE_UMA_TARGET,
+		/*PAR_UMA_MS4_5_SRC*/	DTYPE_MENU | (MENU_UMA_SRC<<8),
 		/*PAR_UMA_MS4_5_AMT*/	DTYPE_0B100,
-		/*PAR_UMA_MS4_5_DEST*/	DTYPE_0B255 /*LX_UMA: a mod slot target, Phase 3*/,
-		/*PAR_UMA_MS4_6_SRC*/	DTYPE_0B255 /*LX_UMA: a mod slot source, Phase 3*/,
+		/*PAR_UMA_MS4_5_DEST*/	DTYPE_UMA_TARGET,
+		/*PAR_UMA_MS4_6_SRC*/	DTYPE_MENU | (MENU_UMA_SRC<<8),
 		/*PAR_UMA_MS4_6_AMT*/	DTYPE_0B100,
-		/*PAR_UMA_MS4_6_DEST*/	DTYPE_0B255 /*LX_UMA: a mod slot target, Phase 3*/,
-		/*PAR_UMA_MS4_7_SRC*/	DTYPE_0B255 /*LX_UMA: a mod slot source, Phase 3*/,
+		/*PAR_UMA_MS4_6_DEST*/	DTYPE_UMA_TARGET,
+		/*PAR_UMA_MS4_7_SRC*/	DTYPE_MENU | (MENU_UMA_SRC<<8),
 		/*PAR_UMA_MS4_7_AMT*/	DTYPE_0B100,
-		/*PAR_UMA_MS4_7_DEST*/	DTYPE_0B255 /*LX_UMA: a mod slot target, Phase 3*/,
-		/*PAR_UMA_MS4_8_SRC*/	DTYPE_0B255 /*LX_UMA: a mod slot source, Phase 3*/,
+		/*PAR_UMA_MS4_7_DEST*/	DTYPE_UMA_TARGET,
+		/*PAR_UMA_MS4_8_SRC*/	DTYPE_MENU | (MENU_UMA_SRC<<8),
 		/*PAR_UMA_MS4_8_AMT*/	DTYPE_0B100,
-		/*PAR_UMA_MS4_8_DEST*/	DTYPE_0B255 /*LX_UMA: a mod slot target, Phase 3*/,
-		/*PAR_UMA_MS5_4_SRC*/	DTYPE_0B255 /*LX_UMA: a mod slot source, Phase 3*/,
+		/*PAR_UMA_MS4_8_DEST*/	DTYPE_UMA_TARGET,
+		/*PAR_UMA_MS5_4_SRC*/	DTYPE_MENU | (MENU_UMA_SRC<<8),
 		/*PAR_UMA_MS5_4_AMT*/	DTYPE_0B100,
-		/*PAR_UMA_MS5_4_DEST*/	DTYPE_0B255 /*LX_UMA: a mod slot target, Phase 3*/,
-		/*PAR_UMA_MS5_5_SRC*/	DTYPE_0B255 /*LX_UMA: a mod slot source, Phase 3*/,
+		/*PAR_UMA_MS5_4_DEST*/	DTYPE_UMA_TARGET,
+		/*PAR_UMA_MS5_5_SRC*/	DTYPE_MENU | (MENU_UMA_SRC<<8),
 		/*PAR_UMA_MS5_5_AMT*/	DTYPE_0B100,
-		/*PAR_UMA_MS5_5_DEST*/	DTYPE_0B255 /*LX_UMA: a mod slot target, Phase 3*/,
-		/*PAR_UMA_MS5_6_SRC*/	DTYPE_0B255 /*LX_UMA: a mod slot source, Phase 3*/,
+		/*PAR_UMA_MS5_5_DEST*/	DTYPE_UMA_TARGET,
+		/*PAR_UMA_MS5_6_SRC*/	DTYPE_MENU | (MENU_UMA_SRC<<8),
 		/*PAR_UMA_MS5_6_AMT*/	DTYPE_0B100,
-		/*PAR_UMA_MS5_6_DEST*/	DTYPE_0B255 /*LX_UMA: a mod slot target, Phase 3*/,
-		/*PAR_UMA_MS5_7_SRC*/	DTYPE_0B255 /*LX_UMA: a mod slot source, Phase 3*/,
+		/*PAR_UMA_MS5_6_DEST*/	DTYPE_UMA_TARGET,
+		/*PAR_UMA_MS5_7_SRC*/	DTYPE_MENU | (MENU_UMA_SRC<<8),
 		/*PAR_UMA_MS5_7_AMT*/	DTYPE_0B100,
-		/*PAR_UMA_MS5_7_DEST*/	DTYPE_0B255 /*LX_UMA: a mod slot target, Phase 3*/,
-		/*PAR_UMA_MS5_8_SRC*/	DTYPE_0B255 /*LX_UMA: a mod slot source, Phase 3*/,
+		/*PAR_UMA_MS5_7_DEST*/	DTYPE_UMA_TARGET,
+		/*PAR_UMA_MS5_8_SRC*/	DTYPE_MENU | (MENU_UMA_SRC<<8),
 		/*PAR_UMA_MS5_8_AMT*/	DTYPE_0B100,
-		/*PAR_UMA_MS5_8_DEST*/	DTYPE_0B255 /*LX_UMA: a mod slot target, Phase 3*/,
-		/*PAR_UMA_MS6_4_SRC*/	DTYPE_0B255 /*LX_UMA: a mod slot source, Phase 3*/,
+		/*PAR_UMA_MS5_8_DEST*/	DTYPE_UMA_TARGET,
+		/*PAR_UMA_MS6_4_SRC*/	DTYPE_MENU | (MENU_UMA_SRC<<8),
 		/*PAR_UMA_MS6_4_AMT*/	DTYPE_0B100,
-		/*PAR_UMA_MS6_4_DEST*/	DTYPE_0B255 /*LX_UMA: a mod slot target, Phase 3*/,
-		/*PAR_UMA_MS6_5_SRC*/	DTYPE_0B255 /*LX_UMA: a mod slot source, Phase 3*/,
+		/*PAR_UMA_MS6_4_DEST*/	DTYPE_UMA_TARGET,
+		/*PAR_UMA_MS6_5_SRC*/	DTYPE_MENU | (MENU_UMA_SRC<<8),
 		/*PAR_UMA_MS6_5_AMT*/	DTYPE_0B100,
-		/*PAR_UMA_MS6_5_DEST*/	DTYPE_0B255 /*LX_UMA: a mod slot target, Phase 3*/,
-		/*PAR_UMA_MS6_6_SRC*/	DTYPE_0B255 /*LX_UMA: a mod slot source, Phase 3*/,
+		/*PAR_UMA_MS6_5_DEST*/	DTYPE_UMA_TARGET,
+		/*PAR_UMA_MS6_6_SRC*/	DTYPE_MENU | (MENU_UMA_SRC<<8),
 		/*PAR_UMA_MS6_6_AMT*/	DTYPE_0B100,
-		/*PAR_UMA_MS6_6_DEST*/	DTYPE_0B255 /*LX_UMA: a mod slot target, Phase 3*/,
-		/*PAR_UMA_MS6_7_SRC*/	DTYPE_0B255 /*LX_UMA: a mod slot source, Phase 3*/,
+		/*PAR_UMA_MS6_6_DEST*/	DTYPE_UMA_TARGET,
+		/*PAR_UMA_MS6_7_SRC*/	DTYPE_MENU | (MENU_UMA_SRC<<8),
 		/*PAR_UMA_MS6_7_AMT*/	DTYPE_0B100,
-		/*PAR_UMA_MS6_7_DEST*/	DTYPE_0B255 /*LX_UMA: a mod slot target, Phase 3*/,
-		/*PAR_UMA_MS6_8_SRC*/	DTYPE_0B255 /*LX_UMA: a mod slot source, Phase 3*/,
+		/*PAR_UMA_MS6_7_DEST*/	DTYPE_UMA_TARGET,
+		/*PAR_UMA_MS6_8_SRC*/	DTYPE_MENU | (MENU_UMA_SRC<<8),
 		/*PAR_UMA_MS6_8_AMT*/	DTYPE_0B100,
-		/*PAR_UMA_MS6_8_DEST*/	DTYPE_0B255 /*LX_UMA: a mod slot target, Phase 3*/,
+		/*PAR_UMA_MS6_8_DEST*/	DTYPE_UMA_TARGET,
 		/*PAR_UMA_FINE_A1*/	DTYPE_PM63,
 		/*PAR_UMA_FINE_B1*/	DTYPE_PM63,
 		/*PAR_UMA_FINE_A2*/	DTYPE_PM63,
@@ -1493,6 +1545,67 @@ const enum Datatypes PROGMEM parameter_dtypes[PAR_UMA_END] = {	// LX_UMA: + the 
 		/*PAR_UMA_PLA_SBF4*/	DTYPE_0B127,
 		/*PAR_UMA_PLA_SBF5*/	DTYPE_0B127,
 		/*PAR_UMA_PLA_SBF6*/	DTYPE_0B127,
+		// LX_UMA desktop only: mod slots 1-3 of each voice, v/o
+		/*PAR_UMA_DSK_MS1_1_SRC*/	DTYPE_MENU | (MENU_UMA_SRC<<8),
+		/*PAR_UMA_DSK_MS1_1_AMT*/	DTYPE_0B100,
+		/*PAR_UMA_DSK_MS1_1_DEST*/	DTYPE_UMA_TARGET,
+		/*PAR_UMA_DSK_MS1_2_SRC*/	DTYPE_MENU | (MENU_UMA_SRC<<8),
+		/*PAR_UMA_DSK_MS1_2_AMT*/	DTYPE_0B100,
+		/*PAR_UMA_DSK_MS1_2_DEST*/	DTYPE_UMA_TARGET,
+		/*PAR_UMA_DSK_MS1_3_SRC*/	DTYPE_MENU | (MENU_UMA_SRC<<8),
+		/*PAR_UMA_DSK_MS1_3_AMT*/	DTYPE_0B100,
+		/*PAR_UMA_DSK_MS1_3_DEST*/	DTYPE_UMA_TARGET,
+		/*PAR_UMA_DSK_MS2_1_SRC*/	DTYPE_MENU | (MENU_UMA_SRC<<8),
+		/*PAR_UMA_DSK_MS2_1_AMT*/	DTYPE_0B100,
+		/*PAR_UMA_DSK_MS2_1_DEST*/	DTYPE_UMA_TARGET,
+		/*PAR_UMA_DSK_MS2_2_SRC*/	DTYPE_MENU | (MENU_UMA_SRC<<8),
+		/*PAR_UMA_DSK_MS2_2_AMT*/	DTYPE_0B100,
+		/*PAR_UMA_DSK_MS2_2_DEST*/	DTYPE_UMA_TARGET,
+		/*PAR_UMA_DSK_MS2_3_SRC*/	DTYPE_MENU | (MENU_UMA_SRC<<8),
+		/*PAR_UMA_DSK_MS2_3_AMT*/	DTYPE_0B100,
+		/*PAR_UMA_DSK_MS2_3_DEST*/	DTYPE_UMA_TARGET,
+		/*PAR_UMA_DSK_MS3_1_SRC*/	DTYPE_MENU | (MENU_UMA_SRC<<8),
+		/*PAR_UMA_DSK_MS3_1_AMT*/	DTYPE_0B100,
+		/*PAR_UMA_DSK_MS3_1_DEST*/	DTYPE_UMA_TARGET,
+		/*PAR_UMA_DSK_MS3_2_SRC*/	DTYPE_MENU | (MENU_UMA_SRC<<8),
+		/*PAR_UMA_DSK_MS3_2_AMT*/	DTYPE_0B100,
+		/*PAR_UMA_DSK_MS3_2_DEST*/	DTYPE_UMA_TARGET,
+		/*PAR_UMA_DSK_MS3_3_SRC*/	DTYPE_MENU | (MENU_UMA_SRC<<8),
+		/*PAR_UMA_DSK_MS3_3_AMT*/	DTYPE_0B100,
+		/*PAR_UMA_DSK_MS3_3_DEST*/	DTYPE_UMA_TARGET,
+		/*PAR_UMA_DSK_MS4_1_SRC*/	DTYPE_MENU | (MENU_UMA_SRC<<8),
+		/*PAR_UMA_DSK_MS4_1_AMT*/	DTYPE_0B100,
+		/*PAR_UMA_DSK_MS4_1_DEST*/	DTYPE_UMA_TARGET,
+		/*PAR_UMA_DSK_MS4_2_SRC*/	DTYPE_MENU | (MENU_UMA_SRC<<8),
+		/*PAR_UMA_DSK_MS4_2_AMT*/	DTYPE_0B100,
+		/*PAR_UMA_DSK_MS4_2_DEST*/	DTYPE_UMA_TARGET,
+		/*PAR_UMA_DSK_MS4_3_SRC*/	DTYPE_MENU | (MENU_UMA_SRC<<8),
+		/*PAR_UMA_DSK_MS4_3_AMT*/	DTYPE_0B100,
+		/*PAR_UMA_DSK_MS4_3_DEST*/	DTYPE_UMA_TARGET,
+		/*PAR_UMA_DSK_MS5_1_SRC*/	DTYPE_MENU | (MENU_UMA_SRC<<8),
+		/*PAR_UMA_DSK_MS5_1_AMT*/	DTYPE_0B100,
+		/*PAR_UMA_DSK_MS5_1_DEST*/	DTYPE_UMA_TARGET,
+		/*PAR_UMA_DSK_MS5_2_SRC*/	DTYPE_MENU | (MENU_UMA_SRC<<8),
+		/*PAR_UMA_DSK_MS5_2_AMT*/	DTYPE_0B100,
+		/*PAR_UMA_DSK_MS5_2_DEST*/	DTYPE_UMA_TARGET,
+		/*PAR_UMA_DSK_MS5_3_SRC*/	DTYPE_MENU | (MENU_UMA_SRC<<8),
+		/*PAR_UMA_DSK_MS5_3_AMT*/	DTYPE_0B100,
+		/*PAR_UMA_DSK_MS5_3_DEST*/	DTYPE_UMA_TARGET,
+		/*PAR_UMA_DSK_MS6_1_SRC*/	DTYPE_MENU | (MENU_UMA_SRC<<8),
+		/*PAR_UMA_DSK_MS6_1_AMT*/	DTYPE_0B100,
+		/*PAR_UMA_DSK_MS6_1_DEST*/	DTYPE_UMA_TARGET,
+		/*PAR_UMA_DSK_MS6_2_SRC*/	DTYPE_MENU | (MENU_UMA_SRC<<8),
+		/*PAR_UMA_DSK_MS6_2_AMT*/	DTYPE_0B100,
+		/*PAR_UMA_DSK_MS6_2_DEST*/	DTYPE_UMA_TARGET,
+		/*PAR_UMA_DSK_MS6_3_SRC*/	DTYPE_MENU | (MENU_UMA_SRC<<8),
+		/*PAR_UMA_DSK_MS6_3_AMT*/	DTYPE_0B100,
+		/*PAR_UMA_DSK_MS6_3_DEST*/	DTYPE_UMA_TARGET,
+		/*PAR_UMA_DSK_VOCT1*/	DTYPE_0B127,
+		/*PAR_UMA_DSK_VOCT2*/	DTYPE_0B127,
+		/*PAR_UMA_DSK_VOCT3*/	DTYPE_0B127,
+		/*PAR_UMA_DSK_VOCT4*/	DTYPE_0B127,
+		/*PAR_UMA_DSK_VOCT5*/	DTYPE_0B127,
+		/*PAR_UMA_DSK_VOCT6*/	DTYPE_0B127,
 };
 
 
@@ -1981,6 +2094,45 @@ static void menu_umaShortValue(uint16_t p, uint8_t v, char* valueAsText)
 	}
 }
 
+
+// LX_UMA (from the Eurorack's menu.c): a mod slot's target, an index into its voice's list (umaModTargets.c). The other
+// engine's targets are kept but marked: "*" for the first letter, and "lxr only" / "fm only" on the edit screen
+static void menu_displaySlotTargetFull(uint16_t parNr, uint8_t idx)
+{
+	const uint8_t voice = (uint8_t)(modSlot_ofDest(parNr) / MOD_SLOTS_PER_VOICE);
+	const uint16_t nameidx = umaTgt_nameIdx(voice, idx);
+	if(nameidx == TEXT_EMPTY) {
+		strcpy(&editDisplayBuffer[1][0],menuText_off);
+		return;
+	}
+	strcpy(&editDisplayBuffer[1][0], (const char PROGMEM *)(&catNames[pgm_read_byte(&valueNames[nameidx].category)]));
+	strcpy(&editDisplayBuffer[1][8], (const char PROGMEM *)(&longNames[pgm_read_byte(&valueNames[nameidx].longName)]));
+	if(voice < 6 && menu_umaMdKnob(nameidx) >= 0)
+	{
+		// the drum-machine engine's knob: what it is on the voice's machine ("Knob 3" -> "k3 RAMP")
+		const char* n = mdDrum_controlName(menu_umaMdMachine(voice), (uint8_t)menu_umaMdKnob(nameidx));
+		snprintf(&editDisplayBuffer[1][8], 9, "k%d %s", menu_umaMdKnob(nameidx) + 1, n[0] ? n : "-");
+	}
+	if(!umaTgt_isActive(voice, idx))
+	{
+		memset(&editDisplayBuffer[0][8], ' ', 8);
+		memcpy(&editDisplayBuffer[0][8], umaTgt_engineNote(umaTgt_engineTag(voice, idx)), 8);
+	}
+}
+
+static void menu_displaySlotTargetShort(uint16_t parNr, uint8_t idx, char *valueAsText)
+{
+	const uint8_t voice = (uint8_t)(modSlot_ofDest(parNr) / MOD_SLOTS_PER_VOICE);
+	const uint16_t nameidx = umaTgt_nameIdx(voice, idx);
+	if(nameidx == TEXT_EMPTY) {
+		memcpy(valueAsText,menuText_off,3);
+		return;
+	}
+	memcpy(valueAsText, shortNames[pgm_read_byte(&valueNames[nameidx].shortName)], 3);
+	if(!umaTgt_isActive(voice, idx))
+		valueAsText[0] = '*';
+}
+
 // the edit screen's 2nd line for UMA settings that have names: the drum machine's type, machine, and each knob by
 // the machine's own name (from the Eurorack's menu_umaEditValue)
 static void menu_umaEditValue(uint16_t p, uint8_t v)
@@ -1988,7 +2140,10 @@ static void menu_umaEditValue(uint16_t p, uint8_t v)
 	char t[24];
 	t[0] = 0;
 	uint8_t wv, wk;
-	if(umaVoice_ofEngine(p) != 0xff)
+	uint8_t slotField;
+	if(modSlot_of(p, &slotField) != 0xff && slotField == 0)
+		umaTgt_sourceName(v, t, sizeof(t));	// a slot's source in full: "LFO A Drum2", "Env Cymbl"
+	else if(umaVoice_ofEngine(p) != 0xff)
 	{
 		// the engine by name (the snare, cymbal, hi-hat store lxr prk mdk pla as 0 1 2 3)
 		const uint8_t e = umaVoice_ofEngine(p) < 3 ? v : v == 1 ? 3 : v == 2 ? 4 : v == 3 ? 5 : 0;
@@ -2041,6 +2196,23 @@ static void menu_umaEditValue(uint16_t p, uint8_t v)
 // after a UMA setting was changed by the encoder (dir +1 / -1) or a pot (dir 0)
 static void menu_umaAfterEdit(uint16_t paramNr, int8_t dir)
 {
+	// a mod slot: a source the desktop has (the Eurorack's cv, accent and MIDI CC places are skipped), then its target
+	uint8_t slotField;
+	const uint8_t slot = modSlot_of(paramNr, &slotField);
+	if(slot != 0xff)
+	{
+		if(slotField == 0 && !umaModMx_sourceExists(activeParameters[paramNr]))
+		{
+			int16_t v = activeParameters[paramNr];
+			const int8_t d = dir < 0 ? -1 : 1;
+			while(v >= 0 && v < UMA_NUM_MOD_SOURCES && !umaModMx_sourceExists((uint8_t)v)) v += d;
+			if(v < 0 || v >= UMA_NUM_MOD_SOURCES)	// none that way: the nearest the other way
+				for(v = activeParameters[paramNr]; v >= 0 && v < UMA_NUM_MOD_SOURCES && !umaModMx_sourceExists((uint8_t)v); v -= d) {}
+			activeParameters[paramNr] = (uint8_t)(v < 0 ? 5 : v >= UMA_NUM_MOD_SOURCES ? 5 : v);
+		}
+		modNode_setDestination(&cvModulators[slot], umaTgt_slotParam(slot));
+		return;
+	}
 	// an engine setting: prk (Drum 1-3: 3, the snare ...: 1) isn't on the desktop, step over it
 	const uint8_t engVoice = umaVoice_ofEngine(paramNr);
 	if(engVoice < 3 && activeParameters[paramNr] == UMA_ENG_PRK)
@@ -2103,8 +2275,25 @@ static const Page* menu_umaExtraScreen(uint8_t page, uint8_t sub, uint8_t n)
 	return n == own ? &umaPitchPages[voice] : 0;
 }
 
+// the mod view (SHIFT + select 7, 0.3a): a voice page shows its mod slots, select 1-8 = slot 1-8
+static uint8_t menu_umaModView;
+void menu_umaModViewToggle(void)
+{
+	menu_umaModView = !menu_umaModView;
+	menu_umaThird = 0;
+	menuIndex = 0;	// slot 1
+	editModeActive = 0;
+	menu_repaintAll();
+}
+uint8_t menu_umaModViewOn(void)
+{
+	return menu_umaModView && menu_activePage <= VOICE7_PAGE;
+}
+
 const Page* menu_getPage(uint8_t page, uint8_t sub)
 {
+	if(menu_umaModView && page <= VOICE7_PAGE && sub < 8)
+		return &umaModPages[menu_umaVoiceOf(page)][sub];
 	if(menu_umaThird && menu_umaThirdPage == page && menu_umaThirdSub == sub)
 	{
 		const Page* extra = menu_umaExtraScreen(page, sub, (uint8_t)(menu_umaThird - 1));
@@ -2796,6 +2985,9 @@ void menu_repaintGeneric()
 			//Bottom row -> parameter value (set below)
 			switch(parameter_dtypes[parNr] & 0xFF)
 			{
+			case DTYPE_UMA_TARGET:	// LX_UMA: a mod slot's target in full
+				menu_displaySlotTargetFull(parNr, curParmVal);
+				break;
 			case DTYPE_TARGET_SELECTION_VELO: //switch(parameters_dtypes[parNr] & 0x0F)
 			case DTYPE_TARGET_SELECTION_LFO:
 				//**LFO **VELO edit mode - display the full target (Cat and long name)
@@ -2925,6 +3117,8 @@ void menu_repaintGeneric()
 		//check if scroll sign needs to be shown
 		uint8_t showScrollSign = checkScrollSign(activePage, activeParameter);
 		editDisplayBuffer[0][15] = showScrollSign;
+		if(menu_umaModViewOn())
+			editDisplayBuffer[0][15] = (char)('1' + activePage);	// LX_UMA: the mod view: the slot
 
 		// bottom values
 
@@ -2942,6 +3136,9 @@ void menu_repaintGeneric()
 			} else { //not if(parNr==PAR_NONE)
 
 				switch(parameter_dtypes[parNr] & 0xFF) {
+				case DTYPE_UMA_TARGET:	// LX_UMA: a mod slot's target, short
+					menu_displaySlotTargetShort(parNr, curParmVal, valueAsText);
+					break;
 				case DTYPE_TARGET_SELECTION_VELO: //switch(parameters[parNr].dtype&0x0F)
 				case DTYPE_TARGET_SELECTION_LFO: //switch(parameters[parNr].dtype&0x0F)
 					//**LFO **VELO non-edit mode display short name with no numeric prefix
@@ -3863,6 +4060,10 @@ static uint8_t getMaxEntriesForMenu(uint8_t menuId)
 		return UMA_QUANT_KEYS;
 	case MENU_UMA_SCALE:
 		return UMA_QUANT_SCALES;
+	case MENU_UMA_SRC:
+		return umaSrcNames[0][0];
+	case MENU_UMA_POL:
+		return umaPolNames[0][0];
 	case MENU_FILTER:
 		return filterTypes[0][0];
 	case MENU_SYNC_RATES:
@@ -4009,6 +4210,12 @@ static void getMenuItemNameForValue(const uint8_t menuId, const uint8_t curParmV
 		break;
 	case MENU_UMA_SCALE:
 		p = umaQuant_scaleShort(curParmVal);
+		break;
+	case MENU_UMA_SRC:
+		p = umaSrcNames[curParmVal < umaSrcNames[0][0] ? curParmVal + 1 : 1];
+		break;
+	case MENU_UMA_POL:
+		p = umaPolNames[curParmVal ? 2 : 1];
 		break;
 	case MENU_FILTER:
 		p = filterTypes[curParmVal + 1];
@@ -4229,6 +4436,7 @@ static void menu_encoderChangeParameter(int8_t inc)
 	uint8_t *paramValue;
 
 	paramValue = &activeParameters[paramNr];
+	const uint8_t umaOld = *paramValue;	// LX_UMA: a slot target steps from its old value
 
 	//increase parameter value
 	if(inc>0) //positive increase
@@ -4248,6 +4456,9 @@ static void menu_encoderChangeParameter(int8_t inc)
 
 	switch(parameter_dtypes[paramNr] & 0xFF)
 	{
+	case DTYPE_UMA_TARGET:	// LX_UMA: an index into the voice's own target list; step over other engines' entries
+		*paramValue = umaTgt_step((uint8_t)(modSlot_ofDest(paramNr) / MOD_SLOTS_PER_VOICE), umaOld, inc);
+		break;
 	case DTYPE_TARGET_SELECTION_VELO: //parameter_dtypes[paramNr] & 0x0F
 	{
 		//**VELO encoder value limit to start and end of range for this voice
@@ -4628,6 +4839,8 @@ uint8_t menu_getSubPage()
 //-----------------------------------------------------------------
 void menu_switchPage(uint8_t pageNr)
 {
+	if(pageNr > VOICE7_PAGE)
+		menu_umaModView = 0;	// LX_UMA: the mod view is the voice pages' only
 	//autosave config page settings
 	/*
 	if(menu_activePage == MENU_MIDI_PAGE)
@@ -5144,6 +5357,8 @@ static uint8_t limitPotValue(int8_t diff, uint16_t paramNr)
 
 	switch(parameter_dtypes[paramNr] & 0xFF)
 	{
+	case DTYPE_UMA_TARGET:	// LX_UMA: a slot's target steps through its voice's list
+		return umaTgt_step((uint8_t)(modSlot_ofDest(paramNr) / MOD_SLOTS_PER_VOICE), originalValue, diff);
 	case DTYPE_TARGET_SELECTION_VELO:
 	case DTYPE_TARGET_SELECTION_LFO: {
 

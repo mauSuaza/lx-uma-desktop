@@ -12,6 +12,7 @@
 #include "uma_s7test.h" // UMA: test 0.0b
 #include "uma_sdreadtest.h" // UMA: test 0.1a
 #include "uma_kits.h" // LX_UMA: the kits' UMA records
+#include "uma_mod.h" // LX_UMA
 #include <stdio.h>
 #include <string.h>
 #include "fatfs.h"
@@ -1002,6 +1003,7 @@ lcd_process_display_interrupt = 1;
 	umaTest_sdReadTick(menu_umaLoadShown());	// test 0.1a: a kit read from the card twice a second
 #endif
 	umaKit_service();	// LX_UMA: the next kit's UMA record, before its pattern starts
+	umaMod_tick();	// LX_UMA: a drum's engine changed: its slots' targets follow
 
 	  //check if we have some usb midi messages and process them
 	  MidiMsg msg;

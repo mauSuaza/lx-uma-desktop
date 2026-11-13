@@ -13,8 +13,10 @@
 #include "Soundengine/Sequencer/sequencer.h"
 #include <string.h>
 #include "uma_random.h"
+#include "uma_mod.h"
 #include "uma_voice.h"
 #include "uma_quant.h"
+#include "Soundengine/modSlots.h"
 #include "Soundengine/DSPAudio/MdDrum.h"
 #include "Soundengine/DSPAudio/PlaitsDrum.h"
 
@@ -90,6 +92,21 @@ static void umaKit_phase2Defaults(uint8_t* rec)
 	}
 }
 
+// Phase 3's settings (record format 4): every slot off (amount 0) on its voice's LFO A, unipolar off, v/o 0
+#define UMA_SRC_LFOA_FIRST	5	// the Eurorack's source numbers: LFO A of Drum 1 (lf1)
+static void umaKit_phase3Defaults(uint8_t* rec)
+{
+	for(uint8_t s = 0; s < NUM_MOD_SLOTS; s++)
+	{
+		R(modSlot_src(s)) = (uint8_t)(UMA_SRC_LFOA_FIRST + s / MOD_SLOTS_PER_VOICE);
+		R(modSlot_amt(s)) = 0;
+		R(modSlot_dest(s)) = 0;
+		R(modSlot_pol(s)) = 0;
+	}
+	for(uint8_t v = 0; v < 6; v++)
+		R(UMA_DSK_VOCT_PAR + v) = 0;
+}
+
 // a new record: every drum on lxr, so a kit sounds as on the stock firmware; the rest a usable start when a drum is
 // set to an FM engine. The values are the Eurorack's (presetManager.c umaFm_kitDefaults, LX_UMA a179390); the other
 // engines' and modulation's defaults come with Phases 2 and 3.
@@ -135,6 +152,7 @@ static void umaKit_makeDefaults(uint8_t* rec)
 	for(uint8_t i = 0; i < 6; i++)
 		rec[PAR_UMA_FINE_A1 - PAR_UMA_BLOCK + i] = 63;	// fine ratios A and B exact
 	umaKit_phase2Defaults(rec);
+	umaKit_phase3Defaults(rec);
 }
 
 // a record read from a file: n bytes valid; anything not understood becomes the defaults
@@ -155,6 +173,8 @@ static void umaKit_check(uint8_t* rec, UINT n)
 	}
 	if(rec[UMA_REC_FORMAT] < 3)	// records from 0.1-0.2b: Phase 2's settings at their defaults
 		umaKit_phase2Defaults(rec);
+	if(rec[UMA_REC_FORMAT] < 4)	// records from 0.1-0.2: the mod slots and v/o at their defaults
+		umaKit_phase3Defaults(rec);
 	rec[UMA_REC_FORMAT] = UMA_KIT_FORMAT;
 }
 
@@ -201,6 +221,7 @@ void umaKit_onKitLoad(uint8_t kit)
 			memcpy(umaKit_active(), umaKit_next, UMA_KIT_BYTES);
 			umaKit_pending = UMA_KIT_NONE;
 			umaRnd_kitLoaded();	// loading never re-rolls: the loaded kit is the restore point
+			umaMod_kitLoaded();	// its mod slots' destinations
 		}
 		else
 			umaKit_pending = kit;	// umaKit_service reads it in a few ms
@@ -216,7 +237,10 @@ void umaKit_onKitLoad(uint8_t kit)
 	__enable_irq();
 	umaKit_irqOff(was);
 	if(took)
-		umaRnd_kitLoaded();	// loading never re-rolls: the loaded kit is the restore point
+		{
+			umaRnd_kitLoaded();	// loading never re-rolls: the loaded kit is the restore point
+			umaMod_kitLoaded();
+		}
 }
 
 void umaKit_store(uint8_t kit)
@@ -305,7 +329,10 @@ void umaKit_service(void)
 		__enable_irq();
 		umaKit_irqOff(was);
 		if(took)
-			umaRnd_kitLoaded();
+			{
+				umaRnd_kitLoaded();
+				umaMod_kitLoaded();
+			}
 		return;
 	}
 

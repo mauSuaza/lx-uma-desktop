@@ -529,6 +529,9 @@ static void buttonHandler_handleSelectButton(uint8_t buttonNr) {
 		switch (buttonHandler_stateMemory.selectButtonMode) {
 		case SELECT_MODE_STEP:
 		case SELECT_MODE_VOICE: {
+			// LX_UMA: SHIFT + select 7, a short press (a long one arms sub-step automation): the mod view on / off
+			if(buttonHandler_stateMemory.selectButtonMode == SELECT_MODE_VOICE && buttonNr == 6)
+				menu_umaModViewToggle();
 
 			//nothing to do here... no more substeps
 

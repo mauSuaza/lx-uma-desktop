@@ -7,7 +7,7 @@
 #define UMA_H_
 
 // version on the start-up screen and in the update file name (LXR_V2_UMA_V<version>.img, CMakeLists.txt)
-#define UMA_VERSION "0.2"	// release: every engine on every voice, envelopes, LPG, wavefolder, randomise, quantizer
+#define UMA_VERSION "0.3a"	// Phase 3 test build: the mod slots (LFO A, envelopes, velocity), the mod view
 
 // UMA's engines and settings (the Eurorack's flag: the copied code is written around it)
 #define UMA_FM 1

@@ -108,6 +108,7 @@ IN_ITCM_RAM float lfo_calc(Lfo *lfo)
 void lfo_dispatchNextValue(Lfo* lfo)
 {
 	float val = lfo_calc(lfo);
+	lfo->value = val;	// LX_UMA: LFO A as a mod matrix source
 	modNode_updateValue(&lfo->modTarget,val);
 }
 //-------------------------------------------------------------

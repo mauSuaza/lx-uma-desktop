@@ -81,6 +81,7 @@
 #define MENU_UMA_CVR	61	// UMA: --- / rst (reset)
 #define MENU_UMA_PLA_WVF	62	// UMA: the wavetable's file: bit (built in), then the SD card's WAVES (PlaitsDrum.cpp)
 #define MENU_UMA_PLA_TRF	63	// UMA: the wave terrain's file: bit, then the card's TERRAIN
+#define MENU_UMA_SRC	64	// LX_UMA desktop: a mod slot's source (the Eurorack's numbers; the ones without a desktop source skipped)
 
 //-----------------------------------------------------------------
 // Shared texts. Reduce mem usage by pooling common text
@@ -263,6 +264,91 @@ const char umaVEngineNames[][4] =
 };
 // LX_UMA (0.2f): the pitch screen's octave (key and scale names: uma_quant.c)
 const char umaOctNames[][4] = {{"-4"}, {"-3"}, {"-2"}, {"-1"}, {"0"}, {"+1"}, {"+2"}, {"+3"}, {"+4"}};
+// LX_UMA (0.3a): a mod slot's source, the Eurorack's list (its numbers: a slot's source means the same on both); the
+// ones without a desktop source (cv, accent jacks, MIDI CC) are skipped when editing (uma_modmatrix.c)
+const char umaSrcNames[][4] =
+{
+	{73},		//number of entries
+	{"cv1"},
+	{"cv2"},
+	{"cv3"},
+	{"cv4"},
+	{"cv5"},
+	{"LA1"},
+	{"LA2"},
+	{"LA3"},
+	{"LA4"},
+	{"LA5"},
+	{"LA6"},
+	{"ac1"},
+	{"ac2"},
+	{"ac3"},
+	{"ac4"},
+	{"ac5"},
+	{"ac6"},
+	{"T1A"},
+	{"T1B"},
+	{"T1C"},
+	{"T1D"},
+	{"T2A"},
+	{"T2B"},
+	{"T2C"},
+	{"T2D"},
+	{"T3A"},
+	{"T3B"},
+	{"T3C"},
+	{"T3D"},
+	{"T4A"},
+	{"T4B"},
+	{"T4C"},
+	{"T4D"},
+	{"T5A"},
+	{"T5B"},
+	{"T5C"},
+	{"T5D"},
+	{"T6A"},
+	{"T6B"},
+	{"T6C"},
+	{"T6D"},
+	{"LB1"},
+	{"LB2"},
+	{"LB3"},
+	{"LB4"},
+	{"LB5"},
+	{"LB6"},
+	{"EN1"},
+	{"EN2"},
+	{"EN3"},
+	{"EN4"},
+	{"EN5"},
+	{"EN6"},
+	{"EI1"},
+	{"EI2"},
+	{"EI3"},
+	{"EI4"},
+	{"EI5"},
+	{"EI6"},
+	{"VL1"},
+	{"VL2"},
+	{"VL3"},
+	{"VL4"},
+	{"VL5"},
+	{"VL6"},
+	{"MC1"},
+	{"MC2"},
+	{"MC3"},
+	{"MC4"},
+	{"MC5"},
+	{"MC6"},
+	{"MC7"},
+	{"MC8"},
+};
+const char umaPolNames[][4] =
+{
+	{2},		//number of entries
+	{"bi "},	// around the knob
+	{"uni"},	// from the knob up
+};
 
 const char umaMcNames[][4] =
 {
@@ -883,6 +969,52 @@ const char shortNames[][4]  =
 	{"oct"},	// LX_UMA SHORT_UMA_OCT
 	{"key"},	// LX_UMA SHORT_UMA_KEY
 	{"scl"},	// LX_UMA SHORT_UMA_SCALE
+	{"v/o"},	// LX_UMA SHORT_1VOCT
+	{"fdA"},	// LX_UMA SHORT_UMA_LFO_FD_A
+	{"fdB"},	// LX_UMA SHORT_UMA_LFO_FD_B
+	{"frB"},	// LX_UMA SHORT_UMA_LFO_FR_B
+	{"ofB"},	// LX_UMA SHORT_UMA_LFO_OF_B
+	{"rtB"},	// LX_UMA SHORT_UMA_LFO_RT_B
+	{"snB"},	// LX_UMA SHORT_UMA_LFO_SN_B
+	{"wvB"},	// LX_UMA SHORT_UMA_LFO_WV_B
+	{"al "},	// LX_UMA SHORT_UMA_T_ALGO
+	{"aA "},	// LX_UMA SHORT_UMA_T_ATK_A
+	{"aB "},	// LX_UMA SHORT_UMA_T_ATK_B
+	{"a2 "},	// LX_UMA SHORT_UMA_T_ATK_B2
+	{"dA "},	// LX_UMA SHORT_UMA_T_DEC_A
+	{"dB "},	// LX_UMA SHORT_UMA_T_DEC_B
+	{"d2 "},	// LX_UMA SHORT_UMA_T_DEC_B2
+	{"eA "},	// LX_UMA SHORT_UMA_T_END_A
+	{"eB "},	// LX_UMA SHORT_UMA_T_END_B
+	{"e2 "},	// LX_UMA SHORT_UMA_T_END_B2
+	{"fb "},	// LX_UMA SHORT_UMA_T_FEEDBACK
+	{"rpm"},	// LX_UMA SHORT_UMA_T_MD_PAL
+	{"mA "},	// LX_UMA SHORT_UMA_T_MOD_A
+	{"mB "},	// LX_UMA SHORT_UMA_T_MOD_B
+	{"m2 "},	// LX_UMA SHORT_UMA_MOD_B2
+	{"pal"},	// LX_UMA SHORT_UMA_T_PRK_ALG
+	{"pp1"},	// LX_UMA SHORT_UMA_T_PRK_P1
+	{"pp2"},	// LX_UMA SHORT_UMA_T_PRK_P2
+	{"rpk"},	// LX_UMA SHORT_UMA_T_PRK_PAL
+	{"pvr"},	// LX_UMA SHORT_UMA_T_PRK_VAR
+	{"rA "},	// LX_UMA SHORT_UMA_T_RATIO_A
+	{"rB "},	// LX_UMA SHORT_UMA_T_RATIO_B
+	{"RE "},	// LX_UMA SHORT_UMA_T_RND_ENV
+	{"RF "},	// LX_UMA SHORT_UMA_T_RND_FINE
+	{"RS "},	// LX_UMA SHORT_UMA_T_RND_SEED
+	{"RW "},	// LX_UMA SHORT_UMA_T_RND_SWEEP
+	{"RT "},	// LX_UMA SHORT_UMA_T_RND_TONE
+	{"a1 "},	// LX_UMA SHORT_UMA_T_SLOT_AMT1
+	{"vel"},	// LX_UMA SHORT_UMA_VEL
+	{"a2 "},	// LX_UMA SHORT_UMA_T_SLOT_AMT2
+	{"a3 "},	// LX_UMA SHORT_UMA_T_SLOT_AMT3
+	{"a4 "},	// LX_UMA SHORT_UMA_T_SLOT_AMT4
+	{"a5 "},	// LX_UMA SHORT_UMA_T_SLOT_AMT5
+	{"a6 "},	// LX_UMA SHORT_UMA_T_SLOT_AMT6
+	{"a7 "},	// LX_UMA SHORT_UMA_T_SLOT_AMT7
+	{"a8 "},	// LX_UMA SHORT_UMA_T_SLOT_AMT8
+	{"src"},	// LX_UMA SHORT_SRC
+	{"pol"},	// LX_UMA SHORT_UMA_SLOT_POL
 };
 //-----------------------------------------------------------------
 // These correspond with the catNamesEnum in menu.h
@@ -928,6 +1060,10 @@ const char catNames[][16] =
 	{"Random"},	// LX_UMA CAT_UMA_RANDOM
 	{"Machine"},	// LX_UMA CAT_UMA_MD
 	{"Plaits"},	// LX_UMA CAT_UMA_PLA
+	{"Mod"},	// LX_UMA CAT_MOD
+	{"LFO B"},	// LX_UMA CAT_UMA_LFO_B
+	{"Prk"},	// LX_UMA CAT_UMA_PRK
+	{"ModSlot"},	// LX_UMA CAT_UMA_MOD_SLOT
 };
 //-----------------------------------------------------------------
 // these must correspond to longNamesEnum
@@ -1073,6 +1209,21 @@ const char longNames[][16] =
 	{"Key mode"},	// LX_UMA LONG_UMA_PLA_KMD
 	{"Key"},	// LX_UMA LONG_UMA_KEY
 	{"Scale/chord"},	// LX_UMA LONG_UMA_SCALE
+	{"1V/Oct"},	// LX_UMA LONG_1VOCT
+	{"Param 1"},	// LX_UMA LONG_UMA_PARAM1
+	{"Param 2"},	// LX_UMA LONG_UMA_PARAM2
+	{"Variation"},	// LX_UMA LONG_UMA_VARIATION
+	{"Amount 1"},	// LX_UMA LONG_UMA_AMOUNT1
+	{"Velocity"},	// LX_UMA LONG_UMA_VELOCITY
+	{"Amount 2"},	// LX_UMA LONG_UMA_AMOUNT2
+	{"Amount 3"},	// LX_UMA LONG_UMA_AMOUNT3
+	{"Amount 4"},	// LX_UMA LONG_UMA_AMOUNT4
+	{"Amount 5"},	// LX_UMA LONG_UMA_AMOUNT5
+	{"Amount 6"},	// LX_UMA LONG_UMA_AMOUNT6
+	{"Amount 7"},	// LX_UMA LONG_UMA_AMOUNT7
+	{"Amount 8"},	// LX_UMA LONG_UMA_AMOUNT8
+	{"Source"},	// LX_UMA LONG_SRC
+	{"Polarity"},	// LX_UMA LONG_UMA_POLARITY
 };
 
 

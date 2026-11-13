@@ -17,6 +17,7 @@
 //#include "../Hardware/SD/ff.h"
 #include "ff.h"
 #include "uma_random.h" // LX_UMA
+#include "uma_mod.h" // LX_UMA
 #include "uma_kits.h" // LX_UMA: the kits' UMA records
 #include <stdio.h>
 #include "menu/CcNr2Text.h"
@@ -278,6 +279,7 @@ FRESULT preset_LoadTmpKit()
 			else
 				umaKit_activeFromFile((FIL*)&SDFile);	// LX_UMA: the edit buffer's UMA record, if saved
 			umaRnd_kitLoaded();	// LX_UMA: the restored edit buffer is randomise's restore point
+			umaMod_kitLoaded();	// LX_UMA: its mod slots' destinations
 
 			//special case mod targets. normalize.
 			const uint8_t nmt=getNumModTargets();

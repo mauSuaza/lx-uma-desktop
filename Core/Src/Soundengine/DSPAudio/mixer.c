@@ -26,6 +26,7 @@
 #include "Soundengine/FxBus.h"
 #include "Soundengine/Soundengine.h" // LX_UMA: soundengine_addVoiceLoad
 #include "uma_random.h" // LX_UMA
+#include "uma_modmatrix.h" // LX_UMA
 #if UMA_VOICE_LOAD
 // LX_UMA test 0.2g: each voice's cycles in this block (settings + sound), for the CPU screen's vc
 #define UMA_VTIME(v, call) do { const uint32_t umaT0 = DWT->CYCCNT; call; soundengine_addVoiceLoad((v), DWT->CYCCNT - umaT0); } while(0)
@@ -581,7 +582,8 @@ IN_ITCM_RAM void mixer_calcNextSampleBlock(int16_t* output,int16_t* output2)
 	SVF_recalcFreq(&cymbalVoice.filter);
 	SVF_recalcFreq(&hatVoice.filter);
 
-	// LX_UMA: randomise, before the drum voices read their settings (Phase 3: after the modulation)
+	// LX_UMA: the mod matrix, then randomise, before the drum voices read their settings
+	umaModMx_process();
 	umaRnd_block();
 
 	//--- Calc async -----

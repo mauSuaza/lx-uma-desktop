@@ -68,6 +68,9 @@ add_library(lxr_preset OBJECT
     Src/uma_voicepar.c
     Src/uma_voice.c
     Src/uma_quant.c
+    Src/uma_mod.c
+    Src/uma_modmatrix.c
+    Src/menu/umaModTargets.c
     Src/uma_random.c
     Src/uma_enginetest.c # LX_UMA test 0.0c
     Src/uma_sdreadtest.c # LX_UMA test 0.1a
@@ -123,6 +126,7 @@ add_library(lxr_dsp OBJECT
     Src/Soundengine/DSPAudio/Samples.c
     Src/Soundengine/DSPAudio/SlopeEg2.c
     Src/Soundengine/DSPAudio/Lpg.c
+    Src/Soundengine/DSPAudio/lfoShapes.c
     Src/Soundengine/DSPAudio/PrkDrum.c # only its randomise rules are linked (no prk engine on the desktop)
     Src/Soundengine/DSPAudio/snapEg.c
     Src/Soundengine/DSPAudio/Snare.c

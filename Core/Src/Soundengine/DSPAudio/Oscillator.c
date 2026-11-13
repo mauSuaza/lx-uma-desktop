@@ -726,17 +726,22 @@ int16_t calcSampleOsc(OscInfo* osc)
 // the scale; fine tune after, the pitch EG (pitchMod) on top where it's used. Once per block, in osc_setFreq
 static inline uint8_t osc_umaOn(const OscInfo* osc)
 {
-	return osc->umaScale || osc->umaOct;
+	return osc->umaScale || osc->umaOct || osc->umaVoct != 0.f;
 }
 static void osc_umaQuantize(OscInfo* osc)
 {
 	if(!osc_umaOn(osc))
 		return;
+	if(!osc->umaScale && !osc->umaOct)	// v/o alone: continuous, as the Eurorack's 1V/oct with the quantizer off
+	{
+		osc->umaBase = osc->freq * osc->modNodeValue * powf(2.f, osc->umaVoct / 12.f);
+		return;
+	}
 	const float cent = midiParser_calcDetune(osc->midiFreq&0xff);
 	float note = 69.f + 12.f * log2f(osc->freq / (440.f * cent));	// coarse and the note (osc_recalcFreq)
 	if(osc->modNodeValue > 0.f)
 		note += 12.f * log2f(osc->modNodeValue);
-	note += 12.f * osc->umaOct;
+	note += 12.f * osc->umaOct + osc->umaVoct;	// LX_UMA: v/o, before the quantizer
 	const int16_t q = umaQuant_snap(note, osc->umaKey, osc->umaScale, &osc->umaHeld);
 	osc->umaBase = 440.f * powf(2.f, (float)(q - 69) / 12.f) * cent;
 }

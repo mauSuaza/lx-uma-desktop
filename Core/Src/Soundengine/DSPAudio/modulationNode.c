@@ -23,6 +23,8 @@
 #include "Soundengine/MIDI/MidiMessages.h"
 #include "Soundengine/MIDI/MidiParser.h"
 #include "frontPanelParser_ui.h"
+#include "uma_mod.h" // LX_UMA: UMA settings as targets
+#include "uma_modmatrix.h" // LX_UMA: the mod slots
 
 INDTCMZ ModulationNode velocityModulators[6];
 
@@ -74,6 +76,10 @@ static void modNode_setOriginalValueChanged(ModulationNode* vm, uint16_t idx)
 void modNode_originalValueChanged(uint16_t idx)
 {
 	uint8_t i;
+	if(idx >= END_OF_SOUND_PARAMETERS)
+		return;	// LX_UMA: not a stock sound parameter (UMA settings are read with umaMod_get)
+	for(i=0;i<NUM_MOD_SLOTS;i++)
+		modNode_setOriginalValueChanged(&cvModulators[i],idx);	// LX_UMA: the mod slots
 	for(i=0;i<6;i++)
 	{
 		modNode_setOriginalValueChanged(&velocityModulators[i],idx);
@@ -101,6 +107,10 @@ IN_ITCM_RAM void modNode_resetTargets()
 	paramArray_setParameter(snareVoice.lfo.modTarget.destination,snareVoice.lfo.modTarget.originalValue);
 	paramArray_setParameter(cymbalVoice.lfo.modTarget.destination,cymbalVoice.lfo.modTarget.originalValue);
 	paramArray_setParameter(hatVoice.lfo.modTarget.destination,hatVoice.lfo.modTarget.originalValue);
+	// LX_UMA: the mod slots on stock parameters (UMA settings go stale by themselves, uma_mod.c)
+	for(i=0;i<NUM_MOD_SLOTS;i++)
+		if(cvModulators[i].destination != 0 && cvModulators[i].destination < END_OF_SOUND_PARAMETERS)
+			paramArray_setParameter(cvModulators[i].destination,cvModulators[i].originalValue);
 
 
 }
@@ -128,6 +138,8 @@ void modNode_setDestination(ModulationNode* vm, uint16_t dest)
 
 	//update dest param
 	vm->destination = dest;
+	if(dest >= END_OF_SOUND_PARAMETERS)
+		return;	// LX_UMA: a UMA setting (or none past the stock ones): no stock value to keep
 
 	const Parameter *p = &parameterArray[vm->destination];
 
@@ -163,9 +175,16 @@ void modNode_setDestination(ModulationNode* vm, uint16_t dest)
 // This is called to actually modulate the value for a modulation node
 void modNode_updateValue(ModulationNode* vm, float val)
 {
-	Parameter const *p = &parameterArray[vm->destination];
-
 	vm->lastVal = val;
+	// LX_UMA: a UMA setting: its modulated value is kept in uma_mod.c
+	if(umaMod_isTarget(vm->destination))
+	{
+		umaMod_apply(vm->destination, vm->amount, val);
+		return;
+	}
+	if(vm->destination >= END_OF_SOUND_PARAMETERS)
+		return;
+	Parameter const *p = &parameterArray[vm->destination];
 
 	// **PATROT avoid setting this if it's not set to something good
 	if(!p->ptr)

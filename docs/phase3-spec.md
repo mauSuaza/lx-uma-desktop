@@ -31,7 +31,8 @@ at the end. The code is the Eurorack's (LX_UMA `a179390`) where it exists; the d
 - **LFO page (select 7):** screen 1-2 the stock LFO (LFO A); pressing the button again steps through **LFO B**,
   **Turing A | B**, **Turing C | D**, then back. As the Eurorack's SHIFT + MOD views, on the desktop's own button.
 - **SHIFT + select 7: the mod view.** In it the **8 select buttons pick slots 1–8** of the selected voice (one screen
-  each, `src amt dst pol`); the voice buttons change the voice. Leaving it: select 7 without SHIFT, or a voice page.
+  each, `src amt dst pol`); the voice buttons change the voice. Leaving it: SHIFT + select 7 again (in the view
+  select 7 picks slot 7), or any page that isn't a voice page.
   To check in the code (0.3a): holding SHIFT with a select button starts sub-step automation recording in voice mode,
   so the mod view may need a short press only (released before the recording timer).
 - **Sources and targets by name** on the slot's edit screen, as on the Eurorack ("LFO B Drum2", "TM C Cymbl";
@@ -73,3 +74,20 @@ setting comes with the kit, and the step's value moves the setting it points at.
 2. **No `vel` setting** on the desktop: the steps have velocity; `VL1`–`VL6` is the velocity as a source.
 3. **4 UMA lanes per voice.**
 4. **Turing Machine clock:** `clk` chooses the sequencer's sixteenths (with the divider) or each hit of its voice.
+
+## 7. 0.3a as built
+
+- **Record format 4:** slots 1–3 of each voice at the record's end (`PAR_UMA_DSK_MS*`; the Eurorack's stock CV slots),
+  slots 4–8 the Eurorack's; `v/o` per voice (`PAR_UMA_DSK_VOCT*`, 0–127 = 0–60 semitones up, before the quantizer;
+  continuous with the quantizer off). New slots start on their voice's LFO A, amount 0.
+- **Modulation:** the Eurorack's `uma_mod.c` (UMA settings PAR_UMA_ENG1 … PAR_UMA_END, the slot amounts among them;
+  kit morph of UMA settings: 0.3e); `uma_modmatrix.c` each block before randomise: sources LFO A (the stock LFO's
+  value, kept now in `Lfo.value`), EN / EI, VL; Turing and LFO B neutral until 0.3c / 0.3b; the Eurorack's source
+  numbers (its cv, accent and MIDI CC places skipped). The modulation node sends UMA targets to `umaMod_apply` and
+  never indexes the stock parameter table with them.
+- **Targets:** the Eurorack's lists entry for entry (`umaModTargets.c`), the snare's, cymbal's and hi-hat's from the
+  Eurorack's shared-list blocks (embedded); never active on the desktop: `vel`, `wvc` `wvm`, morph (0.3e), prk's.
+- **The mod view:** SHIFT + select 7 (a short press) toggles it; select 1–8 = slot 1–8 of the voice (`src amt dst
+  pol`, the slot number in the top right); the edit screen names the source ("LFO A Drum2") and the target in full
+  ("fm only" for another engine's). Slot destinations are set on kit load, on edits, and when a drum's engine changes.
+- Image 603,980 bytes, RAM 350 KB of 384 (~26 KB stack), ITCM 15,408 B.

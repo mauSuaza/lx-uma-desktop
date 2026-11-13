@@ -16,6 +16,7 @@
 #include "uma_random.h"
 #include "uma_voice.h"
 #include "uma_mod.h"
+#include "uma_modmatrix.h"
 #include "Soundengine/DSPAudio/MdDrum.h"
 #include "Soundengine/DSPAudio/PlaitsDrum.h"
 #include <math.h>
@@ -74,6 +75,7 @@ __attribute__((noinline)) void umaFmV_init(void)
 		plaitsDrum_init(v, REAL_FS);
 	}
 	umaVoice_init();	// the snare, cymbal and hi-hat's engines
+	umaModMx_init();	// the mod slots
 }
 
 __attribute__((noinline)) void umaFmV_trigger(uint8_t voiceNr)
