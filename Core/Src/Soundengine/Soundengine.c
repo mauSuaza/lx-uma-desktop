@@ -131,8 +131,15 @@ void soundengine_process()
 #if CALC_SAMPLES_IN_INTERRUPT
 	__HAL_TIM_DISABLE_IT(&htim2, TIM_IT_UPDATE);
 	//HAL_TIM_Base_Stop_IT(&htim2);
+#if UMA_LOAD
+	// UMA: outside SD saves the sound is rendered here, from the main loop, not in the TIM2 interrupt
+	const uint32_t umaLoad_start = DWT->CYCCNT;
+#endif
 	seq_tick();
 	soundengine_calcNextSampleBlock();
+#if UMA_LOAD
+	soundengine_addLoad(DWT->CYCCNT - umaLoad_start);
+#endif
 	__HAL_TIM_SetCounter(&htim2, 1950);
 	//HAL_TIM_Base_Start_IT(&htim2);
 	__HAL_TIM_ENABLE_IT(&htim2, TIM_IT_UPDATE);

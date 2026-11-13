@@ -111,9 +111,11 @@ Goal: before porting any UI, know whether everything fits and what has to give.
 
 ### 0.0a as built
 
-- The readout times the **whole audio interrupt** (TIM2: `seq_tick` + the sound + MIDI), not only the sound as on
-  the Eurorack, so it shows the real headroom with the sequencer. The global page's 1st screen is full on the
-  desktop, so the readout is the 4th slot of the **2nd sub-page** (`ptm tin tou pk`): `pk` = the longest interrupt
-  in the last 2 s in % of a 64-sample block (over 100 = audio drop-outs). The average is computed but not shown
-  (one free slot).
+- The readout times the **sequencer + sound render** (`seq_tick` + the block), so it shows the real headroom with
+  the sequencer. On the desktop the main loop renders (`soundengine_process`); the TIM2 interrupt does it only
+  during SD saves (`USE_INTERRUPT_ONLY_DURING_SAVE_PROJ`), so both places are timed. 0.0a timed only the interrupt
+  and showed 0; fixed in 0.0a2. The global page (SHIFT + step 12; pressed again it steps through the screens) has
+  a full 1st screen, so the readout is the 4th slot of the **2nd sub-page** (`ptm tin tou pk`): `pk` = the longest
+  render in the last 2 s in % of a 64-sample block (over 100 = audio drop-outs). The average is computed but not
+  shown (one free slot).
 - Memory after 0.0a: flash 274.5 KB (image 275,400 bytes), RAM 271 KB (.bss), DTCM 107 KB, ITCM 15.0 KB of 16.
