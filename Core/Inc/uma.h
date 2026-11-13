@@ -7,7 +7,7 @@
 #define UMA_H_
 
 // version on the start-up screen and in the update file name (LXR_V2_UMA_V<version>.img, CMakeLists.txt)
-#define UMA_VERSION "0.1"	// release: FM Drum and FM Tone on Drum 1-3
+#define UMA_VERSION "0.2a"	// Phase 2 test build: no operator waveforms; hold, gate, filter env, LPG, wavefolder (in progress)
 
 // UMA's engines and settings (the Eurorack's flag: the copied code is written around it)
 #define UMA_FM 1

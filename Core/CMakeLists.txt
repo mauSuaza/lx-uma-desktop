@@ -105,7 +105,6 @@ add_library(lxr_dsp OBJECT
     Src/Soundengine/DSPAudio/DrumVoice.c
     # UMA engines, copied from LX_UMA (docs/SOURCES.md)
     Src/Soundengine/DSPAudio/FmDrum.c
-    Src/Soundengine/DSPAudio/FmWaves.c
     Src/Soundengine/DSPAudio/MdDrum.cpp
     Src/Soundengine/DSPAudio/PlaitsDrum.cpp
     ${UMA_PLAITS_SOURCES}
@@ -229,6 +228,8 @@ set_property(SOURCE Src/Soundengine/DSPAudio/PlaitsDrum.cpp ${UMA_PLAITS_SOURCES
 set_property(SOURCE Src/Soundengine/DSPAudio/PlaitsDrum.cpp ${UMA_PLAITS_SOURCES} APPEND PROPERTY INCLUDE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR}/Src/Soundengine/DSPAudio/mi)
 # UMA: card files are loaded on a button press or at start-up, never per block
 set_property(SOURCE Src/uma_sdfiles.c APPEND PROPERTY COMPILE_OPTIONS -Os)
+# LX_UMA (0.2a): no FM operator waveforms on the desktop: sines only, FmWaves.c not built (docs/phase2-spec.md)
+set_property(SOURCE Src/Soundengine/DSPAudio/FmDrum.c APPEND PROPERTY COMPILE_DEFINITIONS FMD_NO_WAVES)
 # LX_UMA (0.1a, as the Eurorack's 0.33l): the user interface and the inputs are compiled for size, not speed: none of
 # it runs per sample, and the firmware has to end below flash sector 7 (STM32F765VGTX_FLASH.ld). MIDI too, except
 # ParameterArray.c (ITCM code, LXR_ITCM_SOURCES)

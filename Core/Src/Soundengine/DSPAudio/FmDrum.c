@@ -263,6 +263,13 @@ static inline uint32_t fmd_cyclesToInc(float cycles)
 static const uint16_t fmd_waveHarmonics[FMW_LEVELS] = {511, 256, 128, 64, 32, 16, 8, 4, 2, 1};
 static void fmd_setWave(FmDrumWave* w, uint8_t value, uint32_t phaseInc)
 {
+#ifdef FMD_NO_WAVES
+	// LX_UMA desktop: no operator waveforms (the user's choice, 2026-11-12): sines only, and FmWaves.c's 120 KB of
+	// tables aren't linked
+	(void)value; (void)phaseInc;
+	w->sine = 1;
+	return;
+#endif
 	if(value == 0)
 	{
 		w->sine = 1;

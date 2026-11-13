@@ -1,6 +1,6 @@
 # Phase 2: all engines, all voices (spec, draft for review)
 
-Status: **draft for review** (2026-11-12). Phase 2 of [port-plan.md](port-plan.md), after release 0.1 (FM on
+Status: **reviewed** (2026-11-12): questions answered (section 5). Phase 2 of [port-plan.md](port-plan.md), after release 0.1 (FM on
 Drum 1–3). Release **0.2** at the end. As in Phase 1, the code is the Eurorack's (LX_UMA `a179390`), the pages are
 the Eurorack's, and each build is checked on the LXR before the next.
 
@@ -34,7 +34,8 @@ Measured on the Eurorack build (its map file), and what's left on the desktop af
 | **Left after 0.1** | **326 KB** | **~108 KB** (stack at the top of it) |
 | Still to come: Phase 3 (modulation, automation) + Phase 4 (card files: 24 KB RAM) | ~30–40 KB | ~30 KB |
 
-**RAM fits** (~25 KB left at the end). **Flash doesn't, by ~10–20 KB, by the end of Phase 4** (question 1).
+**RAM fits** (~25 KB left at the end). Flash was ~10–20 KB short by the end of Phase 4; with the operator waveforms
+removed (question 1) **448 KB are spare** after 0.2a's first step: room for Phases 2–4.
 
 **CPU:** a busy stock pattern is 67 % (`pk`). On the Eurorack each Plaits voice adds ~6 %, FM a little less, mdk
 less. Decided in Phase 0: every engine on every voice, the manual says how many heavy voices are safe; silent voices
@@ -64,12 +65,12 @@ skip their engine (FM, Plaits' tonal models), as on the Eurorack.
 | **0.2f** | Quantizer and the pitch screen | Scales as on the Eurorack |
 | **0.2** | Release: manual chapters, notes | |
 
-## 5. Questions
+## 5. Decided (2026-11-12)
 
-1. **Flash.** ~10–20 KB short by the end of Phase 4. Options: (a) shrink the FM operator waveform tables (120 KB →
-   ~30 KB: fewer points per table and fewer band-limited levels; a small change in the waveforms' sound, to A/B
-   against the Eurorack), (b) mdk at `-O2` instead of `-O3` (−17 KB, its CPU goes up a little), (c) both.
-2. **Mod page in FM and mdk modes:** randomise on screen 2 as on the Eurorack and velocity (`vdt vam vvo`) moves to
-   screen 3, or velocity stays on screen 2 and randomise goes to screen 3?
-3. **Gates from the sequencer:** MIDI notes only (as above), or also a per-voice **gate length** for sequencer hits
-   (a new setting: the gate stays open for n sixteenths), so gate mode and held keys work from patterns too?
+1. **Flash:** the FM operator waveforms (`wvc`, `wvm`) are **removed** on the desktop (the user doesn't use them):
+   every operator is a sine, `FmWaves.c`'s 120 KB of tables aren't linked (`FMD_NO_WAVES` in `FmDrum.c`, the one
+   change to the copied engine, `docs/SOURCES.md`). The kit record keeps the two settings (unused), so kits stay
+   byte-compatible with the Eurorack's list. FM Drum's FM page loses its extra screen; FM Tone's last FM screen is
+   `fna fnb`. Image 294,796 bytes, **448 KB spare**.
+2. **Mod page** (FM, mdk): randomise on screen 2 as on the Eurorack; velocity (`vdt vam vvo`) moves to screen 3.
+3. **Gates:** MIDI notes only; sequencer hits are triggers.

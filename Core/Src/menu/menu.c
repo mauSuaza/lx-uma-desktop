@@ -1883,8 +1883,6 @@ static uint8_t menu_umaEngine(uint8_t page)
 static const Page* menu_umaExtraScreen(uint8_t page, uint8_t sub, uint8_t n)
 {
 	const uint8_t engine = menu_umaEngine(page);
-	if(engine == 1 && sub == UMA_FM_PAGE_FM && n == 0)
-		return &umaFmWavePages[page - VOICE1_PAGE];
 	if(engine == 2)
 	{
 		if(sub == UMA_FM_PAGE_FM)

@@ -17,3 +17,6 @@ To check for differences: `diff -r ~/src/eurorack/lxr-fm/Core/Src/Soundengine/DS
 
 - `Core/Inc/uma_sdfiles.h`: `UMA_SDF_SLOTS` 6 (10 on the Eurorack), to save 16 KB of RAM (0.1a). Keep this when
   copying the file again.
+- `Core/Src/Soundengine/DSPAudio/FmDrum.c`: `#ifdef FMD_NO_WAVES` at the top of `fmd_setWave` (every operator a sine);
+  the desktop builds with it and without `FmWaves.c` (0.2a, the user's choice: no operator waveforms). Keep it when
+  copying the file again.

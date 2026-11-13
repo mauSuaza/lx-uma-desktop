@@ -99,13 +99,7 @@ static void umaFm_syncParams(uint8_t voiceNr)
 			fmDrum_setParam(d, (uint8_t)(FMD_FINE_A + j), v);
 	}
 	umaFm_syncFold(voiceNr);
-	// operator waveforms (C; A and B)
-	for(uint8_t j = 0; j < 2; j++)
-	{
-		const uint8_t v = umaPar((uint16_t)(PAR_UMA_WAVE_C1 + voiceNr * 2 + j));
-		if(fmDrum_getParam(d, (uint8_t)(FMD_WAVE_C + j)) != v)
-			fmDrum_setParam(d, (uint8_t)(FMD_WAVE_C + j), v);
-	}
+	// (operator waveforms: none on the desktop, FMD_NO_WAVES; the kit's wvc / wvm are kept but not played)
 	// FM Tone: ratio C and B2, mod B2, detune, mix X/Y, the sub
 	if(!tone)
 		return;

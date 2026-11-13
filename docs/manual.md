@@ -26,7 +26,7 @@ play as stock sounds).
 | | |
 |---|---|
 | **Drum 1–3** | An engine setting, `eng`, on the Osc page: `lxr` (the LXR's own oscillators, as before), `fmd` (FM Drum) or `fmt` (FM Tone) |
-| **FM Drum** | Three operators after the Digitone II's FM DRUM: 7 algorithms, 51 ratios, operator envelopes, feedback, waveforms |
+| **FM Drum** | Three operators after the Digitone II's FM DRUM: 7 algorithms, 51 ratios, operator envelopes, feedback |
 | **FM Tone** | Four operators after the Digitone's FM TONE: 8 algorithms, detune, X/Y mix, a sub oscillator |
 | **Kits** | Every kit keeps its UMA settings (below) |
 | **CPU readout** | `pk` on the global page (below) |
@@ -101,16 +101,10 @@ metallic.
 | FM (select 4) | 1 | `mod` | Op A Mod | How much A modulates at its envelope's peak |
 | | 1 | `atk` `dec` `end` | Op A Attack / Decay / End lvl | A's envelope: rise (0 instant … 2 s), fall (5 ms–5 s), the level it falls to and holds (share of `mod`) |
 | | 2 | `mod` `atk` `dec` `end` | Op B … | B's, the same (in algorithms 5–7, B's volume) |
-| | 3 | `wvc` `wvm` | FM Wave C / AB | The carrier's and the modulators' waveform: 0 sine … 127 bell |
 | Transient (select 5) | 1 | `wav` `vol` `frq` | Transnt Wave / Volume / Freq | The LXR's transient, layered on the hit |
 | | 1 | `fdb` | FM Feedback | Self-modulation of the algorithm's feedback operator(s): brighter, gritty, then noise |
 | Filter (select 6) | 1 | `frq` `res` `typ` `drv` | Filter … | As on the LXR; |
 | Mix (select 8) | 1 | `vol` `pan` `srt` `drv` | Voice … | Level, pan, sample-rate reduction, drive, as on the LXR |
-
-The waveforms sweep smoothly: 0 sine, ~25 triangle, ~51 saw, ~76 square, ~102 pulse, 127 bell (harmonics 1, 2,
-3, 5, 8, 13). A non-sine **modulator** adds sidebands for each of its harmonics: dense and gritty, best low; a non-sine **carrier** colours the sound more gently. They're band-limited (no aliasing at high
-notes) 
-
 
 ---
 
@@ -179,7 +173,6 @@ up to a hard fold at 127; smooth when modulated). The sub restarts with each hit
 | FM (select 4) | 1 | `mod` `atk` `dec` `end` | Op A … | A's depth and envelope |
 | | 2 | `mod` `atk` `dec` `end` | Op B … | B1's |
 | | 3 | `mod` `atk` `dec` `end` | Op B2 … | B2's: depth (where it modulates) or level (where it's heard), its own envelope |
-| | 4 | `wvc` `wvm` | FM Wave C / AB | Waveforms (`wvm` also sets B2's) |
 | | 4 | `fna` `fnb` | Op A / Op B Fine rt | Fine ratios |
 | Transient (select 5) | 1 | `wav` `vol` `frq` | Transnt Wave / Volume / Freq | The LXR's transient |
 | | 1 | `fdb` | FM Feedback | The algorithm's feedback |
