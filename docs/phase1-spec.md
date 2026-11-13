@@ -98,3 +98,7 @@ Eurorack) and, if still needed, a stock function or two leaves ITCM (CPU measure
   `tou`'s place (2nd sub-page: `ptm tin rd pk`).
 - `-Os` shows a stock bug (menu.c, clear-automation dialog: "autom. 1]?" is one byte too long for the line, its
   terminator lands in the next line's first byte, which is redrawn): left as is.
+- **Result (2026-11-12, user's LXR-02):** `rd` **15 = 1.5 ms** for the slowest kit read: option A holds (a bar at
+  120 BPM is 2,000 ms). Most kits clean, `pk` 70-80 with the FX. Kits 13 NERVOUS and 30 SAWER clip a lot, `pk` above
+  90 (the user won't use the FX on the desktop). Open: CPU over-run or level? (0.0c's engines run on Drum 1-3 every
+  block at fixed, loud settings; the real voice skips silent engines.)
