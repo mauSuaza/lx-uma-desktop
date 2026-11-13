@@ -1,6 +1,6 @@
 # Phase 3: modulation and the sequencer (spec, draft for review)
 
-Status: **draft for review** (2026-11-13). Phase 3 of [port-plan.md](port-plan.md), after release 0.2. Release **0.3**
+Status: **reviewed** (2026-11-13): questions answered (section 6). Phase 3 of [port-plan.md](port-plan.md), after release 0.2. Release **0.3**
 at the end. The code is the Eurorack's (LX_UMA `a179390`) where it exists; the desktop's sequencer automation is new.
 
 ## 1. Decided with the user (2026-11-13)
@@ -64,15 +64,12 @@ setting comes with the kit, and the step's value moves the setting it points at.
 | **0.3e** | Kit morph for UMA settings | Morphing two kits with FM / Plaits settings |
 | **0.3** | Release: manual chapters, notes | |
 
-## 6. Questions
+## 6. Decided (2026-11-13)
 
-1. **LFO A's shapes.** On the Eurorack, UMA turned the LFO's waveform setting into a smooth sweep through 16 shapes
-   (and added a folder); kits converted their old waveform. On the desktop the stock LFO waveform list is kept by
-   Erica's firmware too. Keep LFO A **stock** (its 8 shapes, kits unchanged on both firmwares) and give the new shapes
-   to LFO B only, or **as on the Eurorack** (both LFOs with the 16-shape sweep; kits converted once, on Erica's
-   firmware their LFO shape would read differently)?
-2. **The `vel` setting** (Eurorack: each voice's hit level, a target for ghost notes and accents without MIDI). The
-   desktop's steps have velocity, so `vel` isn't needed as a setting; keep it out (`VL` stays as the source)?
-3. **UMA lanes** (section 4): 4 per voice enough? Or another idea for automating UMA settings?
-4. **Turing Machine clock:** the sequencer's sixteenths (with the divider), or also each hit of its voice (a new value
-   per hit, whatever the rhythm)?
+1. **LFO A stays stock** (Erica's 8 shapes and its sync list: kits read the same on Erica's firmware). LFO B gets the
+   Eurorack's 16-shape sweep and folder. For a kit converter: desktop → Eurorack is exact (the Eurorack converts the
+   stock shapes, `lfoShapes_fromOldWave` / `fromOldSync`); Eurorack → desktop rounds LFO A to the nearest stock shape
+   and division. The user converts mainly desktop → Eurorack.
+2. **No `vel` setting** on the desktop: the steps have velocity; `VL1`–`VL6` is the velocity as a source.
+3. **4 UMA lanes per voice.**
+4. **Turing Machine clock:** `clk` chooses the sequencer's sixteenths (with the divider) or each hit of its voice.
