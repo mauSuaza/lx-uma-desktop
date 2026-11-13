@@ -104,7 +104,13 @@ static void umaKit_phase3Defaults(uint8_t* rec)
 		R(modSlot_pol(s)) = 0;
 	}
 	for(uint8_t v = 0; v < 6; v++)
+	{
 		R(UMA_DSK_VOCT_PAR + v) = 0;
+		uint8_t* l = &R(UMA_LFOB_FIRST_PAR + v * UMA_LFOB_PARS);	// LFO B: a slow sine, free, no retrigger
+		l[0] = 30; l[1] = 0; l[2] = 0; l[3] = 0;
+		R(UMA_LFOB_SYNC_PAR + v) = 0;
+		R(UMA_LFOB_FOLD_PAR + v) = 0;
+	}
 }
 
 // a new record: every drum on lxr, so a kit sounds as on the stock firmware; the rest a usable start when a drum is

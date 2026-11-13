@@ -70,6 +70,7 @@ add_library(lxr_preset OBJECT
     Src/uma_quant.c
     Src/uma_mod.c
     Src/uma_modmatrix.c
+    Src/uma_lfo.c
     Src/menu/umaModTargets.c
     Src/uma_random.c
     Src/uma_enginetest.c # LX_UMA test 0.0c

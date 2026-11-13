@@ -13,6 +13,7 @@
 
 
 #include "uma_kits.h" // LX_UMA
+#include "uma_modmatrix.h" // LX_UMA
 #include "stm32f7xx_hal.h"
 #include "Soundengine/globals.h"
 #include "Soundengine/DSPAudio/DrumVoice.h"
@@ -1268,6 +1269,7 @@ IN_ITCM_RAM void seq_nextStep()
 	if(!seq_running)
 		return;
 
+	umaModMx_seqStep();	// LX_UMA: a sixteenth (LFO B's bar restarts, the Turing Machines' clock)
 	seq_masterStepCnt++;
 
 	//---- calc master step position. max value is 64. also take in regard the pattern length -----
@@ -1922,6 +1924,7 @@ uint8_t seq_isRunning() {
 //------------------------------------------------------------------------------
 void seq_resetPosition()
 {
+	umaModMx_seqStart();	// LX_UMA: the sixteenths count again from the start
 	led_resetBlinkTimer();
 
 	// reset all track rotations to 0. We are not saving rotated value. it's a performance tool.
@@ -1976,6 +1979,7 @@ void seq_setRunning(uint8_t isRunning)
 
 		trigger_clockReceived = 0;
 		seq_prescaleCounter = 0;
+		umaModMx_seqStart();	// LX_UMA: the sixteenths count from the start (bar restarts, Turing clocks)
 		seq_sendRealtime(MIDI_START);
 		trigger_reset(1);
 	}

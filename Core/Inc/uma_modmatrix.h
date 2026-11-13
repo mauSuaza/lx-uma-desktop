@@ -20,5 +20,10 @@ void umaModMx_init(void);
 void umaModMx_process(void);
 // 1 if the source exists on the desktop (the menu lists only these)
 uint8_t umaModMx_sourceExists(uint8_t src);
+// the sequencer: started (step 0 next), and each sixteenth (seq_nextStep)
+void umaModMx_seqStart(void);
+void umaModMx_seqStep(void);
+// voice 0-6 is hit (6: the open hi-hat): LFO B's retrigger
+void umaModMx_hit(uint8_t voice);
 
 #endif /* UMA_MODMATRIX_H_ */

@@ -467,6 +467,9 @@ uint8_t umaTgt_engineTag(uint8_t voice, uint8_t idx)
 		return umaTgt_vxEntry(voice, idx)->engine;
 	if(idx == umaTgt_velAt(voice))
 		return 0;	// LX_UMA desktop: no `vel` setting (the steps have velocity)
+	if(idx >= umaTgt_baseCount(voice) + MOD_SLOTS_PER_VOICE && idx < umaTgt_toneStart(voice)
+		&& umaTgt_lfoBParam(voice, (uint8_t)(idx - umaTgt_baseCount(voice) - MOD_SLOTS_PER_VOICE)) == (uint16_t)(UMA_LFOA_FOLD_PAR + voice))
+		return 0;	// LX_UMA desktop: LFO A is the stock LFO (no folder)
 	if(voice >= 3 && voice < 6 && idx >= 1 && idx <= umaTgt_vxBaseCount[voice - 3])
 		return umaTgt_vxBase[voice - 3][idx - 1].engine;
 	if(voice < 3 && idx >= umaTgt_toneStart(voice))

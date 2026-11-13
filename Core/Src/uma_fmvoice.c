@@ -87,7 +87,8 @@ __attribute__((noinline)) void umaFmV_trigger(uint8_t voiceNr)
 		umaMd_hitPending[voiceNr] = 1;
 		umaPla_hitPending[voiceNr] = 1;
 	}	// started in umaFmV_block, after randomise drew this block's machine
-	umaRnd_hit(voiceNr);	// a modulated randomise setting re-rolls in this block (Phase 3), before the voice renders
+	umaRnd_hit(voiceNr);	// a modulated randomise setting re-rolls in this block, before the voice renders
+	umaModMx_hit(voiceNr);	// LFO B's retrigger
 }
 
 // wavefolder and body level; the fold's drive follows the amp EG, or the LPG's vactrol

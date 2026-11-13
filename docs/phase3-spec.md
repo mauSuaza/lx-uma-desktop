@@ -93,3 +93,14 @@ setting comes with the kit, and the step's value moves the setting it points at.
 - Image 603,980 bytes, RAM 350 KB of 384 (~26 KB stack), ITCM 15,408 B.
 
 - **2026-11-13:** 0.3d (UMA lanes) moved later on the roadmap; 0.3b, 0.3c and 0.3e are built in a row, the user tests 0.3e.
+
+## 8. 0.3b as built
+
+- **LFO B** per voice (`uma_lfo.c`): its own small LFO with the Eurorack's maths (the 16-shape morph and the folder,
+  `lfoShapes.c`; LFO A stays Erica's stock LFO), synced to the sequencer's tempo (`seq_getBpm`), restarted by a
+  voice's hits (`v1`–`v6`) or every 1, 2, 4, 8 bars (the sequencer's sixteenths: `umaModMx_seqStep` in
+  `seq_nextStep`, counted from the start). Its retrigger and sync use the Eurorack's lists (`umaLfoBRtgNames`,
+  `umaLfoBSyncNames`), not LFO A's stock ones. Sources `LB1`–`LB6`.
+- **LFO page** (select 7): after LFO A's two screens, `frB snB wvB rtB`, then `ofB fdB`; the shape shown by name,
+  the blend on the edit screen ("sin>tri 40%"). LFO A's fold target is never active (LFO A is stock).
+- Defaults: LFO B a slow sine (frequency 30), free, no retrigger, no fold.

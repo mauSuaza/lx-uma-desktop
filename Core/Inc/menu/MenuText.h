@@ -82,6 +82,8 @@
 #define MENU_UMA_PLA_WVF	62	// UMA: the wavetable's file: bit (built in), then the SD card's WAVES (PlaitsDrum.cpp)
 #define MENU_UMA_PLA_TRF	63	// UMA: the wave terrain's file: bit, then the card's TERRAIN
 #define MENU_UMA_SRC	64	// LX_UMA desktop: a mod slot's source (the Eurorack's numbers; the ones without a desktop source skipped)
+#define MENU_UMA_LFOB_RTG	65	// LX_UMA desktop: LFO B's retrigger (umaLfoBRtgNames)
+#define MENU_UMA_LFOB_SYNC	66	// LX_UMA desktop: LFO B's sync (umaLfoBSyncNames)
 
 //-----------------------------------------------------------------
 // Shared texts. Reduce mem usage by pooling common text
@@ -348,6 +350,42 @@ const char umaPolNames[][4] =
 	{2},		//number of entries
 	{"bi "},	// around the knob
 	{"uni"},	// from the knob up
+};
+// LX_UMA (0.3b): LFO B's retrigger and sync (the Eurorack's lists; LFO A keeps the stock ones)
+const char umaLfoBRtgNames[][4] =
+{
+	{11},		//number of entries: off, v1-v6, every 1 2 4 8 bars
+	{"off"},
+	{"v1"},
+	{"v2"},
+	{"v3"},
+	{"v4"},
+	{"v5"},
+	{"v6"},
+	{"1b "},
+	{"2b "},
+	{"4b "},
+	{"8b "},
+};
+const char umaLfoBSyncNames[][4] =
+{
+	{16},		//number of entries: off and 15 divisions of the tempo
+	{"off"},
+	{"4/1"},
+	{"2/1"},
+	{"1/1"},
+	{"1/2"},
+	{"4. "},
+	{"1/3"},
+	{"1/4"},
+	{"8. "},
+	{"1/6"},
+	{"1/8"},
+	{"16."},
+	{"12 "},
+	{"16 "},
+	{"24 "},
+	{"32 "},
 };
 
 const char umaMcNames[][4] =

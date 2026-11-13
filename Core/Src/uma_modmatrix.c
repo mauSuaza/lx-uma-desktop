@@ -22,7 +22,7 @@
 #define UMA_TURING 0	// the Turing Machines (0.3c): until then their sources sit at the middle (no change)
 #endif
 #ifndef UMA_LFOB
-#define UMA_LFOB 0		// LFO B (0.3b): the same
+#define UMA_LFOB 1		// LFO B (0.3b)
 #endif
 
 INDTCMZ ModulationNode cvModulators[NUM_MOD_SLOTS];
@@ -79,6 +79,23 @@ void umaModMx_init(void)
 {
 	for(uint8_t i = 0; i < NUM_MOD_SLOTS; i++)
 		modNode_init(&cvModulators[i]);
+	umaLfoB_init();
+}
+
+// the sequencer's sixteenths since it started: LFO B's bar restarts (and the Turing Machines' clock, 0.3c)
+static uint32_t umaModMx_tick;
+void umaModMx_seqStart(void)
+{
+	umaModMx_tick = 0;
+}
+void umaModMx_seqStep(void)
+{
+	umaLfoB_barTick(umaModMx_tick);
+	umaModMx_tick++;
+}
+void umaModMx_hit(uint8_t voice)
+{
+	umaLfoB_hit(voice);
 }
 
 // v/o of each voice (0-127 = 0-60 semitones up, modulated) into its pitched oscillators, as the quantizer's settings
@@ -99,6 +116,7 @@ static void umaModMx_voct(void)
 
 void umaModMx_process(void)
 {
+	umaLfoB_block();	// LFO B's next value, before the slots read it
 	umaMod_newPass();	// modulated UMA settings not set again in this pass go stale
 	for(uint8_t i = 0; i < NUM_MOD_SLOTS; i++)
 	{

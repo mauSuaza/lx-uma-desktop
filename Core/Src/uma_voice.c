@@ -17,6 +17,7 @@
 #include "menu/menu.h"	// activeParameters
 #include "uma_mod.h"
 #include "uma_random.h"
+#include "uma_modmatrix.h"
 #include "Soundengine/config.h"
 #include "Soundengine/DSPAudio/Snare.h"
 #include "Soundengine/DSPAudio/CymbalVoice.h"
@@ -119,6 +120,7 @@ void umaVoice_trigger(uint8_t voice, uint8_t isOpen)
 	umaVoice_openHit[voice - 3] = isOpen;
 	umaVoice_pending[voice - 3] = 1;	// started in umaVoice_async, after randomise
 	umaRnd_hit(voice);
+	umaModMx_hit((uint8_t)(voice == 5 && isOpen ? 6 : voice));	// LX_UMA: LFO B's retrigger
 }
 
 #if UMA_PRK

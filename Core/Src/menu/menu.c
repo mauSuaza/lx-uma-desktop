@@ -33,6 +33,7 @@
 #include "Soundengine/Sequencer/sequencer.h"
 #include "Soundengine/Soundengine.h"
 #include "uma_voice.h" // LX_UMA
+#include "Soundengine/DSPAudio/lfoShapes.h" // LX_UMA: LFO B's shapes
 #include "uma_modmatrix.h" // LX_UMA: the mod slots
 #include "menu/umaModTargets.h" // LX_UMA
 #include "uma_turing.h" // LX_UMA: the sources' numbers
@@ -897,27 +898,27 @@ const enum Datatypes PROGMEM parameter_dtypes[PAR_UMA_END] = {	// LX_UMA: + the 
 		/*PAR_UMA_LFOB1_FREQ*/	DTYPE_0B127,
 		/*PAR_UMA_LFOB1_OFS*/	DTYPE_0B127,
 		/*PAR_UMA_LFOB1_WAVE*/	DTYPE_0B127,
-		/*PAR_UMA_LFOB1_RTG*/	DTYPE_MENU | (MENU_RETRIGGER<<8),
+		/*PAR_UMA_LFOB1_RTG*/	DTYPE_MENU | (MENU_UMA_LFOB_RTG<<8),
 		/*PAR_UMA_LFOB2_FREQ*/	DTYPE_0B127,
 		/*PAR_UMA_LFOB2_OFS*/	DTYPE_0B127,
 		/*PAR_UMA_LFOB2_WAVE*/	DTYPE_0B127,
-		/*PAR_UMA_LFOB2_RTG*/	DTYPE_MENU | (MENU_RETRIGGER<<8),
+		/*PAR_UMA_LFOB2_RTG*/	DTYPE_MENU | (MENU_UMA_LFOB_RTG<<8),
 		/*PAR_UMA_LFOB3_FREQ*/	DTYPE_0B127,
 		/*PAR_UMA_LFOB3_OFS*/	DTYPE_0B127,
 		/*PAR_UMA_LFOB3_WAVE*/	DTYPE_0B127,
-		/*PAR_UMA_LFOB3_RTG*/	DTYPE_MENU | (MENU_RETRIGGER<<8),
+		/*PAR_UMA_LFOB3_RTG*/	DTYPE_MENU | (MENU_UMA_LFOB_RTG<<8),
 		/*PAR_UMA_LFOB4_FREQ*/	DTYPE_0B127,
 		/*PAR_UMA_LFOB4_OFS*/	DTYPE_0B127,
 		/*PAR_UMA_LFOB4_WAVE*/	DTYPE_0B127,
-		/*PAR_UMA_LFOB4_RTG*/	DTYPE_MENU | (MENU_RETRIGGER<<8),
+		/*PAR_UMA_LFOB4_RTG*/	DTYPE_MENU | (MENU_UMA_LFOB_RTG<<8),
 		/*PAR_UMA_LFOB5_FREQ*/	DTYPE_0B127,
 		/*PAR_UMA_LFOB5_OFS*/	DTYPE_0B127,
 		/*PAR_UMA_LFOB5_WAVE*/	DTYPE_0B127,
-		/*PAR_UMA_LFOB5_RTG*/	DTYPE_MENU | (MENU_RETRIGGER<<8),
+		/*PAR_UMA_LFOB5_RTG*/	DTYPE_MENU | (MENU_UMA_LFOB_RTG<<8),
 		/*PAR_UMA_LFOB6_FREQ*/	DTYPE_0B127,
 		/*PAR_UMA_LFOB6_OFS*/	DTYPE_0B127,
 		/*PAR_UMA_LFOB6_WAVE*/	DTYPE_0B127,
-		/*PAR_UMA_LFOB6_RTG*/	DTYPE_MENU | (MENU_RETRIGGER<<8),
+		/*PAR_UMA_LFOB6_RTG*/	DTYPE_MENU | (MENU_UMA_LFOB_RTG<<8),
 		/*PAR_UMA_MS1_4_SRC*/	DTYPE_MENU | (MENU_UMA_SRC<<8),
 		/*PAR_UMA_MS1_4_AMT*/	DTYPE_0B100,
 		/*PAR_UMA_MS1_4_DEST*/	DTYPE_UMA_TARGET,
@@ -1059,12 +1060,12 @@ const enum Datatypes PROGMEM parameter_dtypes[PAR_UMA_END] = {	// LX_UMA: + the 
 		/*PAR_UMA_WAVE_AB2*/	DTYPE_0B127,
 		/*PAR_UMA_WAVE_C3*/	DTYPE_0B127,
 		/*PAR_UMA_WAVE_AB3*/	DTYPE_0B127,
-		/*PAR_UMA_LFOB1_SYNC*/	DTYPE_MENU | (MENU_SYNC_RATES<<8),
-		/*PAR_UMA_LFOB2_SYNC*/	DTYPE_MENU | (MENU_SYNC_RATES<<8),
-		/*PAR_UMA_LFOB3_SYNC*/	DTYPE_MENU | (MENU_SYNC_RATES<<8),
-		/*PAR_UMA_LFOB4_SYNC*/	DTYPE_MENU | (MENU_SYNC_RATES<<8),
-		/*PAR_UMA_LFOB5_SYNC*/	DTYPE_MENU | (MENU_SYNC_RATES<<8),
-		/*PAR_UMA_LFOB6_SYNC*/	DTYPE_MENU | (MENU_SYNC_RATES<<8),
+		/*PAR_UMA_LFOB1_SYNC*/	DTYPE_MENU | (MENU_UMA_LFOB_SYNC<<8),
+		/*PAR_UMA_LFOB2_SYNC*/	DTYPE_MENU | (MENU_UMA_LFOB_SYNC<<8),
+		/*PAR_UMA_LFOB3_SYNC*/	DTYPE_MENU | (MENU_UMA_LFOB_SYNC<<8),
+		/*PAR_UMA_LFOB4_SYNC*/	DTYPE_MENU | (MENU_UMA_LFOB_SYNC<<8),
+		/*PAR_UMA_LFOB5_SYNC*/	DTYPE_MENU | (MENU_UMA_LFOB_SYNC<<8),
+		/*PAR_UMA_LFOB6_SYNC*/	DTYPE_MENU | (MENU_UMA_LFOB_SYNC<<8),
 		/*PAR_UMA_RTC1*/	DTYPE_MENU | (MENU_UMA_RATIO<<8),
 		/*PAR_UMA_RB2_1*/	DTYPE_MENU | (MENU_UMA_RATIO<<8),
 		/*PAR_UMA_M2_1*/	DTYPE_0B127,
@@ -2078,10 +2079,24 @@ static const Page* menu_umaPlaFilPage(uint8_t page)
 		: m == PL_MODEL_TERRAIN ? &umaPlaTerFmPages[page - VOICE1_PAGE] : 0;
 }
 
+// LFO B's shape: a morph 0-127 (lfoShapes.h), shown as the nearest shape, the blend on the edit screen
+static uint8_t menu_umaIsLfoBWave(uint16_t p)
+{
+	return p >= UMA_LFOB_FIRST_PAR && p < UMA_LFOB_FIRST_PAR + 6 * UMA_LFOB_PARS && (p - UMA_LFOB_FIRST_PAR) % UMA_LFOB_PARS == 2;
+}
+
 // a value shown on the page in place of its number or list entry: the drum machine (tbd, pmt ...) and the Plaits
-// model (bd ...) by their names
+// model (bd ...) by their names, LFO B's shape
 static void menu_umaShortValue(uint16_t p, uint8_t v, char* valueAsText)
 {
+	if(menu_umaIsLfoBWave(p))
+	{
+		uint8_t a, b;
+		float f;
+		lfoShapes_blend(v, &a, &b, &f);
+		memcpy(valueAsText, lfoShapes_name(f < 0.5f ? a : b), 3);
+		return;
+	}
 	uint8_t voice, k;
 	const uint8_t kind = umaVoice_which(p, &voice, &k);
 	if(kind == 3 && k == 1)
@@ -2141,7 +2156,17 @@ static void menu_umaEditValue(uint16_t p, uint8_t v)
 	t[0] = 0;
 	uint8_t wv, wk;
 	uint8_t slotField;
-	if(modSlot_of(p, &slotField) != 0xff && slotField == 0)
+	if(menu_umaIsLfoBWave(p))
+	{
+		uint8_t a, b;
+		float f;
+		lfoShapes_blend(v, &a, &b, &f);	// "Sine", or "sin>tri 40%" between two
+		if(f <= 0.f)
+			snprintf(t, sizeof(t), "%s", lfoShapes_longName(a));
+		else
+			snprintf(t, sizeof(t), "%s>%s %u%%", lfoShapes_name(a), lfoShapes_name(b), (unsigned)(f * 100.f + 0.5f));
+	}
+	else if(modSlot_of(p, &slotField) != 0xff && slotField == 0)
 		umaTgt_sourceName(v, t, sizeof(t));	// a slot's source in full: "LFO A Drum2", "Env Cymbl"
 	else if(umaVoice_ofEngine(p) != 0xff)
 	{
@@ -2242,6 +2267,9 @@ static void menu_umaAfterEdit(uint16_t paramNr, int8_t dir)
 // an engine's own extra screen n of a page and sub-page, or NULL
 static const Page* menu_umaEngineExtra(uint8_t page, uint8_t sub, uint8_t n)
 {
+	// the LFO page on every voice: LFO B (0.3b), then its offset and fold
+	if(sub == UMA_LFO_PAGE && menu_umaVoiceOf(page) != 0xff)
+		return n < 2 ? &umaLfoBPages[menu_umaVoiceOf(page)][n] : 0;
 	const uint8_t engine = menu_umaEngine(page);
 	if(engine == UMA_ENG_PLA && sub == UMA_FM_PAGE_OSC && n == 0
 		&& (menu_umaPlaModel(page) == PL_MODEL_WAVETABLE || menu_umaPlaModel(page) == PL_MODEL_TERRAIN))
@@ -4062,6 +4090,10 @@ static uint8_t getMaxEntriesForMenu(uint8_t menuId)
 		return UMA_QUANT_SCALES;
 	case MENU_UMA_SRC:
 		return umaSrcNames[0][0];
+	case MENU_UMA_LFOB_RTG:
+		return umaLfoBRtgNames[0][0];
+	case MENU_UMA_LFOB_SYNC:
+		return umaLfoBSyncNames[0][0];
 	case MENU_UMA_POL:
 		return umaPolNames[0][0];
 	case MENU_FILTER:
@@ -4213,6 +4245,12 @@ static void getMenuItemNameForValue(const uint8_t menuId, const uint8_t curParmV
 		break;
 	case MENU_UMA_SRC:
 		p = umaSrcNames[curParmVal < umaSrcNames[0][0] ? curParmVal + 1 : 1];
+		break;
+	case MENU_UMA_LFOB_RTG:
+		p = umaLfoBRtgNames[curParmVal < umaLfoBRtgNames[0][0] ? curParmVal + 1 : 1];
+		break;
+	case MENU_UMA_LFOB_SYNC:
+		p = umaLfoBSyncNames[curParmVal < umaLfoBSyncNames[0][0] ? curParmVal + 1 : 1];
 		break;
 	case MENU_UMA_POL:
 		p = umaPolNames[curParmVal ? 2 : 1];
