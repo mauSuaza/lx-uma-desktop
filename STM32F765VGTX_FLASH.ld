@@ -253,6 +253,13 @@ SECTIONS
     
 
 
+  /* LX_UMA test 0.0b (Core/Src/uma_s7test.c): a pattern at the start of flash sector 7. Empty, and dropped,
+     unless UMA_S7TEST is set in uma.h */
+  .uma_s7test 0x080C0000 :
+  {
+    KEEP(*(.uma_s7test))
+  } >FLASH
+
   /* Remove information from the compiler libraries */
   /DISCARD/ :
   {

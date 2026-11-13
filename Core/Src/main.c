@@ -9,6 +9,9 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "uma_s7test.h" // UMA: test 0.0b
+#include <stdio.h>
+#include <string.h>
 #include "fatfs.h"
 
 
@@ -355,8 +358,22 @@ lcd_clear();
 lcd_string("LX_UMA v" UMA_VERSION);
 //goto 2nd line
 lcd_setcursor(0,2);
+#if UMA_S7TEST
+// test 0.0b: did the bootloader write the sector-7 pattern? Shown for 3 s
+{
+	const uint16_t bad = uma_s7check();
+	char text[17];
+	if(bad == 0)
+		strcpy(text, "S7 ok");
+	else
+		sprintf(text, "S7 BAD %u", (unsigned)bad);
+	lcd_string(text);
+	HAL_Delay(3000);
+}
+#else
 lcd_string("base fw V");
 lcd_string(FIRMWARE_VERSION);
+#endif
 #endif
 
 lcd_showSplash();

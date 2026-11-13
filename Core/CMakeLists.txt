@@ -28,6 +28,7 @@ add_library(lxr_platform OBJECT
     Src/sysmem.c
     Src/delay.c
     Src/flash_if.c
+    Src/uma_s7test.c # LX_UMA test 0.0b: sector-7 pattern
 )
 # Shown on the boot splash screen; comes from project(VERSION) in the top-level CMakeLists.txt.
 set_source_files_properties(Src/main.c PROPERTIES

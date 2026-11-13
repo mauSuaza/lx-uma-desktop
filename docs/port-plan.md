@@ -118,4 +118,16 @@ Goal: before porting any UI, know whether everything fits and what has to give.
   a full 1st screen, so the readout is the 4th slot of the **2nd sub-page** (`ptm tin tou pk`): `pk` = the longest
   render in the last 2 s in % of a 64-sample block (over 100 = audio drop-outs). The average is computed but not
   shown (one free slot).
+- **Result (2026-11-12, user's LXR-02):** 0.0a2 installs and boots; `pk` **67 %** with a pattern playing: the
+  stock desktop's headroom is about a third of the CPU.
+
+### 0.0b as built
+
+- A 4 KB pattern at 0x080C0000 (section `.uma_s7test`, `Core/Src/uma_s7test.c`), the image padded with zeros up to
+  it (757,760 bytes, ends at 0x080C1000). The start-up screen's 2nd line shows "S7 ok" or "S7 BAD n" (bytes that
+  differ) for 3 s. **0.0b2** writes the inverse pattern (`UMA_S7TEST 2`): over 0.0b's pattern that needs 0 bits
+  turned into 1, which only an erase allows. Zeros alone can't show it (Eurorack 0.33l lesson).
+- Reading: 0.0b and 0.0b2 both install and say "S7 ok" → the bootloader erases sector 7, the cap is 992 KB.
+  Either fails ("flash write error") or says "S7 BAD" → the cap is 736 KB. After a failed install, reinstall 0.0a2.
+
 - Memory after 0.0a: flash 274.5 KB (image 275,400 bytes), RAM 271 KB (.bss), DTCM 107 KB, ITCM 15.0 KB of 16.
