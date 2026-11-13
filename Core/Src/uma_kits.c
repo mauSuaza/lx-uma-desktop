@@ -13,6 +13,10 @@
 #include "Soundengine/Sequencer/sequencer.h"
 #include <string.h>
 #include "uma_random.h"
+#include "uma_voice.h"
+#include "uma_quant_defs.h"
+#include "Soundengine/DSPAudio/MdDrum.h"
+#include "Soundengine/DSPAudio/PlaitsDrum.h"
 
 volatile uint8_t umaKit_deferred;
 
@@ -39,6 +43,51 @@ static void umaKit_irqOff(uint8_t was)
 {
 	if(!was)
 		HAL_TIM_Base_Stop_IT(&htim2);
+}
+
+#define R(par) rec[(par) - PAR_UMA_BLOCK]
+// Phase 2's settings (record format 3): mdk on its first kick (Drum 1-3) or the voice's own type (snare, cymbal,
+// hi-hat), Plaits at its start, every voice at full velocity, the quantizer off (the Eurorack's defaults,
+// presetManager.c umaFm_kitDefaults, formats 29-40)
+static void umaKit_phase2Defaults(uint8_t* rec)
+{
+	for(uint8_t d = 0; d < 3; d++)
+	{
+		uint8_t* k = &R(UMA_MD_FIRST_PAR + d * UMA_MD_PARS);
+		k[0] = MD_KICK;
+		k[1] = 0;
+		mdDrum_defaults(mdDrum_machineOf(MD_KICK, 0), &k[2]);
+		R(UMA_MD_PAL_PAR + d) = MD_PAL_TYP;
+	}
+	for(uint8_t v = 3; v < 6; v++)	// the snare, cymbal and hi-hat on their stock sound (lxr)
+	{
+		uint8_t* x = &R(UMA_VX_PAR(v, 0));
+		for(uint8_t k = 0; k < UMA_VX_PARS; k++) x[k] = 0;
+		x[UMA_VX_PRK_P1] = 50;
+		x[UMA_VX_PRK_P2] = 40;
+		static const uint8_t ownType[3] = {MD_SNARE, MD_CYMBAL, MD_HAT};	// mdk starts on the voice's own type
+		x[UMA_VX_MD_TYP] = ownType[v - 3];
+		mdDrum_defaults(mdDrum_machineOf(ownType[v - 3], 0), &x[UMA_VX_MD_K1]);
+		x[UMA_VX_MD_PAL] = MD_PAL_TYP;
+		x[UMA_VX_FOLD_SYM] = 63;	// the folder off, centred
+		x[UMA_VX_FOLD_LEV] = 100;
+		x[UMA_VX_FENV] = 63;		// the filter envelope off
+	}
+	for(uint8_t v = 0; v < 6; v++)
+	{
+		uint8_t* x = &R(UMA_PLA_FIRST_PAR + v * UMA_PLA_PARS);	// Plaits: drums, bass drum, knobs at noon, out
+		x[0] = PL_BANK_DRUMS; x[1] = 0; x[2] = 64; x[3] = 64; x[4] = 64; x[5] = PL_OUT_OUT;
+		R(UMA_PLA_DXB_PAR + v) = 0;					// the 6-op on bank A
+		R(UMA_PLA_KMD_PAR + v) = PL_DXK_PATCH;		// its own envelopes
+		R(UMA_PLA_TWI_PAR + v) = UMA_PLA_TWI_NOON;	// TWIST at noon (Plaits as Mutable made it)
+		R(UMA_PLA_WVF_PAR + v) = 0;					// built-in tables
+		R(UMA_PLA_TRF_PAR + v) = 0;
+		R(UMA_PLA_SUB_PAR + v) = R(UMA_PLA_SBS_PAR + v) = R(UMA_PLA_SBO_PAR + v) = R(UMA_PLA_SBF_PAR + v) = 0;
+		R(UMA_VEL_PAR + v) = 127;					// full velocity (Phase 3)
+		R(UMA_QUANT_FIRST_PAR + v * UMA_QUANT_PARS) = UMA_QUANT_OCT_ZERO;	// the quantizer off
+		R(UMA_QUANT_FIRST_PAR + v * UMA_QUANT_PARS + 1) = 0;
+		R(UMA_QUANT_FIRST_PAR + v * UMA_QUANT_PARS + 2) = 0;
+	}
 }
 
 // a new record: every drum on lxr, so a kit sounds as on the stock firmware; the rest a usable start when a drum is
@@ -85,6 +134,7 @@ static void umaKit_makeDefaults(uint8_t* rec)
 	}
 	for(uint8_t i = 0; i < 6; i++)
 		rec[PAR_UMA_FINE_A1 - PAR_UMA_BLOCK + i] = 63;	// fine ratios A and B exact
+	umaKit_phase2Defaults(rec);
 }
 
 // a record read from a file: n bytes valid; anything not understood becomes the defaults
@@ -103,6 +153,8 @@ static void umaKit_check(uint8_t* rec, UINT n)
 		umaKit_makeDefaults(rec);
 		rec[UMA_REC_STAMP] = stamp;
 	}
+	if(rec[UMA_REC_FORMAT] < 3)	// records from 0.1-0.2b: Phase 2's settings at their defaults
+		umaKit_phase2Defaults(rec);
 	rec[UMA_REC_FORMAT] = UMA_KIT_FORMAT;
 }
 

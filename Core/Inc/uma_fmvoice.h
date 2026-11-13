@@ -14,5 +14,7 @@ void umaFmV_block(uint8_t voiceNr, float freqHz);			// calcDrumVoiceAsync, with 
 // calcDrumVoiceSyncBlock: 1 if the drum is on an FM engine and buf holds its block (silence while the amp EG is shut:
 // the engine isn't run then), 0 for the LXR oscillators
 uint8_t umaFmV_render(uint8_t voiceNr, int16_t* buf, uint8_t size);
+// 1 if the drum's engine shapes its own volume (mdk): the amp EG doesn't scale it
+uint8_t umaFmV_ownEnv(uint8_t voiceNr);
 
 #endif /* UMA_FMVOICE_H_ */

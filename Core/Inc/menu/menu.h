@@ -319,6 +319,19 @@ enum NamesEnum
 	TEXT_UMA_RND_SWEEP,
 	TEXT_UMA_RND_SEED,
 	TEXT_UMA_RND_FINE,
+	TEXT_UMA_MD_TYP,
+	TEXT_UMA_MD_MCH,
+	TEXT_UMA_MD_K1,
+	TEXT_UMA_MD_K2,
+	TEXT_UMA_MD_K3,
+	TEXT_UMA_MD_K4,
+	TEXT_UMA_MD_K5,
+	TEXT_UMA_MD_K6,
+	TEXT_UMA_MD_K7,
+	TEXT_UMA_MD_K8,
+	TEXT_UMA_MD_RMC,
+	TEXT_UMA_MD_RKN,
+	TEXT_UMA_MD_PAL,
 	NUM_NAMES
 };
 //-----------------------------------------------------------------
@@ -464,6 +477,18 @@ enum shortNamesEnum
 	SHORT_UMA_RND_SWEEP,
 	SHORT_UMA_RND_SEED,
 	SHORT_UMA_RND_FINE,
+	SHORT_UMA_MD_TYP,
+	SHORT_UMA_MD_MCH,
+	SHORT_UMA_MD_K1,
+	SHORT_UMA_MD_K2,
+	SHORT_UMA_MD_K3,
+	SHORT_UMA_MD_K4,
+	SHORT_UMA_MD_K5,
+	SHORT_UMA_MD_K6,
+	SHORT_UMA_MD_K7,
+	SHORT_UMA_MD_K8,
+	SHORT_UMA_MD_RMC,
+	SHORT_UMA_MD_RKN,
 };
 //-----------------------------------------------------------------
 // These correspond with catNames in MenuText.h
@@ -506,6 +531,7 @@ enum catNamesEnum
 	CAT_UMA_SUB,
 	CAT_UMA_LPG,
 	CAT_UMA_RANDOM,
+	CAT_UMA_MD,
 };
 //-----------------------------------------------------------------
 // these must correspond with longNames in MenuText.h
@@ -628,6 +654,17 @@ enum longNamesEnum
 	LONG_UMA_PALETTE,
 	LONG_UMA_SWEEP,
 	LONG_UMA_SEED,
+	LONG_UMA_TYPE,
+	LONG_UMA_MACHINE,
+	LONG_UMA_KNOB1,
+	LONG_UMA_KNOB2,
+	LONG_UMA_KNOB3,
+	LONG_UMA_KNOB4,
+	LONG_UMA_KNOB5,
+	LONG_UMA_KNOB6,
+	LONG_UMA_KNOB7,
+	LONG_UMA_KNOB8,
+	LONG_UMA_KNOBS,
 };
 
 //enum for the save category parameter

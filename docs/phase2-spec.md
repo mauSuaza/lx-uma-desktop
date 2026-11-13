@@ -96,3 +96,15 @@ skip their engine (FM, Plaits' tonal models), as on the Eurorack.
 - **Mod page** (FM): `pd slp amt rpl | rto rev rsw rsd`, then `rfn vdt vam vvo` (random fine, then the desktop's
   velocity settings).
 - Image 318,532 bytes; RAM 271.6 KB (+2 KB, randomise's restore copies).
+
+## 8. 0.2c as built
+
+- **mdk on Drum 1–3** (`uma_fmvoice.c`, from the Eurorack's DrumVoice.c): the machine (or the one `rmc` drew), its
+  knobs relative to the home machine, the wavefolder, the transient on top, the filter; the amp EG doesn't scale it.
+- `eng` lists `lxr fmd fmt --- mdk`: the Eurorack's numbers, prk's place (3) is skipped when editing.
+- **Pages** as on the Eurorack: Osc `cor fin eng typ | mch`, FM the machine's 8 knobs by their own names (unused ones
+  skipped), Mod `rmc rkn rsd rpl`, Transient `wav vol frq | fld fty sym lev`. Picking a type or machine loads its
+  default knobs (encoder and pots). The edit screen names the type, machine and knob.
+- **Record format 3**: Phase 2's defaults (mdk, Plaits, the snare/cymbal/hi-hat block, velocity 127, quantizer off),
+  given once to records from 0.1–0.2b.
+- Image 432,804 bytes (~300 KB spare), RAM 276.7 KB, ITCM 15,272 B.

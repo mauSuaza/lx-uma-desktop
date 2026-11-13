@@ -32,6 +32,8 @@
 
 #include "Soundengine/Sequencer/sequencer.h"
 #include "Soundengine/Soundengine.h"
+#include "uma_voice.h" // LX_UMA
+#include "Soundengine/DSPAudio/MdDrum.h" // LX_UMA: the drum machines' names
 #include "uma_sdreadtest.h" // LX_UMA test 0.1a
 
 
@@ -300,6 +302,19 @@ const Name valueNames[NUM_NAMES] =
 		{SHORT_UMA_RND_SWEEP, CAT_UMA_RANDOM, LONG_UMA_SWEEP},/*TEXT_UMA_RND_SWEEP*/
 		{SHORT_UMA_RND_SEED, CAT_UMA_RANDOM, LONG_UMA_SEED},/*TEXT_UMA_RND_SEED*/
 		{SHORT_UMA_RND_FINE, CAT_UMA_RANDOM, LONG_FINE},/*TEXT_UMA_RND_FINE*/
+		{SHORT_UMA_MD_TYP, CAT_UMA_MD, LONG_UMA_TYPE},/*TEXT_UMA_MD_TYP*/
+		{SHORT_UMA_MD_MCH, CAT_UMA_MD, LONG_UMA_MACHINE},/*TEXT_UMA_MD_MCH*/
+		{SHORT_UMA_MD_K1, CAT_UMA_MD, LONG_UMA_KNOB1},/*TEXT_UMA_MD_K1*/
+		{SHORT_UMA_MD_K2, CAT_UMA_MD, LONG_UMA_KNOB2},/*TEXT_UMA_MD_K2*/
+		{SHORT_UMA_MD_K3, CAT_UMA_MD, LONG_UMA_KNOB3},/*TEXT_UMA_MD_K3*/
+		{SHORT_UMA_MD_K4, CAT_UMA_MD, LONG_UMA_KNOB4},/*TEXT_UMA_MD_K4*/
+		{SHORT_UMA_MD_K5, CAT_UMA_MD, LONG_UMA_KNOB5},/*TEXT_UMA_MD_K5*/
+		{SHORT_UMA_MD_K6, CAT_UMA_MD, LONG_UMA_KNOB6},/*TEXT_UMA_MD_K6*/
+		{SHORT_UMA_MD_K7, CAT_UMA_MD, LONG_UMA_KNOB7},/*TEXT_UMA_MD_K7*/
+		{SHORT_UMA_MD_K8, CAT_UMA_MD, LONG_UMA_KNOB8},/*TEXT_UMA_MD_K8*/
+		{SHORT_UMA_MD_RMC, CAT_UMA_RANDOM, LONG_UMA_MACHINE},/*TEXT_UMA_MD_RMC*/
+		{SHORT_UMA_MD_RKN, CAT_UMA_RANDOM, LONG_UMA_KNOBS},/*TEXT_UMA_MD_RKN*/
+		{SHORT_UMA_RND_PALETTE, CAT_UMA_RANDOM, LONG_UMA_PALETTE},/*TEXT_UMA_MD_PAL*/
 };
 
 //---------------------------------------------------------------
@@ -1888,13 +1903,83 @@ static uint8_t menu_umaThird;				// 0: screens 1-2, n: extra screen n of the pag
 static uint8_t menu_umaThirdPage = 0xff;
 static uint8_t menu_umaThirdSub;
 
-// Drum 1-3's engine (0 lxr, 1 fmd FM Drum, 2 fmt FM Tone); 0 for other pages
+// the voice of a voice page: Drum 1-3 0-2, snare 3, cymbal 4, the hi-hat's two pages 5; 0xff for other pages
+static uint8_t menu_umaVoiceOf(uint8_t page)
+{
+	if(page > VOICE7_PAGE)
+		return 0xff;
+	const uint8_t v = (uint8_t)(page - VOICE1_PAGE);
+	return v > 5 ? 5 : v;
+}
+
+// Drum 1-3's engine (UMA_ENG_*: 0 lxr, 1 fmd, 2 fmt, 4 mdk); 0 for other pages (the snare's ...: 0.2d)
 static uint8_t menu_umaEngine(uint8_t page)
 {
 	if(page > VOICE3_PAGE)
 		return 0;
-	const uint8_t e = activeParameters[PAR_UMA_ENG1 + (page - VOICE1_PAGE) * UMA_FM_PARS_PER_DRUM];
-	return e <= 2 ? e : 0;
+	return umaVoice_engineKnob((uint8_t)(page - VOICE1_PAGE));
+}
+
+// the drum-machine engine: the machine a voice's knobs (type, machine) choose
+static uint8_t menu_umaMdMachine(uint8_t voice)
+{
+	return mdDrum_machineOf(activeParameters[umaVoice_mdPar(voice, 0)], activeParameters[umaVoice_mdPar(voice, 1)]);
+}
+
+// a knob of the drum-machine engine's page: its index 0-7, or -1 for any other name
+static int8_t menu_umaMdKnob(uint16_t name)
+{
+	return name >= TEXT_UMA_MD_K1 && name <= TEXT_UMA_MD_K8 ? (int8_t)(name - TEXT_UMA_MD_K1) : -1;
+}
+
+// a value shown on the page in place of its number or list entry: the drum machine by its name (tbd, pmt ...)
+static void menu_umaShortValue(uint16_t p, uint8_t v, char* valueAsText)
+{
+	uint8_t voice, k;
+	if(umaVoice_which(p, &voice, &k) == 3 && k == 1)
+		memcpy(valueAsText, mdDrum_machineShort(mdDrum_machineOf(activeParameters[p - 1], v)), 3);
+}
+
+// the edit screen's 2nd line for UMA settings that have names: the drum machine's type, machine, and each knob by
+// the machine's own name (from the Eurorack's menu_umaEditValue)
+static void menu_umaEditValue(uint16_t p, uint8_t v)
+{
+	char t[24];
+	t[0] = 0;
+	uint8_t wv, wk;
+	if(umaVoice_which(p, &wv, &wk) == 3)
+	{
+		const uint8_t k = wk;
+		const uint16_t base = (uint16_t)(p - k);
+		if(k == 0) snprintf(t, sizeof(t), "%s", mdDrum_typeName(v));
+		else if(k == 1) snprintf(t, sizeof(t), "%s", mdDrum_machineName(mdDrum_machineOf(activeParameters[base], v)));
+		else
+		{
+			const char* n = mdDrum_controlName(mdDrum_machineOf(activeParameters[base], activeParameters[base + 1]), (uint8_t)(k - 2));
+			snprintf(t, sizeof(t), "%s", n[0] ? n : "-");
+		}
+	}
+	const size_t n = strlen(t);
+	if(n)
+		memcpy(&editDisplayBuffer[1][0], t, n > 12 ? 12 : n);
+}
+
+// after a UMA setting was changed by the encoder (dir +1 / -1) or a pot (dir 0)
+static void menu_umaAfterEdit(uint16_t paramNr, int8_t dir)
+{
+	// an engine setting: prk (3) isn't on the desktop, step over it
+	if(umaVoice_ofEngine(paramNr) != 0xff && paramNr < PAR_UMA_ENG1 + 3 * UMA_FM_PARS_PER_DRUM
+		&& activeParameters[paramNr] == UMA_ENG_PRK)
+		activeParameters[paramNr] = dir < 0 ? UMA_ENG_FMT : UMA_ENG_MDK;
+	// a drum-machine type or machine picked by hand: the machine starts from its default knobs
+	uint8_t umaV, umaK;
+	if(umaVoice_which(paramNr, &umaV, &umaK) == 3 && umaK < 2)
+	{
+		const uint16_t base = (uint16_t)(paramNr - umaK);
+		if(activeParameters[base + 1] >= mdDrum_typeCount(activeParameters[base]))	// a type with fewer machines
+			activeParameters[base + 1] = (uint8_t)(mdDrum_typeCount(activeParameters[base]) - 1);
+		mdDrum_defaults(mdDrum_machineOf(activeParameters[base], activeParameters[base + 1]), &activeParameters[base + 2]);
+	}
 }
 
 // an engine's extra screen n of a page and sub-page, or NULL
@@ -1929,6 +2014,14 @@ const Page* menu_getPage(uint8_t page, uint8_t sub)
 	const uint8_t engine = menu_umaEngine(page);
 	if(engine)
 	{
+		if(engine == UMA_ENG_MDK)	// mdk: Osc (type, machine), the machine's knobs on the FM page, Transient the folder
+		{
+			if(sub == UMA_FM_PAGE_OSC) return &umaMdPages[page - VOICE1_PAGE][0];
+			if(sub == UMA_FM_PAGE_FM) return &umaMdPages[page - VOICE1_PAGE][1];
+			if(sub == UMA_FM_PAGE_MOD) return &umaMdPages[page - VOICE1_PAGE][2];
+			if(sub == UMA_FM_PAGE_TRANS) return &umaMdPages[page - VOICE1_PAGE][3];
+			return &menuPages[page][sub];
+		}
 		if(sub == UMA_FM_PAGE_OSC) return engine == 2 ? &umaFmtOscPages[page - VOICE1_PAGE] : &umaFmPages[page - VOICE1_PAGE][0];
 		if(sub == UMA_FM_PAGE_FM) return &umaFmPages[page - VOICE1_PAGE][1];
 		if(sub == UMA_FM_PAGE_MOD) return &umaFmPages[page - VOICE1_PAGE][2];
@@ -1940,6 +2033,9 @@ const Page* menu_getPage(uint8_t page, uint8_t sub)
 // LX_UMA (from the Eurorack's menu.c): FM Drum's algorithm list is the first 7 of FM Tone's 8
 static uint8_t menu_umaListEntries(uint16_t paramNr, uint8_t numEntries)
 {
+	uint8_t voice, k;
+	if(umaVoice_which(paramNr, &voice, &k) == 3 && k == 1)	// the drum-machine engine: each type its machines
+		return mdDrum_typeCount(activeParameters[paramNr - 1]);
 	if(paramNr >= PAR_UMA_ENG1 && paramNr < UMA_RND_FIRST_PAR
 		&& (paramNr - PAR_UMA_ENG1) % UMA_FM_PARS_PER_DRUM == PAR_UMA_ALGO1 - PAR_UMA_ENG1
 		&& activeParameters[paramNr - (PAR_UMA_ALGO1 - PAR_UMA_ENG1)] != 2)
@@ -2648,6 +2744,7 @@ void menu_repaintGeneric()
 
 
 			} //switch(parameters_dtypes[parNr] & 0x0F) end
+			menu_umaEditValue(parNr, curParmVal);	// LX_UMA: names of UMA values
 
 		} // parameter type is not automation target
 
@@ -2668,6 +2765,17 @@ void menu_repaintGeneric()
 		memcpy(&editDisplayBuffer[0][12],
 			&shortNames[pgm_read_byte(&valueNames[pgm_read_word(&ap->top4+is2ndPage)].shortName)],3);
 
+		// LX_UMA: the drum-machine engine's knobs show the machine's own names (blank where it has none)
+		if(menu_umaVoiceOf(menu_activePage) != 0xff)
+			for(uint8_t j = 0; j < 4; j++)
+			{
+				const int8_t knob = menu_umaMdKnob(pgm_read_word(&ap->top1 + j + is2ndPage));
+				if(knob < 0) continue;
+				const char* n = mdDrum_controlShort(menu_umaMdMachine(menu_umaVoiceOf(menu_activePage)), (uint8_t)knob);
+				char* o = &editDisplayBuffer[0][j * 4];
+				for(uint8_t c = 0; c < 3; c++) o[c] = n[c] ? n[c] : ' ';
+				if(!n[0]) o[0] = o[1] = o[2] = ' ';
+			}
 		// capitalize selected item
 		upr_three(&editDisplayBuffer[0][(activeParameter%4)*4]);
 
@@ -2788,6 +2896,7 @@ void menu_repaintGeneric()
 			} // if(parNr==PAR_NONE)
 
 			//write the text to the edit buffer
+			menu_umaShortValue(parNr, curParmVal, valueAsText);	// LX_UMA: the drum machine by its name
 			memcpy(&editDisplayBuffer[1][4*i],valueAsText,3);
 
 		}	// for 1 to 4 .. each menu item
@@ -3577,6 +3686,12 @@ static uint8_t getMaxEntriesForMenu(uint8_t menuId)
 		return umaFoldTypeNames[0][0];
 	case MENU_UMA_PALETTE:
 		return umaPaletteNames[0][0];
+	case MENU_UMA_MD_TYP:
+		return umaMdTypNames[0][0];
+	case MENU_UMA_MD_MCH:
+		return umaMdMchNames[0][0];
+	case MENU_UMA_MD_PAL:
+		return umaMdPalNames[0][0];
 	case MENU_FILTER:
 		return filterTypes[0][0];
 	case MENU_SYNC_RATES:
@@ -3681,6 +3796,15 @@ static void getMenuItemNameForValue(const uint8_t menuId, const uint8_t curParmV
 		break;
 	case MENU_UMA_PALETTE:
 		p = umaPaletteNames[curParmVal + 1];
+		break;
+	case MENU_UMA_MD_TYP:
+		p = umaMdTypNames[curParmVal + 1];
+		break;
+	case MENU_UMA_MD_MCH:
+		p = umaMdMchNames[curParmVal < 13 ? curParmVal + 1 : 13];
+		break;
+	case MENU_UMA_MD_PAL:
+		p = umaMdPalNames[curParmVal + 1];
 		break;
 	case MENU_FILTER:
 		p = filterTypes[curParmVal + 1];
@@ -4073,6 +4197,9 @@ static void menu_encoderChangeParameter(int8_t inc)
 	} //parameter_dtypes[paramNr] & 0x0F
 
 
+	if(paramNr >= PAR_UMA_BLOCK)
+		menu_umaAfterEdit(paramNr, inc);	// LX_UMA
+
 	// TODO this will also send MIDI_CC or CC_2 for the above items that have already been sent. is this desired?
 	//send parameter change to uart tx
 	if(paramNr < 128) // => Sound Parameter
@@ -4134,7 +4261,10 @@ checkvalid:
 
 	// read the new param
 	param = pgm_read_word(&menu_getPage(menu_activePage, activePage)->top1 + activeParameter);
-	if(param == TEXT_SKIP) {
+	if(param == TEXT_SKIP
+		// LX_UMA: a knob the drum-machine engine's machine doesn't use
+		|| (menu_umaMdKnob(param) >= 0 && menu_umaVoiceOf(menu_activePage) != 0xff
+			&& !mdDrum_controlName(menu_umaMdMachine(menu_umaVoiceOf(menu_activePage)), (uint8_t)menu_umaMdKnob(param))[0])) {
 		if(allowedSkips--) // skip this one and check the next
 			goto checkvalid;
 		else
@@ -5204,6 +5334,8 @@ uint8_t menu_parseKnobValue(uint8_t potNr, int16_t diff)
 	{
 		activeParameters[paramNr] = dtypeValue;
 	}
+	if(paramNr >= PAR_UMA_BLOCK)
+		menu_umaAfterEdit(paramNr, 0);	// LX_UMA
 
 	switch(parameter_dtypes[paramNr] & 0xFF)
 	{

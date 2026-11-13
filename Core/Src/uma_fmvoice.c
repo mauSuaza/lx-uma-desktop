@@ -14,6 +14,10 @@
 #include "Soundengine/DSPAudio/FmDrum.h"
 #include "uma_env.h"
 #include "uma_random.h"
+#include "uma_voice.h"
+#include "uma_mod.h"
+#include "Soundengine/DSPAudio/MdDrum.h"
+#include <math.h>
 
 #define UMA_FMV_DRUMS 3
 static FmDrum umaFm[UMA_FMV_DRUMS];
@@ -28,8 +32,16 @@ static uint8_t umaFm_isOn(uint8_t voiceNr)
 {
 	if(voiceNr >= UMA_FMV_DRUMS)
 		return 0;
-	const uint8_t e = umaPar((uint16_t)(PAR_UMA_ENG1 + voiceNr * UMA_FM_PARS_PER_DRUM));
-	return e == 1 || e == 2;
+	const uint8_t e = umaVoice_engine(voiceNr);
+	return e == UMA_ENG_FMD || e == UMA_ENG_FMT;
+}
+
+// the drum-machine engine (0.2c): its own amp and pitch envelopes, then the wavefolder; the voice's transient, filter,
+// drive and mixer stay, the amp EG doesn't scale the volume
+static volatile uint8_t umaMd_hitPending[UMA_FMV_DRUMS];
+static uint8_t umaMd_isOn(uint8_t voiceNr)
+{
+	return voiceNr < UMA_FMV_DRUMS && umaVoice_engine(voiceNr) == UMA_ENG_MDK;
 }
 
 // the voice's amp EG is shut: the engine would be silent, so it isn't run (the next hit starts it as always)
@@ -48,6 +60,7 @@ __attribute__((noinline)) void umaFmV_init(void)
 		fmDrum_setAmpEnv(&umaFm[v], 0);					// the voice's amp EG shapes the volume
 		fmDrum_setParam(&umaFm[v], FMD_SWEEP_AMT, 0);	// the voice's pitch EG does the sweep
 		fmDrum_setParam(&umaFm[v], FMD_LEVEL, 127);		// the voice's mixer sets the volume
+		mdDrum_init(v);
 	}
 }
 
@@ -55,6 +68,8 @@ __attribute__((noinline)) void umaFmV_trigger(uint8_t voiceNr)
 {
 	if(voiceNr < UMA_FMV_DRUMS)
 		fmDrum_trigger(&umaFm[voiceNr], 1.f);	// velocity is applied by the voice
+	if(voiceNr < UMA_FMV_DRUMS)
+		umaMd_hitPending[voiceNr] = 1;	// started in umaFmV_block, after randomise drew this block's machine
 	umaRnd_hit(voiceNr);	// a modulated randomise setting re-rolls in this block (Phase 3), before the voice renders
 }
 
@@ -127,8 +142,51 @@ static void umaFm_syncParams(uint8_t voiceNr)
 	}
 }
 
+
+// the machine: the one rmc drew, else the type and machine settings. The knobs belong to the machine the settings
+// choose (the home machine); any other machine reads them relative to its own defaults (the Eurorack's DrumVoice.c
+// umaMd_syncParams)
+static void umaMd_syncParams(uint8_t voiceNr)
+{
+	const uint16_t kit = (uint16_t)(UMA_MD_FIRST_PAR + voiceNr * UMA_MD_PARS);
+	const uint8_t home = mdDrum_machineOf(activeParameters[kit], activeParameters[kit + 1]);
+	const uint8_t drawn = umaRnd_mdMachine(voiceNr);
+	const uint8_t played = drawn < MD_MACHINES ? drawn : mdDrum_machineOf(umaMod_get(kit), umaMod_get((uint16_t)(kit + 1)));
+	mdDrum_setMachine(voiceNr, played);
+	uint8_t defaults[MD_CONTROLS], homeDefaults[MD_CONTROLS];
+	if(played != home)
+	{
+		mdDrum_defaults(played, defaults);
+		mdDrum_defaults(home, homeDefaults);
+	}
+	for(uint8_t c = 0; c < MD_CONTROLS; c++)
+	{
+		int v = umaMod_get((uint16_t)(kit + 2 + c));
+		if(played != home)
+			v = defaults[c] + v - homeDefaults[c];
+		mdDrum_setControl(voiceNr, c, (uint8_t)(v < 0 ? 0 : v > 127 ? 127 : v));
+	}
+	umaFm_syncFold(voiceNr);
+	// the voice's pitch without the pitch EG (the machine has its own): C4 plays the machine as voiced
+	const OscInfo* osc = &voiceArray[voiceNr].osc;
+	const float f = osc->freq * osc->modNodeValue * (44100.f / REAL_FS);
+	mdDrum_setTranspose(voiceNr, f > 1.f ? 12.f * log2f(f / 261.6256f) : 0.f);
+}
+
 __attribute__((noinline)) void umaFmV_block(uint8_t voiceNr, float freqHz)
 {
+	if(umaMd_isOn(voiceNr))
+	{
+		umaMd_syncParams(voiceNr);
+		if(umaMd_hitPending[voiceNr])
+		{
+			umaMd_hitPending[voiceNr] = 0;
+			mdDrum_trigger(voiceNr);	// with this block's machine and knobs
+		}
+		return;
+	}
+	if(voiceNr < UMA_FMV_DRUMS)
+		umaMd_hitPending[voiceNr] = 0;	// a hit on another engine doesn't wait for mdk
 	if(!umaFm_isOn(voiceNr))
 		return;
 	umaFm_syncParams(voiceNr);
@@ -137,6 +195,22 @@ __attribute__((noinline)) void umaFmV_block(uint8_t voiceNr, float freqHz)
 
 __attribute__((noinline)) uint8_t umaFmV_render(uint8_t voiceNr, int16_t* buf, uint8_t size)
 {
+	if(umaMd_isOn(voiceNr))
+	{
+		// the drum machine, through the wavefolder
+		float mdBuf[MD_BLOCK];
+		if(size == MD_BLOCK)
+			mdDrum_render(voiceNr, mdBuf);
+		else
+			for(uint8_t i = 0; i < MD_BLOCK; i++) mdBuf[i] = 0.f;
+		fmDrum_foldBlock(&umaFm[voiceNr], mdBuf, size);
+		for(uint8_t i = 0; i < size; i++)
+		{
+			float x = mdBuf[i] * 32767.f;
+			buf[i] = (int16_t)(x > 32767.f ? 32767.f : x < -32767.f ? -32767.f : x);
+		}
+		return 1;
+	}
 	if(!umaFm_isOn(voiceNr))
 		return 0;
 	if(umaFm_closed(voiceNr) || size > FMD_BLOCK_SIZE)
@@ -154,4 +228,9 @@ __attribute__((noinline)) uint8_t umaFmV_render(uint8_t voiceNr, int16_t* buf, u
 		buf[i] = (int16_t)s;
 	}
 	return 1;
+}
+
+__attribute__((noinline)) uint8_t umaFmV_ownEnv(uint8_t voiceNr)
+{
+	return umaMd_isOn(voiceNr);
 }

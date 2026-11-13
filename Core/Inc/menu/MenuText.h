@@ -94,13 +94,16 @@ const char menuText_dash[] 	="---";
 const char menuText_blank[] ="   ";
 const char menuText_any[]  	= "any";
 //-----------------------------------------------------------------
-// LX_UMA: a drum's engine (the Eurorack's numbers: 3 prk and the others come with Phase 2)
+// LX_UMA: a drum's engine, the Eurorack's numbers: 3 (prk) isn't on the desktop and is skipped when editing
+// (menu_umaAfterEdit); pla (5) comes with 0.2e
 const char umaEngineNames[][4] =
 {
-	{3},		//number of entries
+	{5},		//number of entries
 	{"lxr"},
 	{"fmd"},	// FM Drum
 	{"fmt"},	// FM Tone
+	{"---"},	// (prk, not on the desktop)
+	{"mdk"},	// drum machines (MdDrum.cpp)
 };
 
 const char umaAlgoNames[][4] =
@@ -223,6 +226,29 @@ const char umaPaletteNames[][4] =
 	{"bas"},
 	{"hrm"},
 	{"met"},
+};
+// LX_UMA (0.2c): the drum-machine engine
+const char umaMdTypNames[][4] =
+{
+	{6},		//number of entries
+	{"kik"},
+	{"snr"},
+	{"clp"},
+	{"hat"},
+	{"cym"},
+	{"prc"},
+};
+const char umaMdPalNames[][4] =
+{
+	{3},		//number of entries
+	{"typ"},	// the home machine's type
+	{"fam"},	// its type and family
+	{"all"},	// any machine
+};
+const char umaMdMchNames[][4] =
+{
+	{13},		//number of entries: the most a type has
+	{"1  "}, {"2  "}, {"3  "}, {"4  "}, {"5  "}, {"6  "}, {"7  "}, {"8  "}, {"9  "}, {"10 "}, {"11 "}, {"12 "}, {"13 "},
 };
 //-----------------------------------------------------------------
 const char stepFlamNames[][4] =
@@ -687,6 +713,18 @@ const char shortNames[][4]  =
 	{"rsw"},	// LX_UMA SHORT_UMA_RND_SWEEP
 	{"rsd"},	// LX_UMA SHORT_UMA_RND_SEED
 	{"rfn"},	// LX_UMA SHORT_UMA_RND_FINE
+	{"typ"},	// LX_UMA SHORT_UMA_MD_TYP
+	{"mch"},	// LX_UMA SHORT_UMA_MD_MCH
+	{"k1 "},	// LX_UMA SHORT_UMA_MD_K1
+	{"k2 "},	// LX_UMA SHORT_UMA_MD_K2
+	{"k3 "},	// LX_UMA SHORT_UMA_MD_K3
+	{"k4 "},	// LX_UMA SHORT_UMA_MD_K4
+	{"k5 "},	// LX_UMA SHORT_UMA_MD_K5
+	{"k6 "},	// LX_UMA SHORT_UMA_MD_K6
+	{"k7 "},	// LX_UMA SHORT_UMA_MD_K7
+	{"k8 "},	// LX_UMA SHORT_UMA_MD_K8
+	{"rmc"},	// LX_UMA SHORT_UMA_MD_RMC
+	{"rkn"},	// LX_UMA SHORT_UMA_MD_RKN
 };
 //-----------------------------------------------------------------
 // These correspond with the catNamesEnum in menu.h
@@ -730,6 +768,7 @@ const char catNames[][16] =
 	{"Sub"},	// LX_UMA CAT_UMA_SUB
 	{"LPG"},	// LX_UMA CAT_UMA_LPG
 	{"Random"},	// LX_UMA CAT_UMA_RANDOM
+	{"Machine"},	// LX_UMA CAT_UMA_MD
 };
 //-----------------------------------------------------------------
 // these must correspond to longNamesEnum
@@ -853,6 +892,17 @@ const char longNames[][16] =
 	{"Palette"},	// LX_UMA LONG_UMA_PALETTE
 	{"Sweep"},	// LX_UMA LONG_UMA_SWEEP
 	{"Seed"},	// LX_UMA LONG_UMA_SEED
+	{"Type"},	// LX_UMA LONG_UMA_TYPE
+	{"Machine"},	// LX_UMA LONG_UMA_MACHINE
+	{"Knob 1"},	// LX_UMA LONG_UMA_KNOB1
+	{"Knob 2"},	// LX_UMA LONG_UMA_KNOB2
+	{"Knob 3"},	// LX_UMA LONG_UMA_KNOB3
+	{"Knob 4"},	// LX_UMA LONG_UMA_KNOB4
+	{"Knob 5"},	// LX_UMA LONG_UMA_KNOB5
+	{"Knob 6"},	// LX_UMA LONG_UMA_KNOB6
+	{"Knob 7"},	// LX_UMA LONG_UMA_KNOB7
+	{"Knob 8"},	// LX_UMA LONG_UMA_KNOB8
+	{"Knobs"},	// LX_UMA LONG_UMA_KNOBS
 };
 
 

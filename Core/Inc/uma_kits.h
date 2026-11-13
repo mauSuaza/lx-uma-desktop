@@ -15,8 +15,9 @@
 #include "ff.h"
 
 #define UMA_KIT_BYTES		1024	// a kit's UMA record, in RAM and on the card (the settings use ~800 by Phase 3)
-#define UMA_KIT_FORMAT		2		// record byte 0: the format; conversions of older records go by it
-										// 1: 0.1b, only the test stamp. 2: 0.1c, the FM settings
+#define UMA_KIT_FORMAT		3		// record byte 0: the format; conversions of older records go by it
+										// 1: 0.1b, only the test stamp. 2: 0.1c, the FM settings.
+										// 3: 0.2c, Phase 2's settings at their defaults (mdk, Plaits, the snare ..., vel, quantizer)
 #define UMA_KIT_STORE		"/UMAKITS.DAT"
 #define UMA_KIT_NONE		0xff
 

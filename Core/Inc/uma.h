@@ -7,7 +7,7 @@
 #define UMA_H_
 
 // version on the start-up screen and in the update file name (LXR_V2_UMA_V<version>.img, CMakeLists.txt)
-#define UMA_VERSION "0.2b"	// Phase 2 test build: 0.2a + randomise on the FM engines
+#define UMA_VERSION "0.2c"	// Phase 2 test build: 0.2b + mdk on Drum 1-3
 
 // UMA's engines and settings (the Eurorack's flag: the copied code is written around it)
 #define UMA_FM 1

@@ -315,7 +315,8 @@ IN_ITCM_RAM void calcDrumVoiceSyncBlock(const uint8_t voiceNr, int16_t* buf, con
 #if UMA_ENGINE_TEST
 	if(!umaTest_selfEnveloped(voiceNr))
 #endif
-	if(!umaEnv_lpgOn(voiceNr))	// LX_UMA: the low-pass gate sets the volume itself; the amp EG then only modulates
+	if(!umaEnv_lpgOn(voiceNr) && !umaFmV_ownEnv(voiceNr))	// LX_UMA: the low-pass gate (or mdk) sets the volume itself;
+		// the amp EG then only modulates
 	bufferTool_addGainInterpolated(buf,voiceArray[voiceNr].ampFilterInput, voiceArray[voiceNr].lastGain, size);
 
 	//buf[i] = dither_process(voiceArray[voiceNr].dither, buf[i]
