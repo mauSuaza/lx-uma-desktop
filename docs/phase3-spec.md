@@ -61,7 +61,7 @@ setting comes with the kit, and the step's value moves the setting it points at.
 | **0.3a** | The modulation layer (`uma_mod.c`), the 8 slots, sources LFO A / EN / EI / VL; the mod view (SHIFT + select 7) | Slots move settings; the view's buttons |
 | **0.3b** | LFO B; the LFO page's views | LFO B as on the Eurorack; synced to the tempo |
 | **0.3c** | Turing Machines (4 per voice), their views and sources | Locked loops, `v/o` melodies through the quantizer |
-| **0.3d** | Automation of UMA settings: the UMA lanes | A step moves an FM ratio, a Plaits model, `rto` |
+| ~~0.3d~~ | Automation of UMA settings (the UMA lanes): **moved later on the roadmap** (2026-11-13, the user) | |
 | **0.3e** | Kit morph for UMA settings | Morphing two kits with FM / Plaits settings |
 | **0.3** | Release: manual chapters, notes | |
 
@@ -91,3 +91,5 @@ setting comes with the kit, and the step's value moves the setting it points at.
   pol`, the slot number in the top right); the edit screen names the source ("LFO A Drum2") and the target in full
   ("fm only" for another engine's). Slot destinations are set on kit load, on edits, and when a drum's engine changes.
 - Image 603,980 bytes, RAM 350 KB of 384 (~26 KB stack), ITCM 15,408 B.
+
+- **2026-11-13:** 0.3d (UMA lanes) moved later on the roadmap; 0.3b, 0.3c and 0.3e are built in a row, the user tests 0.3e.
