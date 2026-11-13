@@ -104,3 +104,14 @@ setting comes with the kit, and the step's value moves the setting it points at.
 - **LFO page** (select 7): after LFO A's two screens, `frB snB wvB rtB`, then `ofB fdB`; the shape shown by name,
   the blend on the edit screen ("sin>tri 40%"). LFO A's fold target is never active (LFO A is stock).
 - Defaults: LFO B a slow sine (frequency 30), free, no retrigger, no fold.
+
+## 9. 0.3c as built
+
+- **Turing Machines** (`uma_turing.c`, `TuringMachine.c`): the Eurorack's, 4 per voice, 64-step patterns kept in the
+  kit (saving the kit saves the live pattern). `clk` (CLK): `own`, `dr1`–`hat` (that voice's hits), or `seq`: the
+  sequencer's sixteenths (`umaModMx_seqStep`), each with the divider. Byte values as on the Eurorack (`seq` = its `clk`).
+  Sources `T1A`–`T6D`.
+- **LFO page** (select 7): after LFO B's two screens, **Turing A | B** (`len prb clk div` each), then **Turing C | D**.
+- **Record format 5:** kits from 0.1–0.3b get the Eurorack's defaults (8 steps, locked, own clock, every hit) and
+  random patterns.
+- Image 611,324 bytes, RAM 358.5 KB of 384.

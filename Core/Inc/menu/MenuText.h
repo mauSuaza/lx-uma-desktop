@@ -367,6 +367,20 @@ const char umaLfoBRtgNames[][4] =
 	{"4b "},
 	{"8b "},
 };
+// LX_UMA (0.3c): a Turing Machine's clock (the Eurorack's list, its byte values): its own voice's hits, another
+// voice's, or the sequencer's sixteenths (the Eurorack's `clk`, UMA_TM_CLOCK_TICK)
+const char umaTmClockNames[][4] =
+{
+	{8},		//number of entries
+	{"own"},
+	{"dr1"},
+	{"dr2"},
+	{"dr3"},
+	{"snr"},
+	{"cym"},
+	{"hat"},
+	{"seq"},
+};
 const char umaLfoBSyncNames[][4] =
 {
 	{16},		//number of entries: off and 15 divisions of the tempo
@@ -1053,6 +1067,22 @@ const char shortNames[][4]  =
 	{"a8 "},	// LX_UMA SHORT_UMA_T_SLOT_AMT8
 	{"src"},	// LX_UMA SHORT_SRC
 	{"pol"},	// LX_UMA SHORT_UMA_SLOT_POL
+	{"lnA"},	// LX_UMA SHORT_UMA_TM_LEN_A
+	{"prA"},	// LX_UMA SHORT_UMA_TM_PRB_A
+	{"ckA"},	// LX_UMA SHORT_UMA_TM_CLK_A
+	{"dvA"},	// LX_UMA SHORT_UMA_TM_DIV_A
+	{"lnB"},	// LX_UMA SHORT_UMA_TM_LEN_B
+	{"prB"},	// LX_UMA SHORT_UMA_TM_PRB_B
+	{"ckB"},	// LX_UMA SHORT_UMA_TM_CLK_B
+	{"dvB"},	// LX_UMA SHORT_UMA_TM_DIV_B
+	{"lnC"},	// LX_UMA SHORT_UMA_TM_LEN_C
+	{"prC"},	// LX_UMA SHORT_UMA_TM_PRB_C
+	{"ckC"},	// LX_UMA SHORT_UMA_TM_CLK_C
+	{"dvC"},	// LX_UMA SHORT_UMA_TM_DIV_C
+	{"lnD"},	// LX_UMA SHORT_UMA_TM_LEN_D
+	{"prD"},	// LX_UMA SHORT_UMA_TM_PRB_D
+	{"ckD"},	// LX_UMA SHORT_UMA_TM_CLK_D
+	{"dvD"},	// LX_UMA SHORT_UMA_TM_DIV_D
 };
 //-----------------------------------------------------------------
 // These correspond with the catNamesEnum in menu.h
@@ -1102,6 +1132,10 @@ const char catNames[][16] =
 	{"LFO B"},	// LX_UMA CAT_UMA_LFO_B
 	{"Prk"},	// LX_UMA CAT_UMA_PRK
 	{"ModSlot"},	// LX_UMA CAT_UMA_MOD_SLOT
+	{"TuringA"},	// LX_UMA CAT_UMA_TM_A
+	{"TuringB"},	// LX_UMA CAT_UMA_TM_B
+	{"TuringC"},	// LX_UMA CAT_UMA_TM_C
+	{"TuringD"},	// LX_UMA CAT_UMA_TM_D
 };
 //-----------------------------------------------------------------
 // these must correspond to longNamesEnum
@@ -1262,6 +1296,9 @@ const char longNames[][16] =
 	{"Amount 8"},	// LX_UMA LONG_UMA_AMOUNT8
 	{"Source"},	// LX_UMA LONG_SRC
 	{"Polarity"},	// LX_UMA LONG_UMA_POLARITY
+	{"Prob"},	// LX_UMA LONG_UMA_PROB
+	{"Clock"},	// LX_UMA LONG_UMA_CLOCK
+	{"Div"},	// LX_UMA LONG_UMA_DIV
 };
 
 

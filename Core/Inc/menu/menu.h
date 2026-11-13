@@ -393,6 +393,22 @@ enum NamesEnum
 	TEXT_CV_AMT,
 	TEXT_CV_DEST,
 	TEXT_UMA_SLOT_POL,
+	TEXT_UMA_TM_LEN_A,
+	TEXT_UMA_TM_PRB_A,
+	TEXT_UMA_TM_CLK_A,
+	TEXT_UMA_TM_DIV_A,
+	TEXT_UMA_TM_LEN_B,
+	TEXT_UMA_TM_PRB_B,
+	TEXT_UMA_TM_CLK_B,
+	TEXT_UMA_TM_DIV_B,
+	TEXT_UMA_TM_LEN_C,
+	TEXT_UMA_TM_PRB_C,
+	TEXT_UMA_TM_CLK_C,
+	TEXT_UMA_TM_DIV_C,
+	TEXT_UMA_TM_LEN_D,
+	TEXT_UMA_TM_PRB_D,
+	TEXT_UMA_TM_CLK_D,
+	TEXT_UMA_TM_DIV_D,
 	NUM_NAMES
 };
 //-----------------------------------------------------------------
@@ -608,6 +624,22 @@ enum shortNamesEnum
 	SHORT_UMA_T_SLOT_AMT8,
 	SHORT_SRC,
 	SHORT_UMA_SLOT_POL,
+	SHORT_UMA_TM_LEN_A,
+	SHORT_UMA_TM_PRB_A,
+	SHORT_UMA_TM_CLK_A,
+	SHORT_UMA_TM_DIV_A,
+	SHORT_UMA_TM_LEN_B,
+	SHORT_UMA_TM_PRB_B,
+	SHORT_UMA_TM_CLK_B,
+	SHORT_UMA_TM_DIV_B,
+	SHORT_UMA_TM_LEN_C,
+	SHORT_UMA_TM_PRB_C,
+	SHORT_UMA_TM_CLK_C,
+	SHORT_UMA_TM_DIV_C,
+	SHORT_UMA_TM_LEN_D,
+	SHORT_UMA_TM_PRB_D,
+	SHORT_UMA_TM_CLK_D,
+	SHORT_UMA_TM_DIV_D,
 };
 //-----------------------------------------------------------------
 // These correspond with catNames in MenuText.h
@@ -656,6 +688,10 @@ enum catNamesEnum
 	CAT_UMA_LFO_B,
 	CAT_UMA_PRK,
 	CAT_UMA_MOD_SLOT,
+	CAT_UMA_TM_A,
+	CAT_UMA_TM_B,
+	CAT_UMA_TM_C,
+	CAT_UMA_TM_D,
 };
 //-----------------------------------------------------------------
 // these must correspond with longNames in MenuText.h
@@ -815,6 +851,9 @@ enum longNamesEnum
 	LONG_UMA_AMOUNT8,
 	LONG_SRC,
 	LONG_UMA_POLARITY,
+	LONG_UMA_PROB,
+	LONG_UMA_CLOCK,
+	LONG_UMA_DIV,
 };
 
 //enum for the save category parameter

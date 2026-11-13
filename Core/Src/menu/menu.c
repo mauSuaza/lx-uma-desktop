@@ -382,6 +382,22 @@ const Name valueNames[NUM_NAMES] =
 		{SHORT_AMNT, CAT_MOD, LONG_AMOUNT},/*TEXT_CV_AMT*/
 		{SHORT_DEST, CAT_MOD, LONG_DEST_PARAM},/*TEXT_CV_DEST*/
 		{SHORT_UMA_SLOT_POL, CAT_MOD, LONG_UMA_POLARITY},/*TEXT_UMA_SLOT_POL*/
+		{SHORT_UMA_TM_LEN_A, CAT_UMA_TM_A, LONG_LENGTH},/*TEXT_UMA_TM_LEN_A*/
+		{SHORT_UMA_TM_PRB_A, CAT_UMA_TM_A, LONG_UMA_PROB},/*TEXT_UMA_TM_PRB_A*/
+		{SHORT_UMA_TM_CLK_A, CAT_UMA_TM_A, LONG_UMA_CLOCK},/*TEXT_UMA_TM_CLK_A*/
+		{SHORT_UMA_TM_DIV_A, CAT_UMA_TM_A, LONG_UMA_DIV},/*TEXT_UMA_TM_DIV_A*/
+		{SHORT_UMA_TM_LEN_B, CAT_UMA_TM_B, LONG_LENGTH},/*TEXT_UMA_TM_LEN_B*/
+		{SHORT_UMA_TM_PRB_B, CAT_UMA_TM_B, LONG_UMA_PROB},/*TEXT_UMA_TM_PRB_B*/
+		{SHORT_UMA_TM_CLK_B, CAT_UMA_TM_B, LONG_UMA_CLOCK},/*TEXT_UMA_TM_CLK_B*/
+		{SHORT_UMA_TM_DIV_B, CAT_UMA_TM_B, LONG_UMA_DIV},/*TEXT_UMA_TM_DIV_B*/
+		{SHORT_UMA_TM_LEN_C, CAT_UMA_TM_C, LONG_LENGTH},/*TEXT_UMA_TM_LEN_C*/
+		{SHORT_UMA_TM_PRB_C, CAT_UMA_TM_C, LONG_UMA_PROB},/*TEXT_UMA_TM_PRB_C*/
+		{SHORT_UMA_TM_CLK_C, CAT_UMA_TM_C, LONG_UMA_CLOCK},/*TEXT_UMA_TM_CLK_C*/
+		{SHORT_UMA_TM_DIV_C, CAT_UMA_TM_C, LONG_UMA_DIV},/*TEXT_UMA_TM_DIV_C*/
+		{SHORT_UMA_TM_LEN_D, CAT_UMA_TM_D, LONG_LENGTH},/*TEXT_UMA_TM_LEN_D*/
+		{SHORT_UMA_TM_PRB_D, CAT_UMA_TM_D, LONG_UMA_PROB},/*TEXT_UMA_TM_PRB_D*/
+		{SHORT_UMA_TM_CLK_D, CAT_UMA_TM_D, LONG_UMA_CLOCK},/*TEXT_UMA_TM_CLK_D*/
+		{SHORT_UMA_TM_DIV_D, CAT_UMA_TM_D, LONG_UMA_DIV},/*TEXT_UMA_TM_DIV_D*/
 };
 
 //---------------------------------------------------------------
@@ -2267,9 +2283,10 @@ static void menu_umaAfterEdit(uint16_t paramNr, int8_t dir)
 // an engine's own extra screen n of a page and sub-page, or NULL
 static const Page* menu_umaEngineExtra(uint8_t page, uint8_t sub, uint8_t n)
 {
-	// the LFO page on every voice: LFO B (0.3b), then its offset and fold
+	// the LFO page on every voice: LFO B (0.3b), then its offset and fold; the Turing Machines A | B, C | D (0.3c)
 	if(sub == UMA_LFO_PAGE && menu_umaVoiceOf(page) != 0xff)
-		return n < 2 ? &umaLfoBPages[menu_umaVoiceOf(page)][n] : 0;
+		return n < 2 ? &umaLfoBPages[menu_umaVoiceOf(page)][n]
+			: n < 2 + UMA_TM_VIEWS ? &umaTmPages[menu_umaVoiceOf(page)][n - 2] : 0;
 	const uint8_t engine = menu_umaEngine(page);
 	if(engine == UMA_ENG_PLA && sub == UMA_FM_PAGE_OSC && n == 0
 		&& (menu_umaPlaModel(page) == PL_MODEL_WAVETABLE || menu_umaPlaModel(page) == PL_MODEL_TERRAIN))
@@ -4094,6 +4111,8 @@ static uint8_t getMaxEntriesForMenu(uint8_t menuId)
 		return umaLfoBRtgNames[0][0];
 	case MENU_UMA_LFOB_SYNC:
 		return umaLfoBSyncNames[0][0];
+	case MENU_UMA_TM_CLOCK:
+		return umaTmClockNames[0][0];
 	case MENU_UMA_POL:
 		return umaPolNames[0][0];
 	case MENU_FILTER:
@@ -4251,6 +4270,9 @@ static void getMenuItemNameForValue(const uint8_t menuId, const uint8_t curParmV
 		break;
 	case MENU_UMA_LFOB_SYNC:
 		p = umaLfoBSyncNames[curParmVal < umaLfoBSyncNames[0][0] ? curParmVal + 1 : 1];
+		break;
+	case MENU_UMA_TM_CLOCK:
+		p = umaTmClockNames[curParmVal < umaTmClockNames[0][0] ? curParmVal + 1 : 1];
 		break;
 	case MENU_UMA_POL:
 		p = umaPolNames[curParmVal ? 2 : 1];

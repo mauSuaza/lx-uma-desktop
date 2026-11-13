@@ -225,6 +225,7 @@ void umaMod_kitLoaded(void)
 		modNode_setDestination(&cvModulators[s], umaTgt_slotParam(s));
 	for(uint8_t d = 0; d < 3; d++)
 		umaMod_lastEngine[d] = activeParameters[PAR_UMA_ENG1 + d * UMA_FM_PARS_PER_DRUM];
+	umaTm_kitLoaded();	// the Turing Machines take the kit's saved patterns
 }
 
 void umaMod_tick(void)

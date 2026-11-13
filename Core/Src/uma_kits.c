@@ -7,6 +7,7 @@
  * hands it over with the interrupt off.
  */
 #include "main.h"
+#include "Soundengine/DSPAudio/random.h"
 #include "uma_kits.h"
 #include "Parameters.h"
 #include "menu/menu.h"
@@ -113,6 +114,23 @@ static void umaKit_phase3Defaults(uint8_t* rec)
 	}
 }
 
+// the Turing Machines (format 5, 0.3c): the Eurorack's defaults (locked, 8 steps, own clock, every hit), random patterns
+static void umaKit_turingDefaults(uint8_t* rec)
+{
+	for(uint8_t i = 0; i < UMA_TM_VOICES * UMA_TM_PER_VOICE; i++)
+	{
+		uint8_t* tm = &R(UMA_TM_FIRST_PAR + i * UMA_TM_PARS_PER_TM);
+		tm[0] = 8;	// length
+		tm[1] = 0;	// probability: locked
+		tm[2] = 0;	// clock: own voice
+		tm[3] = 1;	// every hit
+		for(uint8_t b = 0; b < 2; b++)
+			R(UMA_TM_REG_FIRST_PAR + i * 2 + b) = (uint8_t)GetRngValue();
+		for(uint8_t b = 0; b < UMA_TM_REGX_PARS; b++)
+			R(UMA_TM_REGX_FIRST_PAR + i * UMA_TM_REGX_PARS + b) = (uint8_t)GetRngValue();
+	}
+}
+
 // a new record: every drum on lxr, so a kit sounds as on the stock firmware; the rest a usable start when a drum is
 // set to an FM engine. The values are the Eurorack's (presetManager.c umaFm_kitDefaults, LX_UMA a179390); the other
 // engines' and modulation's defaults come with Phases 2 and 3.
@@ -159,6 +177,7 @@ static void umaKit_makeDefaults(uint8_t* rec)
 		rec[PAR_UMA_FINE_A1 - PAR_UMA_BLOCK + i] = 63;	// fine ratios A and B exact
 	umaKit_phase2Defaults(rec);
 	umaKit_phase3Defaults(rec);
+	umaKit_turingDefaults(rec);
 }
 
 // a record read from a file: n bytes valid; anything not understood becomes the defaults
@@ -181,6 +200,8 @@ static void umaKit_check(uint8_t* rec, UINT n)
 		umaKit_phase2Defaults(rec);
 	if(rec[UMA_REC_FORMAT] < 4)	// records from 0.1-0.2: the mod slots and v/o at their defaults
 		umaKit_phase3Defaults(rec);
+	if(rec[UMA_REC_FORMAT] < 5)	// records from 0.1-0.3b: the Turing Machines at their defaults
+		umaKit_turingDefaults(rec);
 	rec[UMA_REC_FORMAT] = UMA_KIT_FORMAT;
 }
 

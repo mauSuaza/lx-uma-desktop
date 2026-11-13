@@ -7,7 +7,7 @@
 #define UMA_H_
 
 // version on the start-up screen and in the update file name (LXR_V2_UMA_V<version>.img, CMakeLists.txt)
-#define UMA_VERSION "0.3b"	// Phase 3 test build: 0.3a + LFO B
+#define UMA_VERSION "0.3c"	// Phase 3 test build: 0.3b + the Turing Machines
 
 // UMA's engines and settings (the Eurorack's flag: the copied code is written around it)
 #define UMA_FM 1

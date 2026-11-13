@@ -3,7 +3,7 @@
  *
  * Settings per machine: kit parameters PAR_UMA_TM<voice><A-D>_LEN/PRB/CLK/DIV. A machine steps on the hits
  * of its clock voice (CLK: 0 = its own voice, 1-6 = that voice), or on the 1/16 ticks of the OP HH clock
- * (CLK 7 = clk, uma_clock.h), every DIV-th one. Sources T1A-T6D in the
+ * (CLK 7 = clk, uma_clock.h; LX_UMA desktop: the sequencer's sixteenths), every DIV-th one. Sources T1A-T6D in the
  * mod matrix (cvSrcNames, CV_process).
  *
  * Copyright (C) 2026 UMA contributors

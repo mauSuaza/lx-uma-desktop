@@ -10,6 +10,7 @@
 #include "uma_mod.h"
 #include "uma_turing.h"
 #include "uma_lfo.h"
+#include "Soundengine/DSPAudio/random.h"
 #include "Parameters.h"
 #include "menu/menu.h"
 #include "menu/umaModTargets.h"
@@ -19,7 +20,7 @@
 #include "Soundengine/DSPAudio/HiHat.h"
 
 #ifndef UMA_TURING
-#define UMA_TURING 0	// the Turing Machines (0.3c): until then their sources sit at the middle (no change)
+#define UMA_TURING 1	// the Turing Machines (0.3c)
 #endif
 #ifndef UMA_LFOB
 #define UMA_LFOB 1		// LFO B (0.3b)
@@ -80,9 +81,10 @@ void umaModMx_init(void)
 	for(uint8_t i = 0; i < NUM_MOD_SLOTS; i++)
 		modNode_init(&cvModulators[i]);
 	umaLfoB_init();
+	umaTm_init(GetRngValue());	// the Turing Machines start from random patterns (a kit brings its own)
 }
 
-// the sequencer's sixteenths since it started: LFO B's bar restarts (and the Turing Machines' clock, 0.3c)
+// the sequencer's sixteenths since it started: LFO B's bar restarts; the Turing Machines' clock (CLK `seq`)
 static uint32_t umaModMx_tick;
 void umaModMx_seqStart(void)
 {
@@ -91,11 +93,13 @@ void umaModMx_seqStart(void)
 void umaModMx_seqStep(void)
 {
 	umaLfoB_barTick(umaModMx_tick);
+	umaTm_clockTick();
 	umaModMx_tick++;
 }
 void umaModMx_hit(uint8_t voice)
 {
 	umaLfoB_hit(voice);
+	umaTm_hit(voice);
 }
 
 // v/o of each voice (0-127 = 0-60 semitones up, modulated) into its pitched oscillators, as the quantizer's settings
