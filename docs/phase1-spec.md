@@ -126,3 +126,5 @@ Eurorack) and, if still needed, a stock function or two leaves ITCM (CPU measure
 - **Test build:** `UMA_KIT_TEST` stamps a kit's record with its number + 1 when it is saved; the CPU screen shows the
   playing kit's stamp as `uk` (2nd sub-page: `ptm tin uk pk`).
 - Image 671,328 bytes (80.4 KB spare); RAM 338.6 KB; ITCM +16 B.
+- **Result (2026-11-12, user's LXR-02):** verified: stamps follow their kits through kit save/load, project save, power
+  cycle, and pattern changes (prefetch), audio clean ("works great").
