@@ -13,6 +13,8 @@
 
 
 #include "Soundengine/DSPAudio/CymbalVoice.h"
+#include "uma.h"
+#include "uma_voice.h"
 #include "Soundengine/DSPAudio/squareRootLut.h"
 #include "Soundengine/DSPAudio/modulationNode.h"
 #include "Soundengine/TriggerOut.h"
@@ -91,6 +93,9 @@ void Cymbal_updatePan()
 void Cymbal_trigger( const uint8_t vel, const uint8_t note)
 {
 	lfo_retrigger(4);
+#if UMA_FM
+	umaVoice_trigger(4, 0);	// LX_UMA: mdk (Plaits: 0.2e) start their hit after randomise
+#endif
 	//update velocity modulation
 	modNode_updateValue(&velocityModulators[4],vel/127.f);
 
@@ -150,12 +155,19 @@ IN_ITCM_RAM void Cymbal_calcAsync()
 	osc_setFreq(&cymbalVoice.osc);
 	osc_setFreq(&cymbalVoice.modOsc);
 	osc_setFreq(&cymbalVoice.modOsc2);
+#if UMA_FM
+	umaVoice_async(4);	// LX_UMA: mdk (Plaits: 0.2e)'s settings and pitch, the hit
+#endif
 
 
 }
 //---------------------------------------------------
 void Cymbal_calcSyncBlock(int16_t* buf, const uint8_t size)
 {
+#if UMA_FM
+	if(umaVoice_render(4, buf, size))	// LX_UMA: prk or mdk instead of the stock cymbal
+		return;
+#endif
 		int16_t mod[size];
 		int16_t mod2[size];
 		//calc next mod osc sample
@@ -170,7 +182,11 @@ void Cymbal_calcSyncBlock(int16_t* buf, const uint8_t size)
 		if(fxBus.fxType != FX_REVERB)
 		{
 #endif
+#if UMA_FM
+			umaVoice_filterBlock(4, buf, size);	// LX_UMA: with the filter envelope
+#else
 			SVF_calcBlockZDF(&cymbalVoice.filter,cymbalVoice.filterType,buf,size);
+#endif
 
 #if USE_REVERB
 		}

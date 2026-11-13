@@ -14,6 +14,8 @@
 
 
 #include "Soundengine/DSPAudio/HiHat.h"
+#include "uma.h"
+#include "uma_voice.h"
 #include "Soundengine/DSPAudio/squareRootLut.h"
 #include "Soundengine/DSPAudio/modulationNode.h"
 #include "Soundengine/TriggerOut.h"
@@ -90,6 +92,9 @@ void HiHat_updatePan()
 void HiHat_trigger( uint8_t vel, uint8_t isOpen, const uint8_t note)
 {
 	lfo_retrigger(5);
+#if UMA_FM
+	umaVoice_trigger(5, isOpen);	// LX_UMA: mdk (Plaits: 0.2e) start their hit after randomise (open: the machine's open version)
+#endif
 
 	//update velocity modulation
 	modNode_updateValue(&velocityModulators[5],vel/127.f);
@@ -158,12 +163,19 @@ IN_ITCM_RAM void HiHat_calcAsync( )
 	osc_setFreq(&hatVoice.osc);
 	osc_setFreq(&hatVoice.modOsc);
 	osc_setFreq(&hatVoice.modOsc2);
+#if UMA_FM
+	umaVoice_async(5);	// LX_UMA: mdk (Plaits: 0.2e)'s settings and pitch, the hit
+#endif
 
 
 }
 //---------------------------------------------------
 void HiHat_calcSyncBlock(int16_t* buf, const uint8_t size)
 {
+#if UMA_FM
+	if(umaVoice_render(5, buf, size))	// LX_UMA: prk or mdk instead of the stock hi-hat
+		return;
+#endif
 	//2 buffers for the mod oscs
 	int16_t mod1[size],mod2[size];
 	//calc next mod osc samples, scaled with mod amount
@@ -179,7 +191,11 @@ void HiHat_calcSyncBlock(int16_t* buf, const uint8_t size)
 	if(fxBus.fxType != FX_REVERB)
 	{
 #endif
+#if UMA_FM
+		umaVoice_filterBlock(5, buf, size);	// LX_UMA: with the filter envelope
+#else
 		SVF_calcBlockZDF(&hatVoice.filter,hatVoice.filterType,buf,size);
+#endif
 
 #if USE_REVERB
 	}

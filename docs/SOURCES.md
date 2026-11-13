@@ -16,6 +16,9 @@ To check for differences: `diff -r ~/src/eurorack/lxr-fm/Core/Src/Soundengine/DS
 | `Core/Src/Soundengine/DSPAudio/Lpg.c`, `Core/Inc/Soundengine/DSPAudio/Lpg.h`, `SlopeEg2.c` / `SlopeEg2.h` (UMA's hold and gate mode; the desktop's stock files were identical to the Eurorack's stock ones) | `a179390` | 2026-11-12, 0.2a |
 | `Core/Src/uma_env.c`, `Core/Inc/uma_env.h` (adapted: no trigger jacks, the desktop's mute, settings from the kit) | `a179390` | 2026-11-12, 0.2a |
 
+| `Core/Src/uma_voicepar.c`, `Core/Inc/uma_voice.h`, `Core/Src/uma_random.c`, `Core/Inc/uma_random.h`, `PrkDrum.c` / `PrkDrum.h` (only `prkDrum_random` is linked) | `a179390` | 2026-11-12, 0.2b |
+| `Core/Src/uma_voice.c` (prk compiled out, `osc_getFreq` local); hooks in `Snare.c`, `CymbalVoice.c`, `HiHat.c` (without the quantizer's, 0.2f) | `a179390` | 2026-11-13, 0.2d |
+
 ## Changed on the desktop
 
 - `Core/Inc/uma_sdfiles.h`: `UMA_SDF_SLOTS` 6 (10 on the Eurorack), to save 16 KB of RAM (0.1a). Keep this when

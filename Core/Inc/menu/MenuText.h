@@ -250,6 +250,15 @@ const char umaMdMchNames[][4] =
 	{13},		//number of entries: the most a type has
 	{"1  "}, {"2  "}, {"3  "}, {"4  "}, {"5  "}, {"6  "}, {"7  "}, {"8  "}, {"9  "}, {"10 "}, {"11 "}, {"12 "}, {"13 "},
 };
+// LX_UMA (0.2d): the snare's, cymbal's and hi-hat's engine, stored 0-3 as on the Eurorack: 1 (prk) isn't on the
+// desktop and is skipped when editing; pla (3) comes with 0.2e
+const char umaVEngineNames[][4] =
+{
+	{3},		//number of entries
+	{"lxr"},	// the voice's own sound
+	{"---"},	// (prk, not on the desktop)
+	{"mdk"},
+};
 //-----------------------------------------------------------------
 const char stepFlamNames[][4] =
 {

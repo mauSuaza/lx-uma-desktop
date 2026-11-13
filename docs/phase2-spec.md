@@ -108,3 +108,13 @@ skip their engine (FM, Plaits' tonal models), as on the Eurorack.
 - **Record format 3**: Phase 2's defaults (mdk, Plaits, the snare/cymbal/hi-hat block, velocity 127, quantizer off),
   given once to records from 0.1–0.2b.
 - Image 432,804 bytes (~300 KB spare), RAM 276.7 KB, ITCM 15,272 B.
+
+## 9. 0.2d as built
+
+- **The snare, cymbal and hi-hat** get `eng` after `fin` on their Osc pages (`lxr --- mdk`: prk's place skipped)
+  and the filter envelope `env` on Filter screen 2 (for their stock sound too). On `mdk` their pages are the
+  Eurorack's (`umaVxMdPages`); the hi-hat's open trigger plays the machine's open version.
+- The Eurorack's `uma_voice.c` (prk compiled out, `UMA_PRK` 0) and its hooks in `Snare.c`, `CymbalVoice.c`,
+  `HiHat.c` (applied as patches: the desktop's files differ from the Eurorack's stock ones elsewhere).
+- `uma_voice.c` already calls Plaits for these voices, so Plaits and the card-file pool are linked from here on
+  (RAM 344 KB of 384: ~32 KB left for the stack and Phase 3; to watch). Image 582 KB (~154 KB spare).

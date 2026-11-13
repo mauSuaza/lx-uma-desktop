@@ -66,6 +66,7 @@ add_library(lxr_preset OBJECT
     Src/uma_fmvoice.c
     Src/uma_env.c
     Src/uma_voicepar.c
+    Src/uma_voice.c
     Src/uma_random.c
     Src/uma_enginetest.c # LX_UMA test 0.0c
     Src/uma_sdreadtest.c # LX_UMA test 0.1a

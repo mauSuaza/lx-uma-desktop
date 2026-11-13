@@ -62,6 +62,7 @@ __attribute__((noinline)) void umaFmV_init(void)
 		fmDrum_setParam(&umaFm[v], FMD_LEVEL, 127);		// the voice's mixer sets the volume
 		mdDrum_init(v);
 	}
+	umaVoice_init();	// the snare, cymbal and hi-hat's engines
 }
 
 __attribute__((noinline)) void umaFmV_trigger(uint8_t voiceNr)

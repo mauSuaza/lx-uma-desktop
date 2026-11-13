@@ -1912,12 +1912,12 @@ static uint8_t menu_umaVoiceOf(uint8_t page)
 	return v > 5 ? 5 : v;
 }
 
-// Drum 1-3's engine (UMA_ENG_*: 0 lxr, 1 fmd, 2 fmt, 4 mdk); 0 for other pages (the snare's ...: 0.2d)
+// a voice page's engine (UMA_ENG_*: Drum 1-3 0 lxr, 1 fmd, 2 fmt, 4 mdk; the snare, cymbal, hi-hat 0 lxr, 4 mdk);
+// 0 for other pages
 static uint8_t menu_umaEngine(uint8_t page)
 {
-	if(page > VOICE3_PAGE)
-		return 0;
-	return umaVoice_engineKnob((uint8_t)(page - VOICE1_PAGE));
+	const uint8_t v = menu_umaVoiceOf(page);
+	return v == 0xff ? 0 : umaVoice_engineKnob(v);
 }
 
 // the drum-machine engine: the machine a voice's knobs (type, machine) choose
@@ -1967,10 +1967,12 @@ static void menu_umaEditValue(uint16_t p, uint8_t v)
 // after a UMA setting was changed by the encoder (dir +1 / -1) or a pot (dir 0)
 static void menu_umaAfterEdit(uint16_t paramNr, int8_t dir)
 {
-	// an engine setting: prk (3) isn't on the desktop, step over it
-	if(umaVoice_ofEngine(paramNr) != 0xff && paramNr < PAR_UMA_ENG1 + 3 * UMA_FM_PARS_PER_DRUM
-		&& activeParameters[paramNr] == UMA_ENG_PRK)
+	// an engine setting: prk (Drum 1-3: 3, the snare ...: 1) isn't on the desktop, step over it
+	const uint8_t engVoice = umaVoice_ofEngine(paramNr);
+	if(engVoice < 3 && activeParameters[paramNr] == UMA_ENG_PRK)
 		activeParameters[paramNr] = dir < 0 ? UMA_ENG_FMT : UMA_ENG_MDK;
+	else if(engVoice != 0xff && engVoice >= 3 && activeParameters[paramNr] == 1)
+		activeParameters[paramNr] = dir < 0 ? 0 : 2;
 	// a drum-machine type or machine picked by hand: the machine starts from its default knobs
 	uint8_t umaV, umaK;
 	if(umaVoice_which(paramNr, &umaV, &umaK) == 3 && umaK < 2)
@@ -2014,6 +2016,15 @@ const Page* menu_getPage(uint8_t page, uint8_t sub)
 	const uint8_t engine = menu_umaEngine(page);
 	if(engine)
 	{
+		if(engine == UMA_ENG_MDK && page >= VOICE4_PAGE)	// the snare, cymbal, hi-hat on mdk: as the drums'
+		{
+			const Page* p = umaVxMdPages[page - VOICE4_PAGE];
+			if(sub == UMA_FM_PAGE_OSC) return &p[0];
+			if(sub == UMA_FM_PAGE_FM) return &p[1];
+			if(sub == UMA_FM_PAGE_MOD) return &p[2];
+			if(sub == UMA_FM_PAGE_TRANS) return &p[3];
+			return &menuPages[page][sub];
+		}
 		if(engine == UMA_ENG_MDK)	// mdk: Osc (type, machine), the machine's knobs on the FM page, Transient the folder
 		{
 			if(sub == UMA_FM_PAGE_OSC) return &umaMdPages[page - VOICE1_PAGE][0];
@@ -3692,6 +3703,8 @@ static uint8_t getMaxEntriesForMenu(uint8_t menuId)
 		return umaMdMchNames[0][0];
 	case MENU_UMA_MD_PAL:
 		return umaMdPalNames[0][0];
+	case MENU_UMA_VENGINE:
+		return umaVEngineNames[0][0];
 	case MENU_FILTER:
 		return filterTypes[0][0];
 	case MENU_SYNC_RATES:
@@ -3805,6 +3818,9 @@ static void getMenuItemNameForValue(const uint8_t menuId, const uint8_t curParmV
 		break;
 	case MENU_UMA_MD_PAL:
 		p = umaMdPalNames[curParmVal + 1];
+		break;
+	case MENU_UMA_VENGINE:
+		p = umaVEngineNames[curParmVal + 1];
 		break;
 	case MENU_FILTER:
 		p = filterTypes[curParmVal + 1];

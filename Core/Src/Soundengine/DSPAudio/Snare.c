@@ -14,6 +14,8 @@
 
 
 #include "Soundengine/DSPAudio/Snare.h"
+#include "uma.h"
+#include "uma_voice.h"
 #include "Soundengine/DSPAudio/squareRootLut.h"
 #include "Soundengine/DSPAudio/modulationNode.h"
 #include "Soundengine/TriggerOut.h"
@@ -82,6 +84,9 @@ void Snare_updatePan()
 void Snare_trigger(const uint8_t vel, const uint8_t note)
 {
 	lfo_retrigger(3);
+#if UMA_FM
+	umaVoice_trigger(3, 0);	// LX_UMA: mdk (Plaits: 0.2e) start their hit after randomise
+#endif
 	//update velocity modulation
 	modNode_updateValue(&velocityModulators[3],vel/127.f);
 
@@ -141,12 +146,19 @@ IN_ITCM_RAM void Snare_calcAsync()
 
 	osc_setFreq(&snareVoice.osc);
 	osc_setFreq(&snareVoice.noiseOsc);
+#if UMA_FM
+	umaVoice_async(3);	// LX_UMA: mdk (Plaits: 0.2e)'s settings and pitch, the hit
+#endif
 
 
 }
 //---------------------------------------------------
 void Snare_calcSyncBlock(int16_t* buf, const uint8_t size)
 {
+#if UMA_FM
+	if(umaVoice_render(3, buf, size))	// LX_UMA: prk or mdk instead of the stock snare
+		return;
+#endif
 	int16_t transBuf[size];
 	int16_t oscBuf[size];
 
@@ -155,7 +167,11 @@ void Snare_calcSyncBlock(int16_t* buf, const uint8_t size)
 	if(fxBus.fxType != FX_REVERB)
 	{
 #endif
+#if UMA_FM
+		umaVoice_filterBlock(3, buf, size);	// LX_UMA: with the filter envelope
+#else
 		SVF_calcBlockZDF(&snareVoice.filter,snareVoice.filterType,buf,size);
+#endif
 #if USE_REVERB
 	}
 	else
