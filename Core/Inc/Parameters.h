@@ -435,6 +435,7 @@ extern uint8_t parameterOrder[END_OF_SOUND_PARAMETERS];
 // numbered from here (PAR_UMA_BLOCK + their offset in the record)
 #define PAR_UMA_BLOCK NUM_PARAMS
 #include "uma_kits.h"
+#include "uma_params.h"
 
 
 #endif /* PARAMETERS_H_ */

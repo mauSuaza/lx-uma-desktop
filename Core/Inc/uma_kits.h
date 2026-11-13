@@ -15,13 +15,15 @@
 #include "ff.h"
 
 #define UMA_KIT_BYTES		1024	// a kit's UMA record, in RAM and on the card (the settings use ~800 by Phase 3)
-#define UMA_KIT_FORMAT		1		// record byte 0: the format; conversions of older records go by it
+#define UMA_KIT_FORMAT		2		// record byte 0: the format; conversions of older records go by it
+										// 1: 0.1b, only the test stamp. 2: 0.1c, the FM settings
 #define UMA_KIT_STORE		"/UMAKITS.DAT"
 #define UMA_KIT_NONE		0xff
 
 // record layout (grows with the phases; PAR_UMA_* numbers are PAR_UMA_BLOCK + the offset)
 #define UMA_REC_FORMAT		0
 #define UMA_REC_STAMP		1		// test 0.1b only: the kit number + 1 when it was last saved (0: never)
+#define UMA_REC_PARS		2		// the settings start here (uma_params.h)
 
 extern volatile uint8_t umaKit_deferred;	// set around a kit load from the audio path (sequencer, MIDI bank change)
 

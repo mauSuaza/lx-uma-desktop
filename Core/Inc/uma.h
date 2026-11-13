@@ -7,7 +7,10 @@
 #define UMA_H_
 
 // version on the start-up screen and in the update file name (LXR_V2_UMA_V<version>.img, CMakeLists.txt)
-#define UMA_VERSION "0.1b"	// Phase 1 test build: the kits' UMA settings (uma_kits.c); 0.0c's engines stay
+#define UMA_VERSION "0.1c"	// Phase 1 test build: the FM pages and settings (menus); the sound still 0.0c's test hook
+
+// UMA's engines and settings (the Eurorack's flag: the copied code is written around it)
+#define UMA_FM 1
 
 // CPU load readout on the global page (SHIFT + step 12, 3rd press), 2nd sub-page, 4th slot `pk`: the longest
 // sequencer + sound render in the last 2 s, in % of a 64-sample block's time. The main loop renders

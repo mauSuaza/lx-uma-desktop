@@ -43,6 +43,44 @@
 #define MENU_STEP_FLAM	 	24
 #define MENU_STEP_SHIFT	 	25
 #define MENU_AUDIO_OUT_FX	26
+// LX_UMA: the Eurorack's UMA lists (its numbers - 2; only those with names below are drawn so far)
+#define MENU_UMA_ENGINE	27	// UMA
+#define MENU_UMA_ALGO	28	// UMA
+#define MENU_UMA_RATIO	29	// UMA
+#define MENU_UMA_TM_CLOCK	30	// UMA
+#define MENU_UMA_GATE	31	// UMA: body envelope trg / gat
+#define MENU_UMA_DRUM_FILTER	32	// UMA: Drum 1-3's filter types, with the low-pass gate
+#define MENU_UMA_FOLD_TYPE	33	// UMA: wavefolder sin / tri
+#define MENU_UMA_MORPH_LISTS	34	// UMA: how lists morph: step / switch
+#define MENU_UMA_CLOCK	35	// UMA: clock source off / jck
+#define MENU_UMA_CLOCK_DIV	36	// UMA: what a clock pulse is worth
+#define MENU_UMA_SUB_SHAPE	37	// UMA: FM Tone's sub shape
+#define MENU_UMA_SUB_OCT	38	// UMA: FM Tone's sub octave
+#define MENU_UMA_PALETTE	39	// UMA: randomise's ratio palette
+#define MENU_UMA_PRK_ALG	40	// UMA: the prk engine's algorithms
+#define MENU_UMA_PRK_VAR	41	// UMA: its variations (named per algorithm on the edit screen)
+#define MENU_UMA_PRK_PAL	42	// UMA: its randomise palette
+#define MENU_UMA_POL	43	// UMA: a mod slot's polarity
+#define MENU_UMA_MD_TYP	44	// UMA: the drum-machine engine's sound types
+#define MENU_UMA_MD_MCH	45	// UMA: a type's machines (shown by name, menu_umaShortValue)
+#define MENU_UMA_MD_PAL	46	// UMA: the drum-machine randomise's palette
+#define MENU_UMA_VENGINE	47	// UMA: the snare's, cymbal's and hi-hat's engine: lxr prk mdk
+#define MENU_UMA_MC	48	// UMA: the CC a MIDI CC source follows: off, 1-127
+#define MENU_UMA_MC_CHAN	49	// UMA: the MIDI CC sources' channel: glb, 1-16, off
+#define MENU_UMA_OCT	50	// UMA: a voice's octave, -4..+4 (uma_quant.h)
+#define MENU_UMA_KEY	51	// UMA: a voice's key, C..B (names from uma_quant.c)
+#define MENU_UMA_SCALE	52	// UMA: a voice's scale or chord (names from uma_quant.c)
+#define MENU_UMA_PLA_BNK	53	// UMA: the Plaits engine's bank: drm ton (names from PlaitsDrum.cpp)
+#define MENU_UMA_PLA_MDL	54	// UMA: a bank's models (shown by name, menu_umaShortValue)
+#define MENU_UMA_PLA_OUT	55	// UMA: Plaits' outputs: out aux mix
+#define MENU_UMA_PLA_DXB	56	// UMA: the 6-op FM's DX7 bank (`fil`): A B C, then the SD card's (PlaitsDrum.cpp)
+#define MENU_UMA_PLA_KMD	57	// UMA: the 6-op FM's key mode: ptc frz
+#define MENU_UMA_CVJ	58	// UMA: the CV calibration's jack cv1-cv5
+#define MENU_UMA_CVP	59	// UMA: its point 0V-5V
+#define MENU_UMA_CVS	60	// UMA: --- / set (store)
+#define MENU_UMA_CVR	61	// UMA: --- / rst (reset)
+#define MENU_UMA_PLA_WVF	62	// UMA: the wavetable's file: bit (built in), then the SD card's WAVES (PlaitsDrum.cpp)
+#define MENU_UMA_PLA_TRF	63	// UMA: the wave terrain's file: bit, then the card's TERRAIN
 
 //-----------------------------------------------------------------
 // Shared texts. Reduce mem usage by pooling common text
@@ -55,6 +93,102 @@ const char menuText_fm[] 	= 	"fm ";
 const char menuText_dash[] 	="---";
 const char menuText_blank[] ="   ";
 const char menuText_any[]  	= "any";
+//-----------------------------------------------------------------
+// LX_UMA: a drum's engine (the Eurorack's numbers: 3 prk and the others come with Phase 2)
+const char umaEngineNames[][4] =
+{
+	{3},		//number of entries
+	{"lxr"},
+	{"fmd"},	// FM Drum
+	{"fmt"},	// FM Tone
+};
+
+const char umaAlgoNames[][4] =
+{
+	{8},		//number of entries (FM Drum uses the first 7, menu_umaListEntries)
+	{"1  "},
+	{"2  "},
+	{"3  "},
+	{"4  "},
+	{"5  "},
+	{"6  "},
+	{"7  "},
+	{"8  "},
+};
+
+const char umaRatioNames[][4] =
+{
+	{51},		//number of entries: FmDrum's ratio table (fmd_ratios)
+	{"1/4"},
+	{"1/3"},
+	{"1/2"},
+	{"2/3"},	// fifth below
+	{".71"},	// 1/sqrt 2
+	{"3/4"},	// fourth below
+	{"1  "},
+	{"6/5"},	// minor third
+	{"5/4"},	// major third
+	{"4/3"},	// fourth
+	{"1.4"},	// sqrt 2
+	{"3/2"},	// fifth
+	{"8/5"},	// minor sixth
+	{"5/3"},	// major sixth
+	{"1.7"},	// sqrt 3
+	{"7/4"},	// harmonic seventh
+	{"9/5"},	// minor seventh
+	{"1.9"},	// major seventh 15/8
+	{"2  "},
+	{"9/4"},	// ninth
+	{"2.4"},	// 1 + sqrt 2
+	{"5/2"},
+	{"8/3"},	// eleventh
+	{"2.8"},	// 2 sqrt 2
+	{"3  "},
+	{"3.1"},	// pi
+	{"3.3"},	// thirteenth 10/3
+	{"3.4"},	// 2 sqrt 3
+	{"7/2"},
+	{"4  "},
+	{"4.2"},	// 3 sqrt 2
+	{"9/2"},
+	{"4.7"},	// 3 pi / 2
+	{"5  "},
+	{"5.2"},	// 3 sqrt 3
+	{"5.7"},	// 4 sqrt 2
+	{"6  "},
+	{"6.3"},	// 2 pi
+	{"6.9"},	// 4 sqrt 3
+	{"7  "},
+	{"7.9"},	// 5 pi / 2
+	{"8  "},
+	{"8.5"},	// 6 sqrt 2
+	{"9  "},
+	{"9.4"},	// 3 pi
+	{"10 "},
+	{"11 "},
+	{"12 "},
+	{"13 "},
+	{"14 "},
+	{"16 "},
+};
+
+const char umaSubShapeNames[][4] =
+{
+	{4},		//number of entries
+	{"sin"},
+	{"tri"},
+	{"saw"},
+	{"sqr"},
+};
+
+const char umaSubOctNames[][4] =
+{
+	{4},		//number of entries
+	{"-1 "},
+	{"-2 "},
+	{"-3 "},
+	{"-4 "},
+};
 //-----------------------------------------------------------------
 const char stepFlamNames[][4] =
 {
@@ -481,6 +615,25 @@ const char shortNames[][4]  =
 	{"flm"},
 	{"shf"},
 
+	// LX_UMA: FM Drum and FM Tone
+	{"eng"},	// LX_UMA SHORT_UMA_ENGINE
+	{"alg"},	// LX_UMA SHORT_UMA_ALGO
+	{"fdb"},	// LX_UMA SHORT_UMA_FEEDBACK
+	{"rta"},	// LX_UMA SHORT_UMA_RATIO_A
+	{"rtb"},	// LX_UMA SHORT_UMA_RATIO_B
+	{"end"},	// LX_UMA SHORT_UMA_END
+	{"fna"},	// LX_UMA SHORT_UMA_FINE_A
+	{"fnb"},	// LX_UMA SHORT_UMA_FINE_B
+	{"wvc"},	// LX_UMA SHORT_UMA_WAVE_C
+	{"wvm"},	// LX_UMA SHORT_UMA_WAVE_AB
+	{"rtc"},	// LX_UMA SHORT_UMA_RATIO_C
+	{"rb2"},	// LX_UMA SHORT_UMA_RATIO_B2
+	{"dtn"},	// LX_UMA SHORT_UMA_DETUNE
+	{"mix"},	// LX_UMA SHORT_UMA_MIX_XY
+	{"sub"},	// LX_UMA SHORT_UMA_SUB
+	{"sbs"},	// LX_UMA SHORT_UMA_SUB_SHAPE
+	{"sbo"},	// LX_UMA SHORT_UMA_SUB_OCT
+	{"sbf"},	// LX_UMA SHORT_UMA_SUB_FOLD
 };
 //-----------------------------------------------------------------
 // These correspond with the catNamesEnum in menu.h
@@ -516,6 +669,12 @@ const char catNames[][16] =
 	{"MIDI"},
 	{"Clock"},
 	{"Fx"},
+	// LX_UMA: FM Drum and FM Tone
+	{"Op A"},	// LX_UMA CAT_UMA_OP_A
+	{"Op B"},	// LX_UMA CAT_UMA_OP_B
+	{"Op C"},	// LX_UMA CAT_UMA_OP_C
+	{"Op B2"},	// LX_UMA CAT_UMA_OP_B2
+	{"Sub"},	// LX_UMA CAT_UMA_SUB
 };
 //-----------------------------------------------------------------
 // these must correspond to longNamesEnum
@@ -610,6 +769,22 @@ const char longNames[][16] =
 	{"KitChMde"},
 	{"Flam"},
 	{"Shift"},
+	// LX_UMA: FM Drum and FM Tone
+	{"Engine"},	// LX_UMA LONG_UMA_ENGINE
+	{"Algorthm"},	// LX_UMA LONG_UMA_ALGO
+	{"Feedback"},	// LX_UMA LONG_UMA_FEEDBACK
+	{"Ratio"},	// LX_UMA LONG_UMA_RATIO
+	{"Mod"},	// LX_UMA LONG_UMA_MOD
+	{"End lvl"},	// LX_UMA LONG_UMA_END
+	{"Fine rt"},	// LX_UMA LONG_UMA_FINE_RATIO
+	{"Wave C"},	// LX_UMA LONG_UMA_WAVE_C
+	{"Wave AB"},	// LX_UMA LONG_UMA_WAVE_AB
+	{"Detune"},	// LX_UMA LONG_UMA_DETUNE
+	{"Mix X/Y"},	// LX_UMA LONG_UMA_MIX_XY
+	{"Level"},	// LX_UMA LONG_UMA_LEVEL
+	{"Shape"},	// LX_UMA LONG_UMA_SHAPE
+	{"Octave"},	// LX_UMA LONG_UMA_OCTAVE
+	{"Fold"},	// LX_UMA LONG_UMA_FOLD
 };
 
 

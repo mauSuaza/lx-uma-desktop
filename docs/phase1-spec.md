@@ -176,3 +176,19 @@ the same; `pk` with a pattern.
 
 1. The Eurorack's page layouts, unchanged.
 2. Places for Phase 2 features stay empty until they work.
+
+### 0.1c as built
+
+- `Core/Inc/uma_params.h`: the Eurorack's 847 UMA settings (generated from its `Parameters.h`), from
+  `PAR_UMA_BLOCK` + 2 = 304; record format 2 (format-1 records from 0.1b get the defaults and keep their stamp).
+  Defaults: the Eurorack's for FM, the body envelope, LPG and fold (`umaKit_makeDefaults`).
+- Value types: `parameter_dtypes` grew to `PAR_UMA_END` with the Eurorack's UMA entries (mod-slot sources and targets
+  plain numbers until Phase 3); checked in the ELF (Drum 1's `eng` at 304 = list, engine names).
+- Names: 29 FM names and their short / category / long texts added to the desktop's tables; `Page.top*` 16-bit.
+  Lists: engine (`lxr fmd fmt`), algorithm (FM Drum 7, FM Tone 8), ratio (51), sub shape, sub octave.
+- `menu_getPage` (Drum 1-3 by `eng`) and the extra screens (the select button again), as on the Eurorack, also for the
+  pots (`adcPots.c`). In FM modes the Mod page keeps the desktop's velocity screen (`vdt vam vvo`), where the
+  Eurorack has randomise (Phase 2).
+- UMA settings are never sent as MIDI CC (numbers above the sound parameters go to `menu_parseGlobalParam`, which
+  ignores them): MIDI and automation for them are Phase 3.
+- Image 676,816 bytes (75 KB spare); RAM unchanged; the sound is still 0.0c's test hook.

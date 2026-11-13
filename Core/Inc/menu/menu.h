@@ -270,7 +270,36 @@ enum NamesEnum
 	TEXT_FX_P3,
 	TEXT_FX_P4,
 	TEXT_PATTERN_MODE,
-
+	// LX_UMA: FM Drum and FM Tone (names from the Eurorack's menu.h)
+	TEXT_UMA_ENGINE,
+	TEXT_UMA_ALGO,
+	TEXT_UMA_FEEDBACK,
+	TEXT_UMA_RATIO_A,
+	TEXT_UMA_RATIO_B,
+	TEXT_UMA_MOD_A,
+	TEXT_UMA_ATK_A,
+	TEXT_UMA_DEC_A,
+	TEXT_UMA_END_A,
+	TEXT_UMA_MOD_B,
+	TEXT_UMA_ATK_B,
+	TEXT_UMA_DEC_B,
+	TEXT_UMA_END_B,
+	TEXT_UMA_FINE_A,
+	TEXT_UMA_FINE_B,
+	TEXT_UMA_WAVE_C,
+	TEXT_UMA_WAVE_AB,
+	TEXT_UMA_RATIO_C,
+	TEXT_UMA_RATIO_B2,
+	TEXT_UMA_MOD_B2,
+	TEXT_UMA_ATK_B2,
+	TEXT_UMA_DEC_B2,
+	TEXT_UMA_END_B2,
+	TEXT_UMA_DETUNE,
+	TEXT_UMA_MIX_XY,
+	TEXT_UMA_SUB,
+	TEXT_UMA_SUB_SHAPE,
+	TEXT_UMA_SUB_OCT,
+	TEXT_UMA_SUB_FOLD,
 
 	NUM_NAMES
 };
@@ -379,7 +408,26 @@ enum shortNamesEnum
 	SHORT_P4,
 	SHORT_KCM,
 	SHORT_FLAM,
-	SHORT_SHIFT
+	SHORT_SHIFT,
+	// LX_UMA
+	SHORT_UMA_ENGINE,
+	SHORT_UMA_ALGO,
+	SHORT_UMA_FEEDBACK,
+	SHORT_UMA_RATIO_A,
+	SHORT_UMA_RATIO_B,
+	SHORT_UMA_END,
+	SHORT_UMA_FINE_A,
+	SHORT_UMA_FINE_B,
+	SHORT_UMA_WAVE_C,
+	SHORT_UMA_WAVE_AB,
+	SHORT_UMA_RATIO_C,
+	SHORT_UMA_RATIO_B2,
+	SHORT_UMA_DETUNE,
+	SHORT_UMA_MIX_XY,
+	SHORT_UMA_SUB,
+	SHORT_UMA_SUB_SHAPE,
+	SHORT_UMA_SUB_OCT,
+	SHORT_UMA_SUB_FOLD
 
 	
 };
@@ -415,7 +463,13 @@ enum catNamesEnum
 	CAT_GENERATOR,
 	CAT_MIDI,
 	CAT_CLOCK,
-	CAT_FX
+	CAT_FX,
+	// LX_UMA
+	CAT_UMA_OP_A,
+	CAT_UMA_OP_B,
+	CAT_UMA_OP_C,
+	CAT_UMA_OP_B2,
+	CAT_UMA_SUB
 };
 //-----------------------------------------------------------------
 // these must correspond with longNames in MenuText.h
@@ -508,7 +562,23 @@ enum longNamesEnum
 	LONG_P4,
 	LONG_PATTERN_MODE,
 	LONG_FLAM,
-	LONG_SHIFT
+	LONG_SHIFT,
+	// LX_UMA
+	LONG_UMA_ENGINE,
+	LONG_UMA_ALGO,
+	LONG_UMA_FEEDBACK,
+	LONG_UMA_RATIO,
+	LONG_UMA_MOD,
+	LONG_UMA_END,
+	LONG_UMA_FINE_RATIO,
+	LONG_UMA_WAVE_C,
+	LONG_UMA_WAVE_AB,
+	LONG_UMA_DETUNE,
+	LONG_UMA_MIX_XY,
+	LONG_UMA_LEVEL,
+	LONG_UMA_SHAPE,
+	LONG_UMA_OCTAVE,
+	LONG_UMA_FOLD
 	
 };
 
@@ -533,17 +603,18 @@ enum loadSaveEnum
 /** struct describing a display page.
 top values are from the 'NamesEnum' selecting a text to display.
 bottom values are from the 'ParamEnums' selecting the parameter value to show*/
+// LX_UMA: the name indices are 16 bits (as on the Eurorack: more than 255 names with all engines)
 typedef struct PageStruct
 {
-	uint8_t top1;
-	uint8_t top2;
-	uint8_t top3;
-	uint8_t top4;
+	uint16_t top1;
+	uint16_t top2;
+	uint16_t top3;
+	uint16_t top4;
 	
-	uint8_t top5;
-	uint8_t top6;
-	uint8_t top7;
-	uint8_t top8;
+	uint16_t top5;
+	uint16_t top6;
+	uint16_t top7;
+	uint16_t top8;
 	
 	uint16_t bot1;
 	uint16_t bot2;
@@ -611,7 +682,7 @@ enum Datatypes
 };
 
 //-----------------------------------------------------------------
-extern const enum Datatypes parameter_dtypes[NUM_PARAMS];
+extern const enum Datatypes parameter_dtypes[PAR_UMA_END];	// LX_UMA: + the UMA record
 extern uint8_t mainParameters[NUM_KIT_SLOTS][END_OF_SOUND_PARAMETERS];		// keeps all kits from sd card in memory
 extern uint8_t activeParameters[NUM_PARAMS + UMA_KIT_BYTES];	// LX_UMA: + the kit's UMA record (uma_kits.h)					// keeps the currently used kit in memory -> editBuffer
 //extern uint8_t morphParameters[END_OF_SOUND_PARAMETERS];
@@ -619,6 +690,7 @@ extern uint8_t *morphParameters;
 //extern uint8_t abs_pot_Parameter_position[NUM_PARAMS];
 
 extern const Page menuPages[NUM_PAGES][NUM_SUB_PAGES];
+const Page* menu_getPage(uint8_t page, uint8_t sub);	// LX_UMA: the page shown (Drum 1-3: by their engine)
 
 
 // **AUTOM declare modTargets array

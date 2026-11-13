@@ -40,10 +40,50 @@ static void umaKit_irqOff(uint8_t was)
 		HAL_TIM_Base_Stop_IT(&htim2);
 }
 
+// a new record: every drum on lxr, so a kit sounds as on the stock firmware; the rest a usable start when a drum is
+// set to an FM engine. The values are the Eurorack's (presetManager.c umaFm_kitDefaults, LX_UMA a179390); the other
+// engines' and modulation's defaults come with Phases 2 and 3.
 static void umaKit_makeDefaults(uint8_t* rec)
 {
 	memset(rec, 0, UMA_KIT_BYTES);
 	rec[UMA_REC_FORMAT] = UMA_KIT_FORMAT;
+	for(uint8_t d = 0; d < 3; d++)
+	{
+		uint8_t* p = &rec[PAR_UMA_ENG1 - PAR_UMA_BLOCK + d * UMA_FM_PARS_PER_DRUM];
+		p[PAR_UMA_ENG1 - PAR_UMA_ENG1]		= 0;	// lxr
+		p[PAR_UMA_ALGO1 - PAR_UMA_ENG1]		= 0;	// algorithm 1
+		p[PAR_UMA_FDBK1 - PAR_UMA_ENG1]		= 0;
+		p[PAR_UMA_RATIO_A1 - PAR_UMA_ENG1]	= 6;	// x1
+		p[PAR_UMA_RATIO_B1 - PAR_UMA_ENG1]	= 18;	// x2
+		p[PAR_UMA_MOD_A1 - PAR_UMA_ENG1]	= 60;
+		p[PAR_UMA_ATK_A1 - PAR_UMA_ENG1]	= 0;
+		p[PAR_UMA_DEC_A1 - PAR_UMA_ENG1]	= 40;
+		p[PAR_UMA_END_A1 - PAR_UMA_ENG1]	= 0;
+		p[PAR_UMA_MOD_B1 - PAR_UMA_ENG1]	= 0;
+		p[PAR_UMA_ATK_B1 - PAR_UMA_ENG1]	= 0;
+		p[PAR_UMA_DEC_B1 - PAR_UMA_ENG1]	= 30;
+		p[PAR_UMA_END_B1 - PAR_UMA_ENG1]	= 0;
+
+		uint8_t* t = &rec[UMA_TONE_FIRST_PAR - PAR_UMA_BLOCK + d * UMA_TONE_PARS];	// FM Tone
+		t[0] = 6;	// ratio C x1
+		t[1] = 6;	// ratio B2 x1
+		uint8_t* b2 = &rec[UMA_B2ENV_FIRST_PAR - PAR_UMA_BLOCK + d * UMA_B2ENV_PARS];	// B2's envelope
+		b2[1] = 30;
+
+		uint8_t* e = &rec[UMA_ENV_FIRST_PAR - PAR_UMA_BLOCK + d * UMA_ENV_PARS];	// the body envelope (Phase 2)
+		e[1] = 127;	// sustain (gate mode only)
+		e[2] = 40;	// release (gate mode only)
+		e[4] = 63;	// filter env off
+		uint8_t* l = &rec[UMA_LPG_FIRST_PAR - PAR_UMA_BLOCK + d * UMA_LPG_PARS];	// the low-pass gate (Phase 2)
+		l[0] = 50;
+		l[1] = 30;
+		l[2] = 127;
+		uint8_t* f = &rec[UMA_FOLD_FIRST_PAR - PAR_UMA_BLOCK + d * UMA_FOLD_PARS];	// the wavefolder (Phase 2) and the body level
+		f[2] = 63;	// symmetric
+		f[3] = 100;	// body level 1
+	}
+	for(uint8_t i = 0; i < 6; i++)
+		rec[PAR_UMA_FINE_A1 - PAR_UMA_BLOCK + i] = 63;	// fine ratios A and B exact
 }
 
 // a record read from a file: n bytes valid; anything not understood becomes the defaults
@@ -56,6 +96,13 @@ static void umaKit_check(uint8_t* rec, UINT n)
 	}
 	if(n < UMA_KIT_BYTES)
 		memset(rec + n, 0, UMA_KIT_BYTES - n);	// a shorter (older) record: the rest default
+	if(rec[UMA_REC_FORMAT] < 2)	// 0.1b's records held only the test stamp: the settings' defaults
+	{
+		const uint8_t stamp = rec[UMA_REC_STAMP];
+		umaKit_makeDefaults(rec);
+		rec[UMA_REC_STAMP] = stamp;
+	}
+	rec[UMA_REC_FORMAT] = UMA_KIT_FORMAT;
 }
 
 static FRESULT umaKit_storeRead(uint8_t kit, uint8_t* rec)
