@@ -158,6 +158,7 @@ extern PatternBackupBuffer patternBackupBuffer;
 extern uint8_t seq_songData[NUM_KIT_SLOTS][MAX_SONG_LENGTH];
 extern uint8_t *seq_activeSong;
 extern uint8_t seq_songPositionPointer;
+uint8_t seq_peekNextPattern(void);	// LX_UMA: the next pattern (song mode), without moving on
 //extern uint8_t seq_bankPreloadPendingFlag;			//pattern bank can't be switched in Audio/Seq IRQ
 												//so the IRQ sets this flag to let the mainloop do the pre loading
 

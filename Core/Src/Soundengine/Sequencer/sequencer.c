@@ -12,6 +12,7 @@
  */
 
 
+#include "uma_kits.h" // LX_UMA
 #include "stm32f7xx_hal.h"
 #include "Soundengine/globals.h"
 #include "Soundengine/DSPAudio/DrumVoice.h"
@@ -596,6 +597,12 @@ static uint8_t seq_determineNextPattern(uint8_t autoIncrement)
 		*/
 
 }
+//------------------------------------------------------------------------------
+// LX_UMA: the pattern that follows the active one (song mode: the next entry), without moving on (uma_kits.c)
+uint8_t seq_peekNextPattern(void)
+{
+	return seq_determineNextPattern(0);
+}
 
 #include "Soundengine/MIDI/Uart.h"
 
@@ -648,7 +655,9 @@ IN_ITCM_RAM void seq_setPendingPatternActive()
 		{
 			//turn FX off to save cycles
 			fxBus.fxType = FX_OFF;
+			umaKit_deferred = 1;	// LX_UMA: the UMA record from the prefetch, no card access in the audio path
 			preset_loadDrumsetRam(seq_patternSet.kitNr[seq_activePattern], 0, 1);
+			umaKit_deferred = 0;
 			menu_selectedPresetNr[SAVE_TYPE_KIT] = seq_patternSet.kitNr[seq_activePattern];
 			menu_loadedPresetNr[CURRENT_KIT] = seq_patternSet.kitNr[seq_activePattern];
 			preset_touchTimer(PRESET_KIT_TIMER);

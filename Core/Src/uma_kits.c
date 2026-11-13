@@ -1,0 +1,222 @@
+/*
+ * uma_kits.c - LX_UMA: the kits' UMA settings (uma_kits.h).
+ *
+ * Card access needs the audio to run from the TIM2 interrupt meanwhile, as the stock saves do
+ * (USE_INTERRUPT_ONLY_DURING_SAVE_PROJ). The interrupt's sequencer may load a kit while the main loop reads the card:
+ * it only uses the prefetch buffer or queues the kit (umaKit_pending); the main loop reads into its own buffer and
+ * hands it over with the interrupt off.
+ */
+#include "main.h"
+#include "uma_kits.h"
+#include "Parameters.h"
+#include "menu/menu.h"
+#include "Soundengine/Sequencer/sequencer.h"
+#include <string.h>
+
+volatile uint8_t umaKit_deferred;
+
+static FIL umaKit_file;
+static uint8_t umaKit_buf[UMA_KIT_BYTES] __attribute__((aligned(4)));		// main loop's card buffer
+static uint8_t umaKit_next[UMA_KIT_BYTES] __attribute__((aligned(4)));		// the prefetched record
+static volatile uint8_t umaKit_nextKit = UMA_KIT_NONE;	// whose record umaKit_next holds
+static volatile uint8_t umaKit_pending = UMA_KIT_NONE;	// a kit loaded from the audio path without its record
+
+static uint8_t* umaKit_active(void)
+{
+	return &activeParameters[PAR_UMA_BLOCK];
+}
+
+// the audio from the interrupt while the card is busy; returns whether it already was
+static uint8_t umaKit_irqOn(void)
+{
+	const uint8_t was = (htim2.Instance->CR1 & TIM_CR1_CEN) != 0;
+	if(!was)
+		HAL_TIM_Base_Start_IT(&htim2);
+	return was;
+}
+static void umaKit_irqOff(uint8_t was)
+{
+	if(!was)
+		HAL_TIM_Base_Stop_IT(&htim2);
+}
+
+static void umaKit_makeDefaults(uint8_t* rec)
+{
+	memset(rec, 0, UMA_KIT_BYTES);
+	rec[UMA_REC_FORMAT] = UMA_KIT_FORMAT;
+}
+
+// a record read from a file: n bytes valid; anything not understood becomes the defaults
+static void umaKit_check(uint8_t* rec, UINT n)
+{
+	if(n == 0 || rec[UMA_REC_FORMAT] == 0 || rec[UMA_REC_FORMAT] > UMA_KIT_FORMAT)
+	{
+		umaKit_makeDefaults(rec);
+		return;
+	}
+	if(n < UMA_KIT_BYTES)
+		memset(rec + n, 0, UMA_KIT_BYTES - n);	// a shorter (older) record: the rest default
+}
+
+static FRESULT umaKit_storeRead(uint8_t kit, uint8_t* rec)
+{
+	UINT n = 0;
+	FRESULT res = f_open(&umaKit_file, UMA_KIT_STORE, FA_OPEN_EXISTING | FA_READ);
+	if(res == FR_OK)
+	{
+		res = f_lseek(&umaKit_file, (FSIZE_t)kit * UMA_KIT_BYTES);
+		if(res == FR_OK)
+			res = f_read(&umaKit_file, rec, UMA_KIT_BYTES, &n);
+		f_close(&umaKit_file);
+	}
+	umaKit_check(rec, res == FR_OK ? n : 0);
+	return res;
+}
+
+static FRESULT umaKit_storeWrite(uint8_t kit, const uint8_t* rec)
+{
+	UINT n = 0;
+	FRESULT res = f_open(&umaKit_file, UMA_KIT_STORE, FA_OPEN_ALWAYS | FA_READ | FA_WRITE);
+	if(res == FR_OK)
+	{
+		res = f_lseek(&umaKit_file, (FSIZE_t)kit * UMA_KIT_BYTES);	// past the end: the file grows
+		if(res == FR_OK)
+			res = f_write(&umaKit_file, rec, UMA_KIT_BYTES, &n);
+		f_close(&umaKit_file);
+	}
+	if(umaKit_nextKit == kit)
+		umaKit_nextKit = UMA_KIT_NONE;	// the prefetched copy is old now
+	return res;
+}
+
+void umaKit_onKitLoad(uint8_t kit)
+{
+	if(kit >= NUM_KIT_SLOTS)
+		return;
+	if(umaKit_deferred)
+	{
+		// from the audio path: no card access here
+		if(umaKit_nextKit == kit)
+		{
+			memcpy(umaKit_active(), umaKit_next, UMA_KIT_BYTES);
+			umaKit_pending = UMA_KIT_NONE;
+		}
+		else
+			umaKit_pending = kit;	// umaKit_service reads it in a few ms
+		return;
+	}
+	umaKit_pending = UMA_KIT_NONE;
+	const uint8_t was = umaKit_irqOn();
+	umaKit_storeRead(kit, umaKit_buf);
+	__disable_irq();
+	if(umaKit_pending == UMA_KIT_NONE)	// unless the sequencer switched kits meanwhile
+		memcpy(umaKit_active(), umaKit_buf, UMA_KIT_BYTES);
+	__enable_irq();
+	umaKit_irqOff(was);
+}
+
+void umaKit_store(uint8_t kit)
+{
+	if(kit >= NUM_KIT_SLOTS)
+		return;
+#if UMA_KIT_TEST
+	umaKit_active()[UMA_REC_STAMP] = (uint8_t)(kit + 1);
+#endif
+	umaKit_active()[UMA_REC_FORMAT] = UMA_KIT_FORMAT;
+	const uint8_t was = umaKit_irqOn();
+	umaKit_storeWrite(kit, umaKit_active());
+	umaKit_irqOff(was);
+}
+
+void umaKit_fromFile(FIL* f, uint8_t kit)
+{
+	if(kit >= NUM_KIT_SLOTS)
+		return;
+	UINT n = 0;
+	if(f_read(f, umaKit_buf, UMA_KIT_BYTES, &n) != FR_OK)
+		n = 0;
+	umaKit_check(umaKit_buf, n);
+	umaKit_storeWrite(kit, umaKit_buf);
+}
+
+void umaKit_defaults(uint8_t kit)
+{
+	if(kit >= NUM_KIT_SLOTS)
+		return;
+	umaKit_makeDefaults(umaKit_buf);
+	umaKit_storeWrite(kit, umaKit_buf);
+}
+
+void umaKit_toFile(FIL* f, uint8_t kit)
+{
+	UINT n;
+	umaKit_storeRead(kit, umaKit_buf);
+	f_write(f, umaKit_buf, UMA_KIT_BYTES, &n);
+}
+
+void umaKit_activeToFile(FIL* f)
+{
+	UINT n;
+	f_write(f, umaKit_active(), UMA_KIT_BYTES, &n);
+}
+
+void umaKit_activeFromFile(FIL* f)
+{
+	UINT n = 0;
+	if(f_read(f, umaKit_buf, UMA_KIT_BYTES, &n) != FR_OK || n == 0)
+		return;	// an older tmp.snd: the kit's own record stays
+	umaKit_check(umaKit_buf, n);
+	memcpy(umaKit_active(), umaKit_buf, UMA_KIT_BYTES);
+}
+
+// the kit the sequencer will load next, or UMA_KIT_NONE
+static uint8_t umaKit_upcoming(void)
+{
+	if(activeParameters[PAR_PATTERN_MODE] != 1)
+		return UMA_KIT_NONE;	// kits don't follow patterns
+	uint8_t pattern = seq_pendingPattern;
+	if(pattern == seq_activePattern)
+		pattern = seq_peekNextPattern();	// song mode: its next entry; else the same pattern again
+	if(pattern == seq_activePattern || pattern >= NUM_PATTERN)
+		return UMA_KIT_NONE;
+	return seq_patternSet.kitNr[pattern];
+}
+
+void umaKit_service(void)
+{
+	// a kit the audio path loaded without its record: read it now
+	const uint8_t late = umaKit_pending;
+	if(late != UMA_KIT_NONE)
+	{
+		const uint8_t was = umaKit_irqOn();
+		umaKit_storeRead(late, umaKit_buf);
+		__disable_irq();
+		if(umaKit_pending == late)
+		{
+			memcpy(umaKit_active(), umaKit_buf, UMA_KIT_BYTES);
+			umaKit_pending = UMA_KIT_NONE;
+		}
+		__enable_irq();
+		umaKit_irqOff(was);
+		return;
+	}
+
+	// the next pattern's kit, before the pattern starts
+	const uint8_t want = umaKit_upcoming();
+	if(want == UMA_KIT_NONE || want >= NUM_KIT_SLOTS || want == umaKit_nextKit)
+		return;
+	const uint8_t was = umaKit_irqOn();
+	umaKit_storeRead(want, umaKit_buf);
+	__disable_irq();
+	memcpy(umaKit_next, umaKit_buf, UMA_KIT_BYTES);
+	umaKit_nextKit = want;
+	__enable_irq();
+	umaKit_irqOff(was);
+}
+
+#if UMA_KIT_TEST
+uint8_t umaKit_stamp(void)
+{
+	return umaKit_active()[UMA_REC_STAMP];
+}
+#endif

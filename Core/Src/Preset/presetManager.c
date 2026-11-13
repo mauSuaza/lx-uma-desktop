@@ -16,6 +16,7 @@
 #include "Preset/PresetManager.h"
 //#include "../Hardware/SD/ff.h"
 #include "ff.h"
+#include "uma_kits.h" // LX_UMA: the kits' UMA records
 #include <stdio.h>
 #include "menu/CcNr2Text.h"
 #include "menu/menu.h"
@@ -228,6 +229,7 @@ FRESULT preset_saveTmpKit()
 	}
 	//write the preset data
 	f_write((FIL*)&SDFile,activeParameters,END_OF_SOUND_PARAMETERS,&bytesWritten);
+	umaKit_activeToFile((FIL*)&SDFile);	// LX_UMA: the edit buffer's UMA record
 
 	//close the file
 	f_close((FIL*)&SDFile);
@@ -272,6 +274,8 @@ FRESULT preset_LoadTmpKit()
 			// set to 0 for any that were not read from the file
 			if(END_OF_SOUND_PARAMETERS-bytesRead)
 				memset(para+bytesRead,0,END_OF_SOUND_PARAMETERS-bytesRead);
+			else
+				umaKit_activeFromFile((FIL*)&SDFile);	// LX_UMA: the edit buffer's UMA record, if saved
 
 			//special case mod targets. normalize.
 			const uint8_t nmt=getNumModTargets();
@@ -828,6 +832,7 @@ static void preset_writeDrumsetData(uint8_t presetNr, uint8_t isMorph)
 			f_write((FIL*)&SDFile,&mainParameters[presetNr][i],1,&bytesWritten);
 		}
 	}
+	umaKit_toFile((FIL*)&SDFile, presetNr);	// LX_UMA: the kit's UMA record after the stock part
 }
 
 //----------------------------------------------------
@@ -842,6 +847,7 @@ void preset_loadDrumsetRam(uint8_t presetNr, uint8_t isMorph, uint8_t sendImmedi
 	{
 		//copy parameters to edit buffer
 		memcpy(activeParameters, mainParameters[presetNr], sizeof(uint8_t) * END_OF_SOUND_PARAMETERS);
+		umaKit_onKitLoad(presetNr);	// LX_UMA: the kit's UMA record
 		//if(activeParameters[PAR_PATTERN_MODE] = 1)
 		//load asociated morph kit as well
 
@@ -892,6 +898,7 @@ void preset_saveDrumsetRam(uint8_t presetNr, uint8_t isMorph)
 	{
 		//copy edit buffer to parameter array
 		memcpy(mainParameters[presetNr], activeParameters, sizeof(uint8_t) * END_OF_SOUND_PARAMETERS);
+		umaKit_store(presetNr);	// LX_UMA: the edit buffer's UMA record into the store
 	}
 }
 //----------------------------------------------------
@@ -1154,6 +1161,8 @@ static FRESULT preset_readDrumsetData(uint8_t presetNr, uint8_t isMorph)
 		// set to 0 for any that were not read from the file
 		if(END_OF_SOUND_PARAMETERS-bytesRead)
 			memset(para+bytesRead,0,END_OF_SOUND_PARAMETERS-bytesRead);
+		if(!isMorph)
+			umaKit_fromFile((FIL*)&SDFile, presetNr);	// LX_UMA: the UMA record after the stock part (or defaults)
 		
 		//special case mod targets. normalize.
 		const uint8_t nmt=getNumModTargets();
@@ -2817,6 +2826,8 @@ FRESULT preset_loadProject(uint8_t presetNr, uint8_t clearTmp)
 
 		//FR_NO_FILE just means an incomplete project and is no reason to abort!
 		res = preset_loadDrumsetSD(i, 0);
+		if(res == FR_NO_FILE)
+			umaKit_defaults(i);	// LX_UMA: no kit file: a default UMA record
 		if ((res != FR_OK) && (res != FR_NO_FILE))
 		{
 			lcd_process_display_interrupt = 1;

@@ -431,5 +431,10 @@ enum ParamEnums
 
 extern uint8_t parameterOrder[END_OF_SOUND_PARAMETERS];
 
+// LX_UMA: the kit's UMA record follows the stock parameters in activeParameters (uma_kits.h); UMA's settings are
+// numbered from here (PAR_UMA_BLOCK + their offset in the record)
+#define PAR_UMA_BLOCK NUM_PARAMS
+#include "uma_kits.h"
+
 
 #endif /* PARAMETERS_H_ */

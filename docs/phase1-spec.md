@@ -102,3 +102,27 @@ Eurorack) and, if still needed, a stock function or two leaves ITCM (CPU measure
   120 BPM is 2,000 ms). Most kits clean, `pk` 70-80 with the FX. Kits 13 NERVOUS and 30 SAWER clip a lot, `pk` above
   90 (the user won't use the FX on the desktop). Open: CPU over-run or level? (0.0c's engines run on Drum 1-3 every
   block at fixed, loud settings; the real voice skips silent engines.)
+
+## 10. 0.1b as built: the kits' UMA records (option A)
+
+- **The record:** 1,024 bytes per kit (`UMA_KIT_BYTES`, `Core/Inc/uma_kits.h`): byte 0 the format (1), then UMA's
+  settings (Phase 1c on; PAR_UMA_* = `PAR_UMA_BLOCK` (= `NUM_PARAMS`, 302) + the offset). In RAM:
+  `activeParameters` grew by one record (the playing kit's), plus a prefetch buffer and a card buffer: +3.6 KB.
+- **The store** `/UMAKITS.DAT` (card root, 64 KB): every kit's working record, at kit × 1,024. Outside `/tmp`, which a
+  project save deletes.
+- **Where records move:**
+
+| Event | Stock | UMA record |
+|---|---|---|
+| Project load | each `NN-*.snd` → `mainParameters` | the file's appended record → the store (none: defaults; no file: defaults) |
+| Boot, `/tmp` overlay | `/tmp` kit files → `mainParameters` | their records → the store (a missing file keeps the project's) |
+| Kit load by hand / reload / project load | `mainParameters[n]` → edit buffer | store[n] → edit buffer, read at once (~1.5 ms, audio from the interrupt) |
+| Pattern change (kit follows), MIDI bank change | the same, in the audio path | the prefetched record if it is kit n, else queued and read by the main loop a few ms later |
+| Prefetch (main loop) | | the next pattern's kit (a queued pattern, or song mode's next entry) read ahead |
+| Kit save | edit buffer → `mainParameters[n]` → `/tmp/NN-NAME.snd` | edit buffer → store[n] → appended to the file |
+| Project save | every kit → `/projNN/NN-NAME.snd` | store[n] appended to each |
+| Autosave `/tmp/tmp.snd` | the edit buffer | its record appended; read back at boot (older files: the kit's record) |
+
+- **Test build:** `UMA_KIT_TEST` stamps a kit's record with its number + 1 when it is saved; the CPU screen shows the
+  playing kit's stamp as `uk` (2nd sub-page: `ptm tin uk pk`).
+- Image 671,328 bytes (80.4 KB spare); RAM 338.6 KB; ITCM +16 B.

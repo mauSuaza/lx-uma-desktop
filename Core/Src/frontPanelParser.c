@@ -11,6 +11,7 @@
  * Public License version 3, with the additional permission and terms in
  * NOTICE.md. See LICENSE and NOTICE.md in the root of the repository.
  */ 
+#include "uma_kits.h" // LX_UMA
 #include "frontPanelParser_ui.h"
 #include "menu/menu.h"
 #include <stdio.h>
@@ -112,7 +113,9 @@ void frontPanel_ccHandler()
 		const uint8_t kitNr = frontParser_midiMsg.data2 % NUM_KIT_SLOTS;
 		menu_selectedPresetNr[0] = kitNr;
 		//preset_loadDrumset(kitNr, 0);
+		umaKit_deferred = 1;	// LX_UMA: may run in the audio interrupt: the UMA record follows from the main loop
 		preset_loadDrumsetRam(kitNr,0, 0);
+		umaKit_deferred = 0;
 		preset_touchTimer(PRESET_KIT_TIMER);
 		menu_repaint();
 		return;
