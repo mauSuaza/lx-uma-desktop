@@ -27,6 +27,7 @@
 #include "uma_enginetest.h" // LX_UMA test 0.0c
 #endif
 #include "uma_fmvoice.h" // LX_UMA: FM Drum and FM Tone on Drum 1-3
+#include "uma_quant.h" // LX_UMA
 #include "uma_env.h" // LX_UMA: hold, gate mode, filter envelope, low-pass gate
 
 INDTCM static float ampSmoothValue = 0.1f;
@@ -243,11 +244,12 @@ IN_ITCM_RAM void calcDrumVoiceAsync(const uint8_t voiceNr)
 #endif
 
 	//update osc phaseInc
+	umaQuant_block(voiceNr);	// LX_UMA: the pitch screen: octave, key, scale (quantized in osc_setFreq)
 	osc_setFreq(&voiceArray[voiceNr].osc);
 	osc_setFreq(&voiceArray[voiceNr].modOsc);
 	{
 		const OscInfo* osc = &voiceArray[voiceNr].osc;
-		const float freq = osc->freq*osc->pitchMod*osc->modNodeValue;
+		const float freq = osc_getFreq(osc);	// with the quantizer
 #if UMA_ENGINE_TEST
 		umaTest_block(voiceNr, freq);
 #endif

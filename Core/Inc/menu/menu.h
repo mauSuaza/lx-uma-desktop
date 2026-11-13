@@ -341,6 +341,9 @@ enum NamesEnum
 	TEXT_UMA_PLA_TWI,
 	TEXT_UMA_PLA_DXB,
 	TEXT_UMA_PLA_KMD,
+	TEXT_UMA_OCT,
+	TEXT_UMA_KEY,
+	TEXT_UMA_SCALE,
 	NUM_NAMES
 };
 //-----------------------------------------------------------------
@@ -507,6 +510,9 @@ enum shortNamesEnum
 	SHORT_UMA_PLA_TWI,
 	SHORT_UMA_PLA_DXB,
 	SHORT_UMA_PLA_KMD,
+	SHORT_UMA_OCT,
+	SHORT_UMA_KEY,
+	SHORT_UMA_SCALE,
 };
 //-----------------------------------------------------------------
 // These correspond with catNames in MenuText.h
@@ -693,6 +699,8 @@ enum longNamesEnum
 	LONG_UMA_PLA_TWI,
 	LONG_UMA_PLA_DXB,
 	LONG_UMA_PLA_KMD,
+	LONG_UMA_KEY,
+	LONG_UMA_SCALE,
 };
 
 //enum for the save category parameter

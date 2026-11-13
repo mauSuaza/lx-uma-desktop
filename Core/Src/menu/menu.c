@@ -33,6 +33,7 @@
 #include "Soundengine/Sequencer/sequencer.h"
 #include "Soundengine/Soundengine.h"
 #include "uma_voice.h" // LX_UMA
+#include "uma_quant.h" // LX_UMA: the pitch screen
 #include "Soundengine/DSPAudio/PlaitsDrum.h" // LX_UMA: the Plaits models' names
 #include "Soundengine/DSPAudio/MdDrum.h" // LX_UMA: the drum machines' names
 #include "uma_sdreadtest.h" // LX_UMA test 0.1a
@@ -325,6 +326,9 @@ const Name valueNames[NUM_NAMES] =
 		{SHORT_UMA_PLA_TWI, CAT_UMA_PLA, LONG_UMA_PLA_TWI},/*TEXT_UMA_PLA_TWI*/
 		{SHORT_UMA_PLA_DXB, CAT_UMA_PLA, LONG_UMA_PLA_DXB},/*TEXT_UMA_PLA_DXB*/
 		{SHORT_UMA_PLA_KMD, CAT_UMA_PLA, LONG_UMA_PLA_KMD},/*TEXT_UMA_PLA_KMD*/
+		{SHORT_UMA_OCT, CAT_OSC, LONG_UMA_OCTAVE},/*TEXT_UMA_OCT*/
+		{SHORT_UMA_KEY, CAT_OSC, LONG_UMA_KEY},/*TEXT_UMA_KEY*/
+		{SHORT_UMA_SCALE, CAT_OSC, LONG_UMA_SCALE},/*TEXT_UMA_SCALE*/
 };
 
 //---------------------------------------------------------------
@@ -1990,6 +1994,9 @@ static void menu_umaEditValue(uint16_t p, uint8_t v)
 		const uint8_t e = umaVoice_ofEngine(p) < 3 ? v : v == 1 ? 3 : v == 2 ? 4 : v == 3 ? 5 : 0;
 		snprintf(t, sizeof(t), "%s", e == 5 ? "Plaits" : e == 4 ? "Drum Machine" : e == 2 ? "FM Tone" : e == 1 ? "FM Drum" : "LXR");
 	}
+	else if(p >= UMA_QUANT_FIRST_PAR && p < UMA_QUANT_FIRST_PAR + UMA_QUANT_VOICES * UMA_QUANT_PARS
+		&& (p - UMA_QUANT_FIRST_PAR) % UMA_QUANT_PARS == 2)
+		snprintf(t, sizeof(t), "%s", umaQuant_scaleName(v));	// the scale or chord in full: "Harm min V7b9"
 	else if(umaVoice_which(p, &wv, &wk) == 4)
 		snprintf(t, sizeof(t), "%s", v == 2 ? "Any machine" : v == 1 ? "Type+family" : "Same type");
 	else if(umaVoice_which(p, &wv, &wk) == 5)
@@ -2060,8 +2067,8 @@ static void menu_umaAfterEdit(uint16_t paramNr, int8_t dir)
 	(void)engVoice;
 }
 
-// an engine's extra screen n of a page and sub-page, or NULL
-static const Page* menu_umaExtraScreen(uint8_t page, uint8_t sub, uint8_t n)
+// an engine's own extra screen n of a page and sub-page, or NULL
+static const Page* menu_umaEngineExtra(uint8_t page, uint8_t sub, uint8_t n)
 {
 	const uint8_t engine = menu_umaEngine(page);
 	if(engine == UMA_ENG_PLA && sub == UMA_FM_PAGE_OSC && n == 0
@@ -2078,6 +2085,22 @@ static const Page* menu_umaExtraScreen(uint8_t page, uint8_t sub, uint8_t n)
 		if(sub == UMA_FM_PAGE_TRANS) return &umaFmtThirdPages[page - VOICE1_PAGE][UMA_FMT_THIRD_TRANS];
 	}
 	return 0;
+}
+
+// extra screen n of a page and sub-page, or NULL: the engine's own, then on every voice's Osc page the pitch screen
+// (oct key scl) as the last
+static const Page* menu_umaExtraScreen(uint8_t page, uint8_t sub, uint8_t n)
+{
+	const Page* e = menu_umaEngineExtra(page, sub, n);
+	if(e)
+		return e;
+	const uint8_t voice = menu_umaVoiceOf(page);
+	if(sub != UMA_FM_PAGE_OSC || voice == 0xff)
+		return 0;
+	uint8_t own = 0;
+	while(menu_umaEngineExtra(page, sub, own))
+		own++;
+	return n == own ? &umaPitchPages[voice] : 0;
 }
 
 const Page* menu_getPage(uint8_t page, uint8_t sub)
@@ -3818,6 +3841,12 @@ static uint8_t getMaxEntriesForMenu(uint8_t menuId)
 		return plaitsDrum_userFileCount(PL_MODEL_TERRAIN);
 	case MENU_UMA_PLA_KMD:
 		return PL_NUM_DXK;
+	case MENU_UMA_OCT:
+		return UMA_QUANT_OCT_MAX + 1;
+	case MENU_UMA_KEY:
+		return UMA_QUANT_KEYS;
+	case MENU_UMA_SCALE:
+		return UMA_QUANT_SCALES;
 	case MENU_FILTER:
 		return filterTypes[0][0];
 	case MENU_SYNC_RATES:
@@ -3955,6 +3984,15 @@ static void getMenuItemNameForValue(const uint8_t menuId, const uint8_t curParmV
 		break;
 	case MENU_UMA_PLA_KMD:
 		p = plaitsDrum_dxKeyShort(curParmVal);
+		break;
+	case MENU_UMA_OCT:
+		p = umaOctNames[curParmVal <= UMA_QUANT_OCT_MAX ? curParmVal : UMA_QUANT_OCT_ZERO];
+		break;
+	case MENU_UMA_KEY:
+		p = umaQuant_keyName(curParmVal);
+		break;
+	case MENU_UMA_SCALE:
+		p = umaQuant_scaleShort(curParmVal);
 		break;
 	case MENU_FILTER:
 		p = filterTypes[curParmVal + 1];

@@ -12,6 +12,8 @@
  */
 
 
+#include "uma_quant.h" // LX_UMA: the pitch screen
+#include <math.h>
 #include "Soundengine/DSPAudio/Oscillator.h"
 #include "Soundengine/DSPAudio/random.h"
 #include "Soundengine/DSPAudio/Samples.h"
@@ -719,8 +721,39 @@ int16_t calcSampleOsc(OscInfo* osc)
 };
 */
  //-----------------------------------------------------------
+// LX_UMA: the scale quantizer (the Eurorack's, without its CV input), on when the voice's scale isn't off or its octave
+// isn't 0: the note from coarse, the step's or MIDI note and its modulation (modNodeValue) and the octave, snapped to
+// the scale; fine tune after, the pitch EG (pitchMod) on top where it's used. Once per block, in osc_setFreq
+static inline uint8_t osc_umaOn(const OscInfo* osc)
+{
+	return osc->umaScale || osc->umaOct;
+}
+static void osc_umaQuantize(OscInfo* osc)
+{
+	if(!osc_umaOn(osc))
+		return;
+	const float cent = midiParser_calcDetune(osc->midiFreq&0xff);
+	float note = 69.f + 12.f * log2f(osc->freq / (440.f * cent));	// coarse and the note (osc_recalcFreq)
+	if(osc->modNodeValue > 0.f)
+		note += 12.f * log2f(osc->modNodeValue);
+	note += 12.f * osc->umaOct;
+	const int16_t q = umaQuant_snap(note, osc->umaKey, osc->umaScale, &osc->umaHeld);
+	osc->umaBase = 440.f * powf(2.f, (float)(q - 69) / 12.f) * cent;
+}
+float osc_getFreq(const OscInfo* osc)
+{
+	if(osc_umaOn(osc))
+		return osc->umaBase*osc->pitchMod;
+	return osc->freq*osc->pitchMod*osc->modNodeValue;
+}
+//-----------------------------------------------------------
 void osc_calcSineFreq(OscInfo* osc)
 {
+	if(osc_umaOn(osc))	// LX_UMA
+	{
+		osc->phaseInc = freq2PhaseIncr(osc->umaBase*osc->pitchMod);
+		return;
+	}
 	osc->phaseInc = freq2PhaseIncr(osc->freq* osc->pitchMod*osc->modNodeValue);
 }
 //-----------------------------------------------------------
@@ -731,7 +764,7 @@ void osc_calcNoiseFreq(OscInfo* osc)
 //-----------------------------------------------------------
 void osc_calcWavetableFreq(OscInfo* osc)
 {
-	const float currentFreq = osc->freq*osc->pitchMod*osc->modNodeValue;
+	const float currentFreq = osc_umaOn(osc) ? osc->umaBase*osc->pitchMod : osc->freq*osc->pitchMod*osc->modNodeValue;	// LX_UMA: quantized
 	osc->phaseInc = freq2PhaseIncr1024(currentFreq);
 
 	const uint8_t overtoneIndex = freqToTableIndex(currentFreq);
@@ -752,6 +785,7 @@ void osc_calcUserSampleFreq(OscInfo* osc)
 //-----------------------------------------------------------
  void osc_setFreq(OscInfo* osc)
  {
+		osc_umaQuantize(osc);	// LX_UMA: the pitch screen's quantizer and octave (samples play as before)
 		switch(osc->waveform)
 		{
 		case SINE:

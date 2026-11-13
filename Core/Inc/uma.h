@@ -7,7 +7,7 @@
 #define UMA_H_
 
 // version on the start-up screen and in the update file name (LXR_V2_UMA_V<version>.img, CMakeLists.txt)
-#define UMA_VERSION "0.2e"	// Phase 2 test build: 0.2d + Plaits on every voice
+#define UMA_VERSION "0.2f"	// Phase 2 test build: 0.2e + the quantizer (pitch screen)
 
 // UMA's engines and settings (the Eurorack's flag: the copied code is written around it)
 #define UMA_FM 1

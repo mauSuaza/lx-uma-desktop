@@ -184,7 +184,7 @@ static void umaMd_syncParams(uint8_t voiceNr)
 	umaFm_syncFold(voiceNr);
 	// the voice's pitch without the pitch EG (the machine has its own): C4 plays the machine as voiced
 	const OscInfo* osc = &voiceArray[voiceNr].osc;
-	const float f = osc->freq * osc->modNodeValue * (44100.f / REAL_FS);
+	const float f = osc_getFreq(osc) / (osc->pitchMod > 0.f ? osc->pitchMod : 1.f) * (44100.f / REAL_FS);
 	mdDrum_setTranspose(voiceNr, f > 1.f ? 12.f * log2f(f / 261.6256f) : 0.f);
 }
 

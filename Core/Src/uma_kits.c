@@ -14,7 +14,7 @@
 #include <string.h>
 #include "uma_random.h"
 #include "uma_voice.h"
-#include "uma_quant_defs.h"
+#include "uma_quant.h"
 #include "Soundengine/DSPAudio/MdDrum.h"
 #include "Soundengine/DSPAudio/PlaitsDrum.h"
 

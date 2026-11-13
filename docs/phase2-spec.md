@@ -130,3 +130,13 @@ skip their engine (FM, Plaits' tonal models), as on the Eurorack.
   (built-in tables until Phase 4); Transient `wav vol frq | fld fty sym lev`. The edit screen names the model, its
   knobs, the output, TWIST, the 6-op patch; a bank change keeps the model in the bank.
 - RAM 347 KB of 384 (Plaits' six voices and the card pool), ~29 KB left for the stack. Image 587 KB (~149 KB spare).
+
+## 11. 0.2f as built
+
+- **The quantizer** on every voice: the Eurorack's `uma_quant.c`; in `Oscillator.c` the quantize step before each
+  oscillator's frequency is set, and `osc_getFreq` (both without the Eurorack's CV input: the note is coarse, the
+  step's or MIDI note and its modulation). FM, mdk and Plaits take the quantized pitch.
+- **Pitch screen** `oct key scl` as the Osc page's last screen on every voice (after an engine's own extra screens),
+  as on the Eurorack; the edit screen shows the scale in full.
+- Image 589,880 bytes (~146 KB spare), RAM 347 KB of 384, ITCM 15,312 B. Phase 2 complete, untested on the module
+  from 0.2a on.

@@ -15,6 +15,7 @@
 
 #include "Soundengine/DSPAudio/Snare.h"
 #include "uma.h"
+#include "uma_quant.h"
 #include "uma_voice.h"
 #include "Soundengine/DSPAudio/squareRootLut.h"
 #include "Soundengine/DSPAudio/modulationNode.h"
@@ -144,6 +145,7 @@ IN_ITCM_RAM void Snare_calcAsync()
 		snareVoice.osc.pitchMod += snapVal*snareVoice.transGen.volume;;
 	}
 
+	umaQuant_block(3);	// LX_UMA: the pitch screen: octave, key, scale
 	osc_setFreq(&snareVoice.osc);
 	osc_setFreq(&snareVoice.noiseOsc);
 #if UMA_FM

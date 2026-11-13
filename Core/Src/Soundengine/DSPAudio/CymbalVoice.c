@@ -14,6 +14,7 @@
 
 #include "Soundengine/DSPAudio/CymbalVoice.h"
 #include "uma.h"
+#include "uma_quant.h"
 #include "uma_voice.h"
 #include "Soundengine/DSPAudio/squareRootLut.h"
 #include "Soundengine/DSPAudio/modulationNode.h"
@@ -152,6 +153,7 @@ IN_ITCM_RAM void Cymbal_calcAsync()
 	}
 
 	//update osc phaseInc
+	umaQuant_block(4);	// LX_UMA: the pitch screen: octave, key, scale
 	osc_setFreq(&cymbalVoice.osc);
 	osc_setFreq(&cymbalVoice.modOsc);
 	osc_setFreq(&cymbalVoice.modOsc2);

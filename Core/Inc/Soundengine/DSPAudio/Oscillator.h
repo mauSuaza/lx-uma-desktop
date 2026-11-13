@@ -59,6 +59,12 @@ typedef struct OscStruct
 	uint16_t	midiFreq;  //upper 8 bit coarse, lower 8 bit fine -> the sound edit freq offset
 	uint8_t baseNote;		// the last played midi note
 	uint32_t startPhase;		// the OSC is reset to this phase on retrigger
+	// LX_UMA: the voice's pitch screen (uma_quant.h), set every block by umaQuant_block; all 0: as stock
+	int8_t umaOct;			// octaves, -4..+4
+	uint8_t umaKey;			// 0-11, C..B
+	uint8_t umaScale;		// 0 off
+	int16_t umaHeld;		// the quantizer's last note (its hysteresis)
+	float umaBase;			// the quantized frequency before the pitch EG (with fine tune), when on
 } OscInfo;
 //-----------------------------------------------------------
 
@@ -117,6 +123,8 @@ void calcUserSampleOscBlock(OscInfo* osc, int16_t* buf, const uint8_t size ,cons
 //-----------------------------------------------------------
 /** set the played midi note.*/
 void osc_setBaseNote(OscInfo* osc, uint8_t baseNote);
+// LX_UMA: the frequency the oscillator plays: tune, the note, the quantizer, pitch EG and modulation
+float osc_getFreq(const OscInfo* osc);
 //-----------------------------------------------------------
 /** recalculate the frequency if either the base note or the offset note value changed*/
 void osc_recalcFreq(OscInfo* osc);

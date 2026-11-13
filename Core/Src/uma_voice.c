@@ -3,7 +3,7 @@
  * (uma_voice.h, docs/design/voice-engines.md).
  *
  * LX_UMA desktop (0.2d): the Eurorack's file (LX_UMA a179390) with prk compiled out (UMA_PRK 0: no prk engine on the
- * desktop, its instances would take 25 KB of RAM) and the oscillator's frequency worked out here (no osc_getFreq).
+ * desktop, its instances would take 25 KB of RAM) and the oscillator's osc_getFreq without a CV input (Oscillator.c).
  *
  * Copyright (C) 2026 UMA contributors
  * SPDX-License-Identifier: GPL-3.0-only
@@ -34,11 +34,6 @@
 #define UMA_PRK 0
 #endif
 
-// the oscillator's frequency now, with its pitch EG and modulation (the Eurorack's osc_getFreq without its CV input)
-static float osc_getFreq(const OscInfo* osc)
-{
-	return osc->freq * osc->pitchMod * osc->modNodeValue;
-}
 
 // the Plaits engine's settings, on every voice (Drum 1-3 call it from DrumVoice.c)
 uint8_t umaVoice_plaSync(uint8_t voice)

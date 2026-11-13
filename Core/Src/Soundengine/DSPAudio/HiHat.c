@@ -15,6 +15,7 @@
 
 #include "Soundengine/DSPAudio/HiHat.h"
 #include "uma.h"
+#include "uma_quant.h"
 #include "uma_voice.h"
 #include "Soundengine/DSPAudio/squareRootLut.h"
 #include "Soundengine/DSPAudio/modulationNode.h"
@@ -160,6 +161,7 @@ IN_ITCM_RAM void HiHat_calcAsync( )
 		hatVoice.osc.pitchMod = 1 + snapVal*hatVoice.transGen.volume;
 	}
 
+	umaQuant_block(5);	// LX_UMA: the pitch screen: octave, key, scale
 	osc_setFreq(&hatVoice.osc);
 	osc_setFreq(&hatVoice.modOsc);
 	osc_setFreq(&hatVoice.modOsc2);
