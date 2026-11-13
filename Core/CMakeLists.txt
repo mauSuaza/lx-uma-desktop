@@ -65,6 +65,8 @@ add_library(lxr_preset OBJECT
     Src/uma_kits.c
     Src/uma_fmvoice.c
     Src/uma_env.c
+    Src/uma_voicepar.c
+    Src/uma_random.c
     Src/uma_enginetest.c # LX_UMA test 0.0c
     Src/uma_sdreadtest.c # LX_UMA test 0.1a
 )
@@ -119,6 +121,7 @@ add_library(lxr_dsp OBJECT
     Src/Soundengine/DSPAudio/Samples.c
     Src/Soundengine/DSPAudio/SlopeEg2.c
     Src/Soundengine/DSPAudio/Lpg.c
+    Src/Soundengine/DSPAudio/PrkDrum.c # only its randomise rules are linked (no prk engine on the desktop)
     Src/Soundengine/DSPAudio/snapEg.c
     Src/Soundengine/DSPAudio/Snare.c
     Src/Soundengine/DSPAudio/squareRootLut.c
@@ -229,7 +232,7 @@ set_property(SOURCE Src/Soundengine/DSPAudio/MdDrum.cpp APPEND PROPERTY INCLUDE_
 set_property(SOURCE Src/Soundengine/DSPAudio/PlaitsDrum.cpp ${UMA_PLAITS_SOURCES} APPEND PROPERTY COMPILE_OPTIONS -Wno-unused-parameter)
 set_property(SOURCE Src/Soundengine/DSPAudio/PlaitsDrum.cpp ${UMA_PLAITS_SOURCES} APPEND PROPERTY INCLUDE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR}/Src/Soundengine/DSPAudio/mi)
 # UMA: card files are loaded on a button press or at start-up, never per block
-set_property(SOURCE Src/uma_sdfiles.c APPEND PROPERTY COMPILE_OPTIONS -Os)
+set_property(SOURCE Src/uma_sdfiles.c Src/uma_random.c APPEND PROPERTY COMPILE_OPTIONS -Os)
 # LX_UMA (0.2a): no FM operator waveforms on the desktop: sines only, FmWaves.c not built (docs/phase2-spec.md)
 set_property(SOURCE Src/Soundengine/DSPAudio/FmDrum.c APPEND PROPERTY COMPILE_DEFINITIONS FMD_NO_WAVES)
 # LX_UMA (0.1a, as the Eurorack's 0.33l): the user interface and the inputs are compiled for size, not speed: none of

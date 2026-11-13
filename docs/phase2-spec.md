@@ -85,3 +85,14 @@ skip their engine (FM, Plaits' tonal models), as on the Eurorack.
 - **Wavefolder** on FM voices: Transient screen 2 `fld fty sym lev`; its drive follows the amp EG or the LPG.
 - `tools/port_names.py`: ports menu names from the Eurorack's tables (used from here on).
 - Image 304,168 bytes (~433 KB spare), RAM 269.5 KB, ITCM 15,224 B (+144: the envelope's hold and release).
+
+## 7. 0.2b as built
+
+- **Randomise on FM** (Drum 1–3): the Eurorack's `uma_random.c` and `uma_voicepar.c` (where each voice's settings
+  are) copied unchanged; `uma_mod.h` is a stand-in until Phase 3 (a setting's value is the kit's). prk's randomise
+  rules come with `PrkDrum.c`, but only `prkDrum_random` is linked (1.2 KB; no prk engine, no prk RAM).
+- Runs once per audio block before the drums read their settings (`mixer.c`); a hit marks the drum; loading a kit
+  (by hand, by a pattern, at boot from `tmp.snd`) makes it the restore point, saving keeps.
+- **Mod page** (FM): `pd slp amt rpl | rto rev rsw rsd`, then `rfn vdt vam vvo` (random fine, then the desktop's
+  velocity settings).
+- Image 318,532 bytes; RAM 271.6 KB (+2 KB, randomise's restore copies).

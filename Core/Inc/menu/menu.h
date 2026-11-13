@@ -313,6 +313,12 @@ enum NamesEnum
 	TEXT_UMA_FOLD_TYPE,
 	TEXT_UMA_FOLD_SYM,
 	TEXT_UMA_BODY_LEV,
+	TEXT_UMA_RND_PALETTE,
+	TEXT_UMA_RND_TONE,
+	TEXT_UMA_RND_ENV,
+	TEXT_UMA_RND_SWEEP,
+	TEXT_UMA_RND_SEED,
+	TEXT_UMA_RND_FINE,
 	NUM_NAMES
 };
 //-----------------------------------------------------------------
@@ -452,6 +458,12 @@ enum shortNamesEnum
 	SHORT_UMA_FOLD_TYPE,
 	SHORT_UMA_FOLD_SYM,
 	SHORT_UMA_BODY_LEV,
+	SHORT_UMA_RND_PALETTE,
+	SHORT_UMA_RND_TONE,
+	SHORT_UMA_RND_ENV,
+	SHORT_UMA_RND_SWEEP,
+	SHORT_UMA_RND_SEED,
+	SHORT_UMA_RND_FINE,
 };
 //-----------------------------------------------------------------
 // These correspond with catNames in MenuText.h
@@ -493,6 +505,7 @@ enum catNamesEnum
 	CAT_UMA_OP_B2,
 	CAT_UMA_SUB,
 	CAT_UMA_LPG,
+	CAT_UMA_RANDOM,
 };
 //-----------------------------------------------------------------
 // these must correspond with longNames in MenuText.h
@@ -612,6 +625,9 @@ enum longNamesEnum
 	LONG_UMA_FOLD_TYPE,
 	LONG_UMA_SYMMETRY,
 	LONG_UMA_BODY_LEV,
+	LONG_UMA_PALETTE,
+	LONG_UMA_SWEEP,
+	LONG_UMA_SEED,
 };
 
 //enum for the save category parameter

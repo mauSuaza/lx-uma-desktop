@@ -12,6 +12,7 @@
 #include "menu/menu.h"
 #include "Soundengine/Sequencer/sequencer.h"
 #include <string.h>
+#include "uma_random.h"
 
 volatile uint8_t umaKit_deferred;
 
@@ -147,6 +148,7 @@ void umaKit_onKitLoad(uint8_t kit)
 		{
 			memcpy(umaKit_active(), umaKit_next, UMA_KIT_BYTES);
 			umaKit_pending = UMA_KIT_NONE;
+			umaRnd_kitLoaded();	// loading never re-rolls: the loaded kit is the restore point
 		}
 		else
 			umaKit_pending = kit;	// umaKit_service reads it in a few ms
@@ -156,10 +158,13 @@ void umaKit_onKitLoad(uint8_t kit)
 	const uint8_t was = umaKit_irqOn();
 	umaKit_storeRead(kit, umaKit_buf);
 	__disable_irq();
-	if(umaKit_pending == UMA_KIT_NONE)	// unless the sequencer switched kits meanwhile
+	const uint8_t took = umaKit_pending == UMA_KIT_NONE;	// unless the sequencer switched kits meanwhile
+	if(took)
 		memcpy(umaKit_active(), umaKit_buf, UMA_KIT_BYTES);
 	__enable_irq();
 	umaKit_irqOff(was);
+	if(took)
+		umaRnd_kitLoaded();	// loading never re-rolls: the loaded kit is the restore point
 }
 
 void umaKit_store(uint8_t kit)
@@ -173,6 +178,7 @@ void umaKit_store(uint8_t kit)
 	const uint8_t was = umaKit_irqOn();
 	umaKit_storeWrite(kit, umaKit_active());
 	umaKit_irqOff(was);
+	umaRnd_kitSaved();	// saving keeps: randomise at 0 now restores the saved sound
 }
 
 void umaKit_fromFile(FIL* f, uint8_t kit)
@@ -238,13 +244,16 @@ void umaKit_service(void)
 		const uint8_t was = umaKit_irqOn();
 		umaKit_storeRead(late, umaKit_buf);
 		__disable_irq();
-		if(umaKit_pending == late)
+		const uint8_t took = umaKit_pending == late;
+		if(took)
 		{
 			memcpy(umaKit_active(), umaKit_buf, UMA_KIT_BYTES);
 			umaKit_pending = UMA_KIT_NONE;
 		}
 		__enable_irq();
 		umaKit_irqOff(was);
+		if(took)
+			umaRnd_kitLoaded();
 		return;
 	}
 

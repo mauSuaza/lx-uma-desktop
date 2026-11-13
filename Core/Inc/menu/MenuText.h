@@ -215,6 +215,15 @@ const char umaFoldTypeNames[][4] =
 	{"sin"},	// smooth, round (Buchla-style)
 	{"tri"},	// sharper, edgier (Serge-style)
 };
+// LX_UMA (0.2b): randomise's ratio palette
+const char umaPaletteNames[][4] =
+{
+	{4},		//number of entries
+	{"all"},
+	{"bas"},
+	{"hrm"},
+	{"met"},
+};
 //-----------------------------------------------------------------
 const char stepFlamNames[][4] =
 {
@@ -672,6 +681,12 @@ const char shortNames[][4]  =
 	{"fty"},	// LX_UMA SHORT_UMA_FOLD_TYPE
 	{"sym"},	// LX_UMA SHORT_UMA_FOLD_SYM
 	{"lev"},	// LX_UMA SHORT_UMA_BODY_LEV
+	{"rpl"},	// LX_UMA SHORT_UMA_RND_PALETTE
+	{"rto"},	// LX_UMA SHORT_UMA_RND_TONE
+	{"rev"},	// LX_UMA SHORT_UMA_RND_ENV
+	{"rsw"},	// LX_UMA SHORT_UMA_RND_SWEEP
+	{"rsd"},	// LX_UMA SHORT_UMA_RND_SEED
+	{"rfn"},	// LX_UMA SHORT_UMA_RND_FINE
 };
 //-----------------------------------------------------------------
 // These correspond with the catNamesEnum in menu.h
@@ -714,6 +729,7 @@ const char catNames[][16] =
 	{"Op B2"},	// LX_UMA CAT_UMA_OP_B2
 	{"Sub"},	// LX_UMA CAT_UMA_SUB
 	{"LPG"},	// LX_UMA CAT_UMA_LPG
+	{"Random"},	// LX_UMA CAT_UMA_RANDOM
 };
 //-----------------------------------------------------------------
 // these must correspond to longNamesEnum
@@ -834,6 +850,9 @@ const char longNames[][16] =
 	{"FoldType"},	// LX_UMA LONG_UMA_FOLD_TYPE
 	{"Symmetry"},	// LX_UMA LONG_UMA_SYMMETRY
 	{"Body lvl"},	// LX_UMA LONG_UMA_BODY_LEV
+	{"Palette"},	// LX_UMA LONG_UMA_PALETTE
+	{"Sweep"},	// LX_UMA LONG_UMA_SWEEP
+	{"Seed"},	// LX_UMA LONG_UMA_SEED
 };
 
 

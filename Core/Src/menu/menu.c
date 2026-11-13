@@ -294,6 +294,12 @@ const Name valueNames[NUM_NAMES] =
 		{SHORT_UMA_FOLD_TYPE, CAT_FM, LONG_UMA_FOLD_TYPE},/*TEXT_UMA_FOLD_TYPE*/
 		{SHORT_UMA_FOLD_SYM, CAT_FM, LONG_UMA_SYMMETRY},/*TEXT_UMA_FOLD_SYM*/
 		{SHORT_UMA_BODY_LEV, CAT_FM, LONG_UMA_BODY_LEV},/*TEXT_UMA_BODY_LEV*/
+		{SHORT_UMA_RND_PALETTE, CAT_UMA_RANDOM, LONG_UMA_PALETTE},/*TEXT_UMA_RND_PALETTE*/
+		{SHORT_UMA_RND_TONE, CAT_UMA_RANDOM, LONG_TONE},/*TEXT_UMA_RND_TONE*/
+		{SHORT_UMA_RND_ENV, CAT_UMA_RANDOM, LONG_UMA_ENV},/*TEXT_UMA_RND_ENV*/
+		{SHORT_UMA_RND_SWEEP, CAT_UMA_RANDOM, LONG_UMA_SWEEP},/*TEXT_UMA_RND_SWEEP*/
+		{SHORT_UMA_RND_SEED, CAT_UMA_RANDOM, LONG_UMA_SEED},/*TEXT_UMA_RND_SEED*/
+		{SHORT_UMA_RND_FINE, CAT_UMA_RANDOM, LONG_FINE},/*TEXT_UMA_RND_FINE*/
 };
 
 //---------------------------------------------------------------
@@ -1895,6 +1901,8 @@ static uint8_t menu_umaEngine(uint8_t page)
 static const Page* menu_umaExtraScreen(uint8_t page, uint8_t sub, uint8_t n)
 {
 	const uint8_t engine = menu_umaEngine(page);
+	if((engine == 1 || engine == 2) && sub == UMA_FM_PAGE_MOD && n == 0)
+		return &umaFmRndFinePages[page - VOICE1_PAGE];	// random fine, and the velocity settings
 	if(engine == 2)
 	{
 		if(sub == UMA_FM_PAGE_FM)
@@ -3567,6 +3575,8 @@ static uint8_t getMaxEntriesForMenu(uint8_t menuId)
 		return umaDrumFilterTypes[0][0];
 	case MENU_UMA_FOLD_TYPE:
 		return umaFoldTypeNames[0][0];
+	case MENU_UMA_PALETTE:
+		return umaPaletteNames[0][0];
 	case MENU_FILTER:
 		return filterTypes[0][0];
 	case MENU_SYNC_RATES:
@@ -3668,6 +3678,9 @@ static void getMenuItemNameForValue(const uint8_t menuId, const uint8_t curParmV
 		break;
 	case MENU_UMA_FOLD_TYPE:
 		p = umaFoldTypeNames[curParmVal + 1];
+		break;
+	case MENU_UMA_PALETTE:
+		p = umaPaletteNames[curParmVal + 1];
 		break;
 	case MENU_FILTER:
 		p = filterTypes[curParmVal + 1];

@@ -24,6 +24,7 @@
 #include "Soundengine/TriggerOut.h"
 #include "menu/menu.h"
 #include "Soundengine/FxBus.h"
+#include "uma_random.h" // LX_UMA
 
 	uint8_t r2_Available;
 	uint8_t l1_Available;
@@ -572,6 +573,9 @@ IN_ITCM_RAM void mixer_calcNextSampleBlock(int16_t* output,int16_t* output2)
 	SVF_recalcFreq(&snareVoice.filter);
 	SVF_recalcFreq(&cymbalVoice.filter);
 	SVF_recalcFreq(&hatVoice.filter);
+
+	// LX_UMA: randomise, before the drum voices read their settings (Phase 3: after the modulation)
+	umaRnd_block();
 
 	//--- Calc async -----
 	calcDrumVoiceAsync(0);

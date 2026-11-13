@@ -13,6 +13,7 @@
 #include "Soundengine/DSPAudio/DrumVoice.h"
 #include "Soundengine/DSPAudio/FmDrum.h"
 #include "uma_env.h"
+#include "uma_random.h"
 
 #define UMA_FMV_DRUMS 3
 static FmDrum umaFm[UMA_FMV_DRUMS];
@@ -54,6 +55,7 @@ __attribute__((noinline)) void umaFmV_trigger(uint8_t voiceNr)
 {
 	if(voiceNr < UMA_FMV_DRUMS)
 		fmDrum_trigger(&umaFm[voiceNr], 1.f);	// velocity is applied by the voice
+	umaRnd_hit(voiceNr);	// a modulated randomise setting re-rolls in this block (Phase 3), before the voice renders
 }
 
 // wavefolder and body level; the fold's drive follows the amp EG, or the LPG's vactrol
