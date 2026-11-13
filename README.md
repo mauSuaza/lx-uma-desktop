@@ -1,4 +1,22 @@
-# LXR V2 firmware (desktop, STM32F765VG)
+# LX_UMA for the LXR-02 desktop
+
+Custom firmware for the Erica Synths LXR-02 drum machine: the desktop port of
+[LX_UMA](https://github.com/mauSuaza/LX_UMA), custom firmware for the LXR Eurorack module. It is based on Erica
+Synths' open-source desktop firmware v1.7 and is **not** official Erica Synths firmware.
+
+**Release 0.1:** FM Drum and FM Tone on Drum 1–3, chosen per drum with `eng` on the Osc page; every kit keeps its
+UMA settings, and projects still load on Erica's firmware. See the **[user manual](docs/manual.md)** and the
+[release notes](docs/release-notes-0.1.md). The plan for the rest of the port: [docs/port-plan.md](docs/port-plan.md).
+
+Install: copy `LXR_V2_UMA_V0.1.img` (from the GitHub release) to the SD card, hold the encoder button while
+switching on, wait for "Update OK!". Back up your card first.
+
+---
+
+The rest of this README is Erica Synths' (building, installing, memory map, licence), with the update file now
+named `LXR_V2_UMA_V<version>.img`.
+
+## LXR V2 firmware (desktop, STM32F765VG)
 
 Firmware for the LXR V2 desktop drum machine: an STM32F765 (Cortex-M7, 216 MHz) running the
 drum voices, FX bus, step sequencer, MIDI (DIN + USB), SD-card preset storage and the LCD/button UI.
