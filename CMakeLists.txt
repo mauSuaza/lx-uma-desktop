@@ -77,6 +77,8 @@ add_library(lxr_board_config INTERFACE)
 target_include_directories(lxr_board_config INTERFACE Core/Inc)
 target_compile_options(lxr_board_config INTERFACE
     $<$<COMPILE_LANGUAGE:C>:-ffast-math -freciprocal-math -mfp16-format=ieee -fomit-frame-pointer>
+    # LX_UMA (0.2g): the C++ engines (Plaits, mdk) with the same float flags as the C code
+    $<$<COMPILE_LANGUAGE:CXX>:-ffast-math -freciprocal-math -fomit-frame-pointer>
 )
 
 add_subdirectory(Drivers)

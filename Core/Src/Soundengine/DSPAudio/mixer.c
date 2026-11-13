@@ -24,7 +24,14 @@
 #include "Soundengine/TriggerOut.h"
 #include "menu/menu.h"
 #include "Soundengine/FxBus.h"
+#include "Soundengine/Soundengine.h" // LX_UMA: soundengine_addVoiceLoad
 #include "uma_random.h" // LX_UMA
+#if UMA_VOICE_LOAD
+// LX_UMA test 0.2g: each voice's cycles in this block (settings + sound), for the CPU screen's vc
+#define UMA_VTIME(v, call) do { const uint32_t umaT0 = DWT->CYCCNT; call; soundengine_addVoiceLoad((v), DWT->CYCCNT - umaT0); } while(0)
+#else
+#define UMA_VTIME(v, call) do { call; } while(0)
+#endif
 
 	uint8_t r2_Available;
 	uint8_t l1_Available;
@@ -578,13 +585,13 @@ IN_ITCM_RAM void mixer_calcNextSampleBlock(int16_t* output,int16_t* output2)
 	umaRnd_block();
 
 	//--- Calc async -----
-	calcDrumVoiceAsync(0);
-	calcDrumVoiceAsync(1);
-	calcDrumVoiceAsync(2);
+	UMA_VTIME(0, calcDrumVoiceAsync(0));
+	UMA_VTIME(1, calcDrumVoiceAsync(1));
+	UMA_VTIME(2, calcDrumVoiceAsync(2));
 
-	Snare_calcAsync();
-	Cymbal_calcAsync();
-	HiHat_calcAsync();
+	UMA_VTIME(3, Snare_calcAsync());
+	UMA_VTIME(4, Cymbal_calcAsync());
+	UMA_VTIME(5, HiHat_calcAsync());
 
 	//calculate trigger io phase
 	//trigger_tickPhaseCounter();
@@ -603,7 +610,7 @@ IN_ITCM_RAM void mixer_calcNextSampleBlock(int16_t* output,int16_t* output2)
 	bufferTool_clearBuffer(fxBusData,OUTPUT_DMA_SIZE*2);
 
 	//calc voice 1
-	calcDrumVoiceSyncBlock(0, sampleData,OUTPUT_DMA_SIZE);
+	UMA_VTIME(0, calcDrumVoiceSyncBlock(0, sampleData,OUTPUT_DMA_SIZE));
 	//decimate voice
 	mixer_decimateBlock(0,sampleData);
 	//copy to selected dma buffer
@@ -628,7 +635,7 @@ IN_ITCM_RAM void mixer_calcNextSampleBlock(int16_t* output,int16_t* output2)
 #if 1
 
 	//calc voice 2
-	calcDrumVoiceSyncBlock(1, sampleData,OUTPUT_DMA_SIZE);
+	UMA_VTIME(1, calcDrumVoiceSyncBlock(1, sampleData,OUTPUT_DMA_SIZE));
 	//decimate voice
 	mixer_decimateBlock(1,sampleData);
 	//copy to selected dma buffer
@@ -648,7 +655,7 @@ IN_ITCM_RAM void mixer_calcNextSampleBlock(int16_t* output,int16_t* output2)
 #endif
 #endif
 	//calc voice 3
-	calcDrumVoiceSyncBlock(2, sampleData,OUTPUT_DMA_SIZE);
+	UMA_VTIME(2, calcDrumVoiceSyncBlock(2, sampleData,OUTPUT_DMA_SIZE));
 	//decimate voice
 	mixer_decimateBlock(2,sampleData);
 	//copy to selected dma buffer
@@ -667,7 +674,7 @@ IN_ITCM_RAM void mixer_calcNextSampleBlock(int16_t* output,int16_t* output2)
 #endif
 #endif
 	//calc snare
-	Snare_calcSyncBlock(sampleData,OUTPUT_DMA_SIZE);
+	UMA_VTIME(3, Snare_calcSyncBlock(sampleData,OUTPUT_DMA_SIZE));
 	//decimate voice
 	mixer_decimateBlock(3,sampleData);
 	//copy to selected dma buffer
@@ -682,7 +689,7 @@ IN_ITCM_RAM void mixer_calcNextSampleBlock(int16_t* output,int16_t* output2)
 #endif
 #endif
 	//calc cymbal
-	Cymbal_calcSyncBlock(sampleData,OUTPUT_DMA_SIZE);
+	UMA_VTIME(4, Cymbal_calcSyncBlock(sampleData,OUTPUT_DMA_SIZE));
 	//decimate voice
 	mixer_decimateBlock(4,sampleData);
 	//copy to selected dma buffer
@@ -698,7 +705,7 @@ IN_ITCM_RAM void mixer_calcNextSampleBlock(int16_t* output,int16_t* output2)
 
 
 	//calc HiHat
-	HiHat_calcSyncBlock(sampleData,OUTPUT_DMA_SIZE);
+	UMA_VTIME(5, HiHat_calcSyncBlock(sampleData,OUTPUT_DMA_SIZE));
 	//decimate voice
 	mixer_decimateBlock(5,sampleData);
 	//copy to selected dma buffer

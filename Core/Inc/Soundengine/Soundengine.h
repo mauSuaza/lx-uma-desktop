@@ -39,4 +39,9 @@ void soundengine_addLoad(uint32_t cycles);
 // UMA: load since the last call, in % of the time: average, and peak (one interrupt vs a block's time) over 2 s
 void soundengine_takeLoad(uint8_t* avg, uint8_t* peak);
 #endif
+#if UMA_VOICE_LOAD
+// LX_UMA test 0.2g: one voice's cycles in this block (mixer.c), and the voice's peak over the last 2 s in % of a block
+void soundengine_addVoiceLoad(uint8_t voice, uint32_t cycles);
+uint8_t soundengine_takeVoiceLoad(uint8_t voice);
+#endif
 #endif /* INC_SOUNDENGINE_SOUNDENGINE_H_ */

@@ -2178,6 +2178,9 @@ static uint8_t menu_umaListEntries(uint16_t paramNr, uint8_t numEntries)
 #if UMA_LOAD
 // UMA: the CPU load readout sits in the empty 4th slot of the global page's 2nd sub-page (after ptm, tin, tou)
 static uint8_t umaLoad_avg, umaLoad_peak;
+#if UMA_VOICE_LOAD
+static uint8_t umaLoad_voice;	// test 0.2g: the selected voice's peak
+#endif
 static uint8_t menu_umaLoadVisible(void)
 {
 	return menu_activePage == MENU_MIDI_PAGE && ((menuIndex&MASK_PAGE)>>PAGE_SHIFT) == 1
@@ -2198,6 +2201,13 @@ void menu_tick()
 	{
 		umaLoadTimer = systick_ticks;
 		soundengine_takeLoad(&umaLoad_avg, &umaLoad_peak);
+#if UMA_VOICE_LOAD
+		{
+			uint8_t v = menu_getActiveVoice();
+			if(v > 5) v = 5;	// the open hi-hat is the hi-hat
+			umaLoad_voice = soundengine_takeVoiceLoad(v);
+		}
+#endif
 		menu_repaint();
 	}
 #endif
@@ -3040,6 +3050,12 @@ void menu_repaintGeneric()
 			memcpy(&editDisplayBuffer[0][12],"pk ",3);
 			numtostrpu(readout,umaLoad_peak,' ');
 			memcpy(&editDisplayBuffer[1][12],readout,3);
+#if UMA_VOICE_LOAD
+			// test 0.2g: the selected voice's peak load in tou's place
+			memcpy(&editDisplayBuffer[0][8],"vc ",3);
+			numtostrpu(readout,umaLoad_voice,' ');
+			memcpy(&editDisplayBuffer[1][8],readout,3);
+#endif
 #if UMA_KIT_TEST
 			// test 0.1b: the playing kit's UMA stamp in tou's place (its number + 1 when saved, 0: never)
 			memcpy(&editDisplayBuffer[0][8],"uk ",3);

@@ -140,3 +140,15 @@ skip their engine (FM, Plaits' tonal models), as on the Eurorack.
   as on the Eurorack; the edit screen shows the scale in full.
 - Image 589,880 bytes (~146 KB spare), RAM 347 KB of 384, ITCM 15,312 B. Phase 2 complete, untested on the module
   from 0.2a on.
+
+## 12. CPU of the heavy Plaits models (0.2g)
+
+- **Result of 0.2f (2026-11-13, the user's LXR-02):** everything works, except that modal resonator, phase
+  distortion and harmonic (additive) take `pk` to 90 and above, with or without the FX, and click easily.
+- Checked: the Plaits code has no double-precision maths (0 f64 instructions in those models), and the caches are on
+  (as on the Eurorack). The desktop starts higher than the Eurorack (busy stock pattern 67 % vs ~60 %).
+- **0.2g (test):** the C++ engines (Plaits, mdk) compiled with the C code's float flags (`-ffast-math`), and `vc` on
+  the CPU screen (tou's place): the **selected voice's** peak load over 2 s, settings + sound, in % of a block.
+- Options after the numbers: render from the interrupt at all times (fewer clicks near the limit); lighter versions
+  of the three heavy models (fewer modes / partials / less oversampling; a small change in sound, A/B first);
+  documented limits.

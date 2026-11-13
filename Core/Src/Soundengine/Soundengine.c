@@ -70,6 +70,42 @@ void soundengine_takeLoad(uint8_t* avg, uint8_t* peak)
 }
 #endif
 
+#if UMA_VOICE_LOAD
+// LX_UMA test 0.2g: per voice (0-5), the highest block (both its calls added) since the last readout, and 8 readouts
+static uint32_t umaVoiceLoad_block[6], umaVoiceLoad_max[6];
+static uint32_t umaVoiceLoad_peaks[6][UMA_LOAD_WINDOWS];
+static uint8_t umaVoiceLoad_window[6];
+static uint8_t umaVoiceLoad_calls[6];
+void soundengine_addVoiceLoad(uint8_t voice, uint32_t cycles)
+{
+	if(voice >= 6) return;
+	umaVoiceLoad_block[voice] += cycles;
+	if(++umaVoiceLoad_calls[voice] >= 2)	// its settings and its sound: one block done
+	{
+		if(umaVoiceLoad_block[voice] > umaVoiceLoad_max[voice])
+			umaVoiceLoad_max[voice] = umaVoiceLoad_block[voice];
+		umaVoiceLoad_block[voice] = 0;
+		umaVoiceLoad_calls[voice] = 0;
+	}
+}
+uint8_t soundengine_takeVoiceLoad(uint8_t voice)
+{
+	if(voice >= 6) return 0;
+	const uint32_t blockCycles = (uint32_t)((float)SystemCoreClock * OUTPUT_DMA_SIZE / REAL_FS);
+	const uint32_t primask = __get_PRIMASK();
+	__disable_irq();
+	const uint32_t m = umaVoiceLoad_max[voice];
+	umaVoiceLoad_max[voice] = 0;
+	__set_PRIMASK(primask);
+	umaVoiceLoad_peaks[voice][umaVoiceLoad_window[voice]] = m;
+	umaVoiceLoad_window[voice] = (uint8_t)((umaVoiceLoad_window[voice] + 1) % UMA_LOAD_WINDOWS);
+	uint32_t peak = 0;
+	for(uint8_t i = 0; i < UMA_LOAD_WINDOWS; i++)
+		if(umaVoiceLoad_peaks[voice][i] > peak) peak = umaVoiceLoad_peaks[voice][i];
+	return umaLoad_percent(peak, blockCycles);
+}
+#endif
+
 uint8_t soundengine_calcNextSampleBlock()
 {
 	if(bCurrentSampleValid!= SAMPLE_VALID)
