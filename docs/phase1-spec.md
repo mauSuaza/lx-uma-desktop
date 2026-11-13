@@ -202,3 +202,4 @@ the same; `pk` with a pattern.
   (`umaFmV_*`). A setting's value is the kit's (modulation: Phase 3); the fold follows the amp EG (the LPG: Phase 2).
 - 0.0c's test hook and 0.1b's `uk` stamp are off (`UMA_ENGINE_TEST`, `UMA_KIT_TEST` 0); Plaits and mdk drop out of
   the image until Phase 2 plays them. Image 419,812 bytes (326 KB spare), RAM 269 KB, ITCM 15,080 B.
+- **Result (2026-11-12):** verified on the user's LXR-02 ("sounds great"). Released as **0.1**.

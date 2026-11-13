@@ -206,8 +206,8 @@ up to a hard fold at 127; smooth when modulated). The sub restarts with each hit
 
 The global page (SHIFT + step 12, pressed again to step through its screens) shows `pk` in the 4th place of its
 2nd screen (`ptm tin tou pk`): the highest load of the last 2 s, in % of the audio's time. Above 100 the audio drops
-out. A stock pattern runs at about 67 %; each FM voice adds a few %, and a voice whose amp envelope has died away
-costs nothing. With three FM Tone voices playing at once, check `pk` on your busiest pattern.
+out. A busy stock pattern runs at about 67 %. FM voices add to it while they sound; a voice whose amp envelope has
+died away costs nothing. With several FM voices playing at once, check `pk` on your busiest pattern.
 
 ## Not in 0.1 yet
 
