@@ -24,10 +24,10 @@
 #define UMA_FMV_DRUMS 3
 static FmDrum umaFm[UMA_FMV_DRUMS];
 
-// a setting's value (Phase 3: the modulated one, umaMod_get)
+// a setting's value: the modulated, morphed one
 static inline uint8_t umaPar(uint16_t p)
 {
-	return activeParameters[p];
+	return umaMod_get(p);
 }
 
 static uint8_t umaFm_isOn(uint8_t voiceNr)

@@ -19,14 +19,13 @@
 #include "Soundengine/config.h"
 #include "Soundengine/DSPAudio/DrumVoice.h"
 #include "Soundengine/DSPAudio/Lpg.h"
+#include "uma_mod.h"	// umaMod_get: a setting's modulated, morphed value
 
 #define UMA_ENV_DRUMS		3
 #define UMA_ENV_HOLD_MAX	2.f		// seconds at 127
 #define UMA_ENV_OCTAVES		6.f		// filter envelope at full
 #define UMA_NO_NOTE			0xff
 
-// a setting's value (Phase 3: the modulated one)
-static inline uint8_t umaMod_get(uint16_t p) { return activeParameters[p]; }
 
 float fastTan(float x);	// ResonantFilter.c
 float softClipTwo(float in);	// ResonantFilter.c
@@ -95,7 +94,7 @@ void umaEnv_trigger(uint8_t drum)
 		return;
 	umaLpg_struck[drum] = 1;
 	// gate mode, and a gate is behind this hit; otherwise it plays as trg (decays) so it never hangs
-	voiceArray[drum].oscVolEg.gated = activeParameters[umaEnv_par(drum, ENV_GATE)] && umaEnv_gateHeld(drum);
+	voiceArray[drum].oscVolEg.gated = umaMod_get(umaEnv_par(drum, ENV_GATE)) && umaEnv_gateHeld(drum);
 }
 
 // the low-pass gate: filter and volume from its vactrol, struck by the hit (Lpg.c, after Plaits)
