@@ -107,6 +107,9 @@ Goal: before porting any UI, know whether everything fits and what has to give.
 - Still to add on top (estimates from section 2): UMA core ~23 KB flash / 32 KB RAM, menus ~38 KB flash, bigger kits
   ~30 KB RAM. Flash: ~61 KB against 57 spare, so the FM tables shrink after all (or the trims). RAM: ~62 KB against
   24, so the card pool goes to 6 slots or fewer and the Plaits work areas are looked at (section 2's list).
+- **Result (2026-11-12, user's LXR-02):** boots; `pk` **83 %** with a pattern playing and the three engines running
+  every block (stock 67 %): +16 points for FM Tone + Plaits wavetable + mdk kick, close to the Eurorack (+18 for three
+  Plaits voices). About 17 % left.
 
 **Out of Phase 0, decided with the user:**
 - the flash budget: with the waveform tables shrunk or not, and anything else to trim;
