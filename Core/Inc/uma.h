@@ -7,7 +7,7 @@
 #define UMA_H_
 
 // version on the start-up screen and in the update file name (LXR_V2_UMA_V<version>.img, CMakeLists.txt)
-#define UMA_VERSION "0.0b2"	// Phase 0 test build: 0.0a2 (stock, renamed, CPU readout) + the sector-7 test
+#define UMA_VERSION "0.0c"	// Phase 0 test build (in progress): the engines in, without menus
 
 // CPU load readout on the global page (SHIFT + step 12, 3rd press), 2nd sub-page, 4th slot `pk`: the longest
 // sequencer + sound render in the last 2 s, in % of a 64-sample block's time. The main loop renders
@@ -16,6 +16,6 @@
 
 // test build 0.0b (docs/port-plan.md): a 4 KB pattern at the start of flash sector 7, checked at start-up
 // ("S7 ok" / "S7 BAD n" on the start-up screen). 1 = the pattern (0.0b), 2 = its inverse (0.0b2), 0 = off
-#define UMA_S7TEST 2
+#define UMA_S7TEST 0
 
 #endif /* UMA_H_ */

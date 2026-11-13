@@ -250,6 +250,11 @@ SECTIONS
   
     /* Check we didn't overflow CCM */
   ASSERT(_sccmstack + _Min_Stack_Size <= _dtcm_stack, "CCM overflow")
+  /* LX_UMA (test 0.0b2, 2026-11-12): the bootloader doesn't erase flash sector 7 (0x080C0000), on the desktop as on
+     the Eurorack: an image reaching it fails with a flash write error. The whole image (code, data, and the DTCM /
+     ITCM contents copied from flash at start-up, which the FLASH region's figure leaves out) must end below it:
+     736 KB. (The test section .uma_s7test, below, is the one exception, for that test only.) */
+  ASSERT(LOADADDR(.itcm_text) + SIZEOF(.itcm_text) <= 0x080C0000, "firmware image reaches flash sector 7, which the bootloader doesn't erase")
     
 
 

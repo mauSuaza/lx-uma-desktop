@@ -129,5 +129,10 @@ Goal: before porting any UI, know whether everything fits and what has to give.
   turned into 1, which only an erase allows. Zeros alone can't show it (Eurorack 0.33l lesson).
 - Reading: 0.0b and 0.0b2 both install and say "S7 ok" → the bootloader erases sector 7, the cap is 992 KB.
   Either fails ("flash write error") or says "S7 BAD" → the cap is 736 KB. After a failed install, reinstall 0.0a2.
+- **Result (2026-11-12): the cap is 736 KB.** 0.0b installed and said "S7 ok" (the sector was blank there); 0.0b2
+  failed with "flash write error": the desktop's bootloader doesn't erase sector 7 either. The linker script now
+  fails any build whose image (with the ITCM/DTCM contents) reaches 0x080C0000, as on the Eurorack. So the flash
+  budget of section 2 holds: ~790 KB estimated → the FM waveform tables must shrink, or more trimming (Eurorack 0.33l
+  list: -Os on UI/FatFs/HAL, mdk -O2, cold Plaits code -Os, speech already dropped in 0.34).
 
 - Memory after 0.0a: flash 274.5 KB (image 275,400 bytes), RAM 271 KB (.bss), DTCM 107 KB, ITCM 15.0 KB of 16.
