@@ -111,6 +111,10 @@ Goal: before porting any UI, know whether everything fits and what has to give.
   every block (stock 67 %): +16 points for FM Tone + Plaits wavetable + mdk kick, close to the Eurorack (+18 for three
   Plaits voices). About 17 % left.
 
+**Phase 0 decisions (2026-11-12):** size-compile the non-audio code first (FM tables shrink only if needed);
+card pool 6 slots; engines on every voice, documented, no hard limit. Found: the kits' UMA settings need ~51 KB if
+all 64 kits stay in RAM (section 2's +30 KB was too low): see [phase1-spec.md](phase1-spec.md), section 3.
+
 **Out of Phase 0, decided with the user:**
 - the flash budget: with the waveform tables shrunk or not, and anything else to trim;
 - the RAM budget: the card files' slots (6, or installed into flash), where the Plaits work areas live;
