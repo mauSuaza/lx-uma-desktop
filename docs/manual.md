@@ -114,8 +114,8 @@ metallic.
 
 `eng` = `fmt`. A melodic FM engine for **bass** (and drums too: the transient and the pitch sweep stay), after
 the Digitone's FM TONE machine, built on the FM Drum engine: four operators, eight algorithms, and a **sub
-oscillator**. Everything around it works as for `fmd`. The FM Drum settings (ratios A and B, mods, envelopes, feedback,
-waveforms) are shared: switching `fmd` ↔ `fmt` keeps them.
+oscillator**. Everything around it works as for `fmd`. The FM Drum settings (ratios A and B, mods, envelopes, feedback) are
+shared: switching `fmd` ↔ `fmt` keeps them.
 
 ### How it works
 
