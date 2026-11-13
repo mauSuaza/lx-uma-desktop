@@ -14,6 +14,10 @@
 // (soundengine_process); the TIM2 interrupt only during SD saves (USE_INTERRUPT_ONLY_DURING_SAVE_PROJ); both timed
 #define UMA_LOAD 1
 
+// test build 0.0c (docs/port-plan.md): the engines linked in, without menus; Drum 1 FM Tone, Drum 2 Plaits
+// wavetable, Drum 3 an mdk kick, fixed settings (Core/Src/uma_enginetest.c)
+#define UMA_ENGINE_TEST 1
+
 // test build 0.0b (docs/port-plan.md): a 4 KB pattern at the start of flash sector 7, checked at start-up
 // ("S7 ok" / "S7 BAD n" on the start-up screen). 1 = the pattern (0.0b), 2 = its inverse (0.0b2), 0 = off
 #define UMA_S7TEST 0

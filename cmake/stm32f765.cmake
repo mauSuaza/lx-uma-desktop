@@ -35,6 +35,8 @@ target_compile_options(lxr_mcu INTERFACE
     ${LXR_MCU_FLAGS}
     --specs=nano.specs
     $<$<COMPILE_LANGUAGE:C>:-ffunction-sections -fdata-sections>
+    # UMA: C++ without exceptions, RTTI, thread-safe statics or a heap (MdDrum.cpp, PlaitsDrum.cpp)
+    $<$<COMPILE_LANGUAGE:CXX>:-ffunction-sections -fdata-sections -fno-exceptions -fno-rtti -fno-threadsafe-statics -fno-use-cxa-atexit>
     $<$<COMPILE_LANGUAGE:ASM>:-x assembler-with-cpp>
 )
 

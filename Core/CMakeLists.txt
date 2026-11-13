@@ -61,6 +61,33 @@ add_library(lxr_ui OBJECT
 add_library(lxr_preset OBJECT
     Src/Preset/initKit.c
     Src/Preset/presetManager.c
+    Src/uma_sdfiles.c
+    Src/uma_enginetest.c # LX_UMA test 0.0c
+)
+
+# UMA: the pla engine. Plaits' code (Mutable Instruments, MIT, mi/README.md) is included unchanged; it includes its
+# files as "plaits/..." and "stmlib/...", from mi/
+set(UMA_PLAITS_SOURCES
+    Src/Soundengine/DSPAudio/mi/plaits/dsp/engine/wavetable_engine.cc
+    Src/Soundengine/DSPAudio/mi/plaits/dsp/engine/fm_engine.cc
+    Src/Soundengine/DSPAudio/mi/plaits/dsp/engine2/six_op_engine.cc
+    Src/Soundengine/DSPAudio/mi/plaits/dsp/fm/algorithms.cc
+    Src/Soundengine/DSPAudio/mi/plaits/dsp/fm/dx_units.cc
+    Src/Soundengine/DSPAudio/mi/plaits/dsp/engine/modal_engine.cc
+    Src/Soundengine/DSPAudio/mi/plaits/dsp/physical_modelling/modal_voice.cc
+    Src/Soundengine/DSPAudio/mi/plaits/dsp/physical_modelling/resonator.cc
+    Src/Soundengine/DSPAudio/mi/plaits/dsp/physical_modelling/string_voice.cc
+    Src/Soundengine/DSPAudio/mi/plaits/dsp/physical_modelling/string.cc
+    Src/Soundengine/DSPAudio/mi/plaits/dsp/engine2/wave_terrain_engine.cc
+    Src/Soundengine/DSPAudio/mi/plaits/dsp/engine/virtual_analog_engine.cc
+    Src/Soundengine/DSPAudio/mi/plaits/dsp/engine/waveshaping_engine.cc
+    Src/Soundengine/DSPAudio/mi/plaits/dsp/engine2/phase_distortion_engine.cc
+    Src/Soundengine/DSPAudio/mi/plaits/dsp/engine/additive_engine.cc
+    Src/Soundengine/DSPAudio/mi/plaits/dsp/engine/chord_engine.cc
+    Src/Soundengine/DSPAudio/mi/plaits/dsp/chords/chord_bank.cc
+    Src/Soundengine/DSPAudio/mi/plaits/resources.cc
+    Src/Soundengine/DSPAudio/mi/stmlib/dsp/units.cc
+    Src/Soundengine/DSPAudio/mi/stmlib/utils/random.cc
 )
 
 # DSP building blocks, drum voices and master effects.
@@ -73,6 +100,12 @@ add_library(lxr_dsp OBJECT
     Src/Soundengine/DSPAudio/distortion.c
     Src/Soundengine/DSPAudio/dither.c
     Src/Soundengine/DSPAudio/DrumVoice.c
+    # UMA engines, copied from LX_UMA (docs/SOURCES.md)
+    Src/Soundengine/DSPAudio/FmDrum.c
+    Src/Soundengine/DSPAudio/FmWaves.c
+    Src/Soundengine/DSPAudio/MdDrum.cpp
+    Src/Soundengine/DSPAudio/PlaitsDrum.cpp
+    ${UMA_PLAITS_SOURCES}
     Src/Soundengine/DSPAudio/HiHat.c
     Src/Soundengine/DSPAudio/lfo.c
     Src/Soundengine/DSPAudio/mixer.c
@@ -184,3 +217,13 @@ endif()
 # jump-threads the loop back edge through that switch and duplicates the whole
 # loop body per case (ResonantFilter.c: 2772 B -> 6720 B at -O3, 8028 B at -O2).
 set_property(SOURCE Src/Soundengine/DSPAudio/ResonantFilter.c APPEND PROPERTY COMPILE_OPTIONS -fno-thread-jumps)
+
+# UMA: the drum-machine engine's machines (OP-XY-MNMD, MIT) are included unchanged; their unused parameters warn
+set_property(SOURCE Src/Soundengine/DSPAudio/MdDrum.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-unused-parameter)
+set_property(SOURCE Src/Soundengine/DSPAudio/MdDrum.cpp APPEND PROPERTY INCLUDE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR}/Src/Soundengine/DSPAudio/mnmd)
+# UMA: Plaits includes its files from mi/
+set_property(SOURCE Src/Soundengine/DSPAudio/PlaitsDrum.cpp ${UMA_PLAITS_SOURCES} APPEND PROPERTY COMPILE_OPTIONS -Wno-unused-parameter)
+set_property(SOURCE Src/Soundengine/DSPAudio/PlaitsDrum.cpp ${UMA_PLAITS_SOURCES} APPEND PROPERTY INCLUDE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR}/Src/Soundengine/DSPAudio/mi)
+# UMA: card files are loaded on a button press or at start-up, never per block
+set_property(SOURCE Src/uma_sdfiles.c APPEND PROPERTY COMPILE_OPTIONS -Os)
+

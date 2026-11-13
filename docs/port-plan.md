@@ -93,6 +93,21 @@ Goal: before porting any UI, know whether everything fits and what has to give.
 | **0.0b** | **The flash cap test:** the same build padded so the image reaches into sector 7 (0x080C0000+), with a known pattern at its end that the firmware checks at start-up and reports on the screen ("S7 ok" / "S7 bad") | builds; the image's end address checked | Installs or fails ("flash write error" as on the Eurorack): **is the cap 736 KB or 992 KB?** |
 | **0.0c** | **The engines in, without menus:** FmDrum + FmWaves, MdDrum, PlaitsDrum and uma_sdfiles linked in, behind a compile-time switch three voices play them with fixed settings (Drum 1 FM Tone, Drum 2 Plaits wavetable, Drum 3 mdk kick), the rest stock | the linker's memory report: flash, RAM, DTCM, ITCM | Boots; the three voices sound (from the sequencer); **CPU** with a pattern; RAM left for the stack |
 
+### 0.0c as built
+
+- Engines copied from LX_UMA `a179390` (`docs/SOURCES.md`): FmDrum + FmWaves, MdDrum + mnmd/, PlaitsDrum + mi/,
+  uma_sdfiles; C++ added to the build as on the Eurorack. Test hook `Core/Src/uma_enginetest.c` (flash, noinline;
+  `UMA_ENGINE_TEST` in uma.h): Drum 1 FM Tone (sub on), Drum 2 Plaits wavetable, Drum 3 the first mdk kick, in place
+  of the voice's oscillators; the transient, filter, amp EG (skipped for the mdk kick, which has its own) and drive
+  stay. The engines run every block, silent or not: the worst case.
+- **Memory (linker):** image 695,312 bytes, ends at 0x080B1C10: **57 KB below the sector-7 cap**, with the full
+  120 KB of FM waveform tables. RAM 351 KB of 384 (main stack at its top: ~24 KB left; stock had 113 KB free):
+  `seq_patternSet` 228 KB, Plaits voices 39 KB, card pool 40 KB (10 slots), mdk voices 4 KB. DTCM 109 KB of 128.
+  ITCM 15,080 B of 16 KB (+80 B for the hook's calls).
+- Still to add on top (estimates from section 2): UMA core ~23 KB flash / 32 KB RAM, menus ~38 KB flash, bigger kits
+  ~30 KB RAM. Flash: ~61 KB against 57 spare, so the FM tables shrink after all (or the trims). RAM: ~62 KB against
+  24, so the card pool goes to 6 slots or fewer and the Plaits work areas are looked at (section 2's list).
+
 **Out of Phase 0, decided with the user:**
 - the flash budget: with the waveform tables shrunk or not, and anything else to trim;
 - the RAM budget: the card files' slots (6, or installed into flash), where the Plaits work areas live;

@@ -23,6 +23,9 @@
 #include "Soundengine/TriggerOut.h"
 #include "Soundengine/MIDI/MidiVoiceControl.h"
 #include "IO/adcPots.h"
+#if UMA_ENGINE_TEST
+#include "uma_enginetest.h" // LX_UMA test 0.0c
+#endif
 
 INDTCM static float ampSmoothValue = 0.1f;
 //---------------------------------------------------
@@ -110,6 +113,9 @@ void initDrumVoice()
 		voiceArray[i].decimationRate = 1;
 
 	}
+#if UMA_ENGINE_TEST
+	umaTest_init();
+#endif
 }
 //---------------------------------------------------
 void Drum_updatePan(const uint8_t voiceNr)
@@ -170,6 +176,9 @@ void Drum_trigger(const uint8_t voiceNr, const uint8_t vol, const uint8_t note)
 	voiceArray[voiceNr].velo = vol/127.f;
 
 	transient_trigger(&voiceArray[voiceNr].transGen);
+#if UMA_ENGINE_TEST
+	umaTest_trigger(voiceNr);
+#endif
 
 	SnapEg_trigger(&voiceArray[voiceNr].snapEg);
 
@@ -230,6 +239,12 @@ IN_ITCM_RAM void calcDrumVoiceAsync(const uint8_t voiceNr)
 	//update osc phaseInc
 	osc_setFreq(&voiceArray[voiceNr].osc);
 	osc_setFreq(&voiceArray[voiceNr].modOsc);
+#if UMA_ENGINE_TEST
+	{
+		const OscInfo* osc = &voiceArray[voiceNr].osc;
+		umaTest_block(voiceNr, osc->freq*osc->pitchMod*osc->modNodeValue);
+	}
+#endif
 
 
 
@@ -247,6 +262,13 @@ IN_ITCM_RAM void calcDrumVoiceSyncBlock(const uint8_t voiceNr, int16_t* buf, con
 	calcOnePoleBlockFixedInput(&voiceArray[voiceNr].ampFilter, voiceArray[voiceNr].ampFilterInput,voiceArray[voiceNr].volEgValueBlock, size);
 #endif
 
+#if UMA_ENGINE_TEST
+	if(umaTest_render(voiceNr, buf, size))
+	{
+	}
+	else
+#endif
+	{
 	//calc next mod osc sampleBlock - int16_t processing
 	calcNextOscSampleBlock(&voiceArray[voiceNr].modOsc,modBuf,size,voiceArray[voiceNr].fmModAmount, voiceArray[voiceNr].pwm);
 
@@ -260,6 +282,7 @@ IN_ITCM_RAM void calcDrumVoiceSyncBlock(const uint8_t voiceNr, int16_t* buf, con
 	else
 	{
 		calcNextOscSampleFmBlock(&voiceArray[voiceNr].osc,modBuf,buf,size,1.0f, voiceArray[voiceNr].pwm);
+	}
 	}
 
 	//calc transient sample - int16_t processing
@@ -277,6 +300,9 @@ IN_ITCM_RAM void calcDrumVoiceSyncBlock(const uint8_t voiceNr, int16_t* buf, con
 #else
 	//bufferTool_addGainInterpolatedDoubleDithered(&voiceArray[voiceNr].dither, buf,voiceArray[voiceNr].ampFilterInput, voiceArray[voiceNr].lastGain, size);
 	//float
+#if UMA_ENGINE_TEST
+	if(!umaTest_selfEnveloped(voiceNr))
+#endif
 	bufferTool_addGainInterpolated(buf,voiceArray[voiceNr].ampFilterInput, voiceArray[voiceNr].lastGain, size);
 
 	//buf[i] = dither_process(voiceArray[voiceNr].dither, buf[i]

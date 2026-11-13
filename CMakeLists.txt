@@ -22,7 +22,7 @@ endif()
 project(LXR_V2_STM32F765
     VERSION 1.7
     DESCRIPTION "LXR V2 drum machine firmware"
-    LANGUAGES C ASM
+    LANGUAGES C CXX ASM
 )
 
 # UMA: update files are named after the LX_UMA version (Core/Inc/uma.h), not Erica's, so a modified
@@ -44,6 +44,10 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 # engine has to run at -O3 to keep up in real time, even in Debug builds.
 set(CMAKE_C_FLAGS_DEBUG     "-O3 -g3")
 set(CMAKE_C_FLAGS_RELEASE   "-O3 -g0")
+# UMA: the drum-machine engine (MdDrum.cpp, OP-XY-MNMD) and Plaits (PlaitsDrum.cpp, mi/) are C++
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_FLAGS_DEBUG   "-O3 -g3")
+set(CMAKE_CXX_FLAGS_RELEASE "-O3 -g0")
 set(CMAKE_ASM_FLAGS_DEBUG   "-g3")
 set(CMAKE_ASM_FLAGS_RELEASE "")
 
