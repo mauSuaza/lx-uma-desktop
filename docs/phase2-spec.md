@@ -118,3 +118,15 @@ skip their engine (FM, Plaits' tonal models), as on the Eurorack.
   `HiHat.c` (applied as patches: the desktop's files differ from the Eurorack's stock ones elsewhere).
 - `uma_voice.c` already calls Plaits for these voices, so Plaits and the card-file pool are linked from here on
   (RAM 344 KB of 384: ~32 KB left for the stack and Phase 3; to watch). Image 582 KB (~154 KB spare).
+
+## 10. 0.2e as built
+
+- **Plaits on every voice**: `eng` `pla` (Drum 1–3: after `mdk`; the snare, cymbal, hi-hat: after `mdk`). Drum 1–3
+  in `uma_fmvoice.c` (from the Eurorack's DrumVoice.c): the drums' models self-enveloped (no amp EG, no pitch EG),
+  the tonal models with both and not run while the EG is shut; then the wavefolder, the transient on top, the filter.
+  The snare, cymbal, hi-hat through `uma_voice.c` (0.2d).
+- **Pages** as on the Eurorack: Osc `cor fin eng bnk | mdl out` (6-op: `kmd` in out's place), then on wavetable and
+  terrain the sub `sub sbs sbo sbf`; FM `hrm tmb mor twi`, with `fil` on the 6-op (banks A–C), wavetable and terrain
+  (built-in tables until Phase 4); Transient `wav vol frq | fld fty sym lev`. The edit screen names the model, its
+  knobs, the output, TWIST, the 6-op patch; a bank change keeps the model in the bank.
+- RAM 347 KB of 384 (Plaits' six voices and the card pool), ~29 KB left for the stack. Image 587 KB (~149 KB spare).

@@ -98,12 +98,13 @@ const char menuText_any[]  	= "any";
 // (menu_umaAfterEdit); pla (5) comes with 0.2e
 const char umaEngineNames[][4] =
 {
-	{5},		//number of entries
+	{6},		//number of entries
 	{"lxr"},
 	{"fmd"},	// FM Drum
 	{"fmt"},	// FM Tone
 	{"---"},	// (prk, not on the desktop)
 	{"mdk"},	// drum machines (MdDrum.cpp)
+	{"pla"},	// Plaits (PlaitsDrum.cpp)
 };
 
 const char umaAlgoNames[][4] =
@@ -254,10 +255,11 @@ const char umaMdMchNames[][4] =
 // desktop and is skipped when editing; pla (3) comes with 0.2e
 const char umaVEngineNames[][4] =
 {
-	{3},		//number of entries
+	{4},		//number of entries
 	{"lxr"},	// the voice's own sound
 	{"---"},	// (prk, not on the desktop)
 	{"mdk"},
+	{"pla"},
 };
 //-----------------------------------------------------------------
 const char stepFlamNames[][4] =
@@ -734,6 +736,15 @@ const char shortNames[][4]  =
 	{"k8 "},	// LX_UMA SHORT_UMA_MD_K8
 	{"rmc"},	// LX_UMA SHORT_UMA_MD_RMC
 	{"rkn"},	// LX_UMA SHORT_UMA_MD_RKN
+	{"bnk"},	// LX_UMA SHORT_UMA_PLA_BNK
+	{"mdl"},	// LX_UMA SHORT_UMA_PLA_MDL
+	{"out"},	// LX_UMA SHORT_UMA_PLA_OUT
+	{"hrm"},	// LX_UMA SHORT_UMA_PLA_HRM
+	{"tmb"},	// LX_UMA SHORT_UMA_PLA_TMB
+	{"mor"},	// LX_UMA SHORT_UMA_PLA_MOR
+	{"twi"},	// LX_UMA SHORT_UMA_PLA_TWI
+	{"fil"},	// LX_UMA SHORT_UMA_PLA_DXB
+	{"kmd"},	// LX_UMA SHORT_UMA_PLA_KMD
 };
 //-----------------------------------------------------------------
 // These correspond with the catNamesEnum in menu.h
@@ -778,6 +789,7 @@ const char catNames[][16] =
 	{"LPG"},	// LX_UMA CAT_UMA_LPG
 	{"Random"},	// LX_UMA CAT_UMA_RANDOM
 	{"Machine"},	// LX_UMA CAT_UMA_MD
+	{"Plaits"},	// LX_UMA CAT_UMA_PLA
 };
 //-----------------------------------------------------------------
 // these must correspond to longNamesEnum
@@ -912,6 +924,15 @@ const char longNames[][16] =
 	{"Knob 7"},	// LX_UMA LONG_UMA_KNOB7
 	{"Knob 8"},	// LX_UMA LONG_UMA_KNOB8
 	{"Knobs"},	// LX_UMA LONG_UMA_KNOBS
+	{"Bank"},	// LX_UMA LONG_UMA_PLA_BNK
+	{"Model"},	// LX_UMA LONG_UMA_PLA_MDL
+	{"Output"},	// LX_UMA LONG_UMA_PLA_OUT
+	{"Harmonics"},	// LX_UMA LONG_UMA_PLA_HRM
+	{"Timbre"},	// LX_UMA LONG_UMA_PLA_TMB
+	{"Morph"},	// LX_UMA LONG_UMA_PLA_MOR
+	{"Twist"},	// LX_UMA LONG_UMA_PLA_TWI
+	{"File"},	// LX_UMA LONG_UMA_PLA_DXB
+	{"Key mode"},	// LX_UMA LONG_UMA_PLA_KMD
 };
 
 

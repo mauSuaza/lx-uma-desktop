@@ -33,6 +33,7 @@
 #include "Soundengine/Sequencer/sequencer.h"
 #include "Soundengine/Soundengine.h"
 #include "uma_voice.h" // LX_UMA
+#include "Soundengine/DSPAudio/PlaitsDrum.h" // LX_UMA: the Plaits models' names
 #include "Soundengine/DSPAudio/MdDrum.h" // LX_UMA: the drum machines' names
 #include "uma_sdreadtest.h" // LX_UMA test 0.1a
 
@@ -315,6 +316,15 @@ const Name valueNames[NUM_NAMES] =
 		{SHORT_UMA_MD_RMC, CAT_UMA_RANDOM, LONG_UMA_MACHINE},/*TEXT_UMA_MD_RMC*/
 		{SHORT_UMA_MD_RKN, CAT_UMA_RANDOM, LONG_UMA_KNOBS},/*TEXT_UMA_MD_RKN*/
 		{SHORT_UMA_RND_PALETTE, CAT_UMA_RANDOM, LONG_UMA_PALETTE},/*TEXT_UMA_MD_PAL*/
+		{SHORT_UMA_PLA_BNK, CAT_UMA_PLA, LONG_UMA_PLA_BNK},/*TEXT_UMA_PLA_BNK*/
+		{SHORT_UMA_PLA_MDL, CAT_UMA_PLA, LONG_UMA_PLA_MDL},/*TEXT_UMA_PLA_MDL*/
+		{SHORT_UMA_PLA_OUT, CAT_UMA_PLA, LONG_UMA_PLA_OUT},/*TEXT_UMA_PLA_OUT*/
+		{SHORT_UMA_PLA_HRM, CAT_UMA_PLA, LONG_UMA_PLA_HRM},/*TEXT_UMA_PLA_HRM*/
+		{SHORT_UMA_PLA_TMB, CAT_UMA_PLA, LONG_UMA_PLA_TMB},/*TEXT_UMA_PLA_TMB*/
+		{SHORT_UMA_PLA_MOR, CAT_UMA_PLA, LONG_UMA_PLA_MOR},/*TEXT_UMA_PLA_MOR*/
+		{SHORT_UMA_PLA_TWI, CAT_UMA_PLA, LONG_UMA_PLA_TWI},/*TEXT_UMA_PLA_TWI*/
+		{SHORT_UMA_PLA_DXB, CAT_UMA_PLA, LONG_UMA_PLA_DXB},/*TEXT_UMA_PLA_DXB*/
+		{SHORT_UMA_PLA_KMD, CAT_UMA_PLA, LONG_UMA_PLA_KMD},/*TEXT_UMA_PLA_KMD*/
 };
 
 //---------------------------------------------------------------
@@ -1932,12 +1942,39 @@ static int8_t menu_umaMdKnob(uint16_t name)
 	return name >= TEXT_UMA_MD_K1 && name <= TEXT_UMA_MD_K8 ? (int8_t)(name - TEXT_UMA_MD_K1) : -1;
 }
 
-// a value shown on the page in place of its number or list entry: the drum machine by its name (tbd, pmt ...)
+// a Plaits voice page's model, PL_MODEL_NONE if none
+static uint8_t menu_umaPlaModel(uint8_t page)
+{
+	const uint8_t v = menu_umaVoiceOf(page);
+	return v == 0xff ? PL_MODEL_NONE : plaitsDrum_modelOf(activeParameters[umaVoice_plaPar(v, 0)], activeParameters[umaVoice_plaPar(v, 1)]);
+}
+// a Plaits voice page whose model is the 6-op FM (its Osc page has the key mode where out is)
+static uint8_t menu_umaPlaIsDx(uint8_t page)
+{
+	return menu_umaPlaModel(page) == PL_MODEL_DX7;
+}
+// the FM page of a Plaits voice: on the 6-op, the wavetable and the wave terrain with `fil`, or 0
+static const Page* menu_umaPlaFilPage(uint8_t page)
+{
+	const uint8_t m = menu_umaPlaModel(page);
+	return m == PL_MODEL_DX7 ? &umaPlaDxFmPages[page - VOICE1_PAGE] : m == PL_MODEL_WAVETABLE ? &umaPlaWavFmPages[page - VOICE1_PAGE]
+		: m == PL_MODEL_TERRAIN ? &umaPlaTerFmPages[page - VOICE1_PAGE] : 0;
+}
+
+// a value shown on the page in place of its number or list entry: the drum machine (tbd, pmt ...) and the Plaits
+// model (bd ...) by their names
 static void menu_umaShortValue(uint16_t p, uint8_t v, char* valueAsText)
 {
 	uint8_t voice, k;
-	if(umaVoice_which(p, &voice, &k) == 3 && k == 1)
+	const uint8_t kind = umaVoice_which(p, &voice, &k);
+	if(kind == 3 && k == 1)
 		memcpy(valueAsText, mdDrum_machineShort(mdDrum_machineOf(activeParameters[p - 1], v)), 3);
+	if(kind == 5 && k == 1)
+	{
+		const char* n = plaitsDrum_modelShort(plaitsDrum_modelOf(activeParameters[p - 1], v));
+		valueAsText[0] = valueAsText[1] = valueAsText[2] = ' ';
+		for(uint8_t i = 0; i < 3 && n[i]; i++) valueAsText[i] = n[i];
+	}
 }
 
 // the edit screen's 2nd line for UMA settings that have names: the drum machine's type, machine, and each knob by
@@ -1947,7 +1984,37 @@ static void menu_umaEditValue(uint16_t p, uint8_t v)
 	char t[24];
 	t[0] = 0;
 	uint8_t wv, wk;
-	if(umaVoice_which(p, &wv, &wk) == 3)
+	if(umaVoice_ofEngine(p) != 0xff)
+	{
+		// the engine by name (the snare, cymbal, hi-hat store lxr prk mdk pla as 0 1 2 3)
+		const uint8_t e = umaVoice_ofEngine(p) < 3 ? v : v == 1 ? 3 : v == 2 ? 4 : v == 3 ? 5 : 0;
+		snprintf(t, sizeof(t), "%s", e == 5 ? "Plaits" : e == 4 ? "Drum Machine" : e == 2 ? "FM Tone" : e == 1 ? "FM Drum" : "LXR");
+	}
+	else if(umaVoice_which(p, &wv, &wk) == 4)
+		snprintf(t, sizeof(t), "%s", v == 2 ? "Any machine" : v == 1 ? "Type+family" : "Same type");
+	else if(umaVoice_which(p, &wv, &wk) == 5)
+	{
+		// Plaits: the bank, the model, and what the knobs and outputs are in the voice's model
+		const uint16_t bnk = umaVoice_plaPar(wv, 0);
+		const uint8_t model = plaitsDrum_modelOf(activeParameters[bnk], wk == 1 ? v : activeParameters[bnk + 1]);
+		if(wk == 2 && model == PL_MODEL_DX7)	// the 6-op: the patch HARMONICS picks, by number and name
+		{
+			char n[12];
+			const uint8_t patch = plaitsDrum_dxPatchOf(v * (1.f / 127.f));
+			plaitsDrum_dxPatchName(activeParameters[umaVoice_plaPar(wv, 6)], patch, n);
+			snprintf(t, sizeof(t), "%u %s", (unsigned)(patch + 1), n);
+		}
+		else if(wk == 6) snprintf(t, sizeof(t), "%s", plaitsDrum_dxBankName(v));
+		else if(wk == 9 || wk == 10) snprintf(t, sizeof(t), "%s", plaitsDrum_userFileName(wk == 9 ? PL_MODEL_WAVETABLE : PL_MODEL_TERRAIN, v));
+		else if(wk == 7) snprintf(t, sizeof(t), "%s", plaitsDrum_dxKeyName(v));
+		else if(wk == 8) snprintf(t, sizeof(t), "%s", plaitsDrum_twistName(model));
+		else if(wk == 0) snprintf(t, sizeof(t), "%s", plaitsDrum_bankName(v));
+		else if(wk == 1) snprintf(t, sizeof(t), "%s", plaitsDrum_modelName(model));
+		else if(wk <= 4) snprintf(t, sizeof(t), "%s", plaitsDrum_knobName(model, (uint8_t)(wk - 2)));
+		else if(wk >= 11) t[0] = 0;	// the sub: nothing more to say, as on fmt
+		else snprintf(t, sizeof(t), "%s", plaitsDrum_outputName(model, v));
+	}
+	else if(umaVoice_which(p, &wv, &wk) == 3)
 	{
 		const uint8_t k = wk;
 		const uint16_t base = (uint16_t)(p - k);
@@ -1982,12 +2049,24 @@ static void menu_umaAfterEdit(uint16_t paramNr, int8_t dir)
 			activeParameters[base + 1] = (uint8_t)(mdDrum_typeCount(activeParameters[base]) - 1);
 		mdDrum_defaults(mdDrum_machineOf(activeParameters[base], activeParameters[base + 1]), &activeParameters[base + 2]);
 	}
+	// a Plaits bank with fewer models: the model stays in it
+	if(umaVoice_which(paramNr, &umaV, &umaK) == 5 && umaK == 0)
+	{
+		const uint8_t n = plaitsDrum_bankCount(activeParameters[paramNr]);
+		if(activeParameters[paramNr + 1] >= (n ? n : 1))
+			activeParameters[paramNr + 1] = (uint8_t)(n ? n - 1 : 0);
+	}
+	// an engine setting past the list's end (a damaged kit): lxr
+	(void)engVoice;
 }
 
 // an engine's extra screen n of a page and sub-page, or NULL
 static const Page* menu_umaExtraScreen(uint8_t page, uint8_t sub, uint8_t n)
 {
 	const uint8_t engine = menu_umaEngine(page);
+	if(engine == UMA_ENG_PLA && sub == UMA_FM_PAGE_OSC && n == 0
+		&& (menu_umaPlaModel(page) == PL_MODEL_WAVETABLE || menu_umaPlaModel(page) == PL_MODEL_TERRAIN))
+		return &umaPlaSubPages[page - VOICE1_PAGE];	// the sub on the wavetable and terrain
 	if((engine == 1 || engine == 2) && sub == UMA_FM_PAGE_MOD && n == 0)
 		return &umaFmRndFinePages[page - VOICE1_PAGE];	// random fine, and the velocity settings
 	if(engine == 2)
@@ -2016,6 +2095,20 @@ const Page* menu_getPage(uint8_t page, uint8_t sub)
 	const uint8_t engine = menu_umaEngine(page);
 	if(engine)
 	{
+		if(engine == UMA_ENG_PLA && page >= VOICE4_PAGE)	// the snare, cymbal, hi-hat on Plaits: as the drums'
+		{
+			if(sub == UMA_FM_PAGE_OSC) return menu_umaPlaIsDx(page) ? &umaVxPlaDxOscPages[page - VOICE4_PAGE] : &umaVxPlaPages[page - VOICE4_PAGE][0];
+			if(sub == UMA_FM_PAGE_FM) return menu_umaPlaFilPage(page) ? menu_umaPlaFilPage(page) : &umaVxPlaPages[page - VOICE4_PAGE][1];
+			if(sub == UMA_FM_PAGE_TRANS) return &umaVxMdPages[page - VOICE4_PAGE][3];
+			return &menuPages[page][sub];
+		}
+		if(engine == UMA_ENG_PLA)	// Plaits: Osc (tune, engine, bank | model, output), FM its knobs, Transient the folder
+		{
+			if(sub == UMA_FM_PAGE_OSC) return menu_umaPlaIsDx(page) ? &umaPlaDxOscPages[page - VOICE1_PAGE] : &umaPlaPages[page - VOICE1_PAGE][0];
+			if(sub == UMA_FM_PAGE_FM) return menu_umaPlaFilPage(page) ? menu_umaPlaFilPage(page) : &umaPlaPages[page - VOICE1_PAGE][1];
+			if(sub == UMA_FM_PAGE_TRANS) return &umaMdPages[page - VOICE1_PAGE][3];
+			return &menuPages[page][sub];
+		}
 		if(engine == UMA_ENG_MDK && page >= VOICE4_PAGE)	// the snare, cymbal, hi-hat on mdk: as the drums'
 		{
 			const Page* p = umaVxMdPages[page - VOICE4_PAGE];
@@ -2045,8 +2138,14 @@ const Page* menu_getPage(uint8_t page, uint8_t sub)
 static uint8_t menu_umaListEntries(uint16_t paramNr, uint8_t numEntries)
 {
 	uint8_t voice, k;
-	if(umaVoice_which(paramNr, &voice, &k) == 3 && k == 1)	// the drum-machine engine: each type its machines
+	const uint8_t kind = umaVoice_which(paramNr, &voice, &k);
+	if(kind == 3 && k == 1)	// the drum-machine engine: each type its machines
 		return mdDrum_typeCount(activeParameters[paramNr - 1]);
+	if(kind == 5 && k == 1)	// Plaits: the bank's models (an empty bank: one place, shown as ---)
+	{
+		const uint8_t n = plaitsDrum_bankCount(activeParameters[paramNr - 1]);
+		return n ? n : 1;
+	}
 	if(paramNr >= PAR_UMA_ENG1 && paramNr < UMA_RND_FIRST_PAR
 		&& (paramNr - PAR_UMA_ENG1) % UMA_FM_PARS_PER_DRUM == PAR_UMA_ALGO1 - PAR_UMA_ENG1
 		&& activeParameters[paramNr - (PAR_UMA_ALGO1 - PAR_UMA_ENG1)] != 2)
@@ -3705,6 +3804,20 @@ static uint8_t getMaxEntriesForMenu(uint8_t menuId)
 		return umaMdPalNames[0][0];
 	case MENU_UMA_VENGINE:
 		return umaVEngineNames[0][0];
+	case MENU_UMA_PLA_BNK:
+		return PL_NUM_BANKS;
+	case MENU_UMA_PLA_MDL:
+		return PL_BANK_MAX_MODELS;	// narrowed to the bank's models (menu_umaListEntries)
+	case MENU_UMA_PLA_OUT:
+		return PL_NUM_OUTPUTS;
+	case MENU_UMA_PLA_DXB:
+		return plaitsDrum_dxBankCount();
+	case MENU_UMA_PLA_WVF:
+		return plaitsDrum_userFileCount(PL_MODEL_WAVETABLE);
+	case MENU_UMA_PLA_TRF:
+		return plaitsDrum_userFileCount(PL_MODEL_TERRAIN);
+	case MENU_UMA_PLA_KMD:
+		return PL_NUM_DXK;
 	case MENU_FILTER:
 		return filterTypes[0][0];
 	case MENU_SYNC_RATES:
@@ -3821,6 +3934,27 @@ static void getMenuItemNameForValue(const uint8_t menuId, const uint8_t curParmV
 		break;
 	case MENU_UMA_VENGINE:
 		p = umaVEngineNames[curParmVal + 1];
+		break;
+	case MENU_UMA_PLA_BNK:
+		p = plaitsDrum_bankShort(curParmVal);
+		break;
+	case MENU_UMA_PLA_MDL:
+		p = umaMdMchNames[curParmVal < 13 ? curParmVal + 1 : 13];	// the model's name: menu_umaShortValue
+		break;
+	case MENU_UMA_PLA_OUT:
+		p = curParmVal == 0 ? "out" : curParmVal == 1 ? "aux" : "mix";
+		break;
+	case MENU_UMA_PLA_DXB:
+		p = plaitsDrum_dxBankShort(curParmVal);
+		break;
+	case MENU_UMA_PLA_WVF:
+		p = plaitsDrum_userFileShort(PL_MODEL_WAVETABLE, curParmVal);
+		break;
+	case MENU_UMA_PLA_TRF:
+		p = plaitsDrum_userFileShort(PL_MODEL_TERRAIN, curParmVal);
+		break;
+	case MENU_UMA_PLA_KMD:
+		p = plaitsDrum_dxKeyShort(curParmVal);
 		break;
 	case MENU_FILTER:
 		p = filterTypes[curParmVal + 1];

@@ -332,6 +332,15 @@ enum NamesEnum
 	TEXT_UMA_MD_RMC,
 	TEXT_UMA_MD_RKN,
 	TEXT_UMA_MD_PAL,
+	TEXT_UMA_PLA_BNK,
+	TEXT_UMA_PLA_MDL,
+	TEXT_UMA_PLA_OUT,
+	TEXT_UMA_PLA_HRM,
+	TEXT_UMA_PLA_TMB,
+	TEXT_UMA_PLA_MOR,
+	TEXT_UMA_PLA_TWI,
+	TEXT_UMA_PLA_DXB,
+	TEXT_UMA_PLA_KMD,
 	NUM_NAMES
 };
 //-----------------------------------------------------------------
@@ -489,6 +498,15 @@ enum shortNamesEnum
 	SHORT_UMA_MD_K8,
 	SHORT_UMA_MD_RMC,
 	SHORT_UMA_MD_RKN,
+	SHORT_UMA_PLA_BNK,
+	SHORT_UMA_PLA_MDL,
+	SHORT_UMA_PLA_OUT,
+	SHORT_UMA_PLA_HRM,
+	SHORT_UMA_PLA_TMB,
+	SHORT_UMA_PLA_MOR,
+	SHORT_UMA_PLA_TWI,
+	SHORT_UMA_PLA_DXB,
+	SHORT_UMA_PLA_KMD,
 };
 //-----------------------------------------------------------------
 // These correspond with catNames in MenuText.h
@@ -532,6 +550,7 @@ enum catNamesEnum
 	CAT_UMA_LPG,
 	CAT_UMA_RANDOM,
 	CAT_UMA_MD,
+	CAT_UMA_PLA,
 };
 //-----------------------------------------------------------------
 // these must correspond with longNames in MenuText.h
@@ -665,6 +684,15 @@ enum longNamesEnum
 	LONG_UMA_KNOB7,
 	LONG_UMA_KNOB8,
 	LONG_UMA_KNOBS,
+	LONG_UMA_PLA_BNK,
+	LONG_UMA_PLA_MDL,
+	LONG_UMA_PLA_OUT,
+	LONG_UMA_PLA_HRM,
+	LONG_UMA_PLA_TMB,
+	LONG_UMA_PLA_MOR,
+	LONG_UMA_PLA_TWI,
+	LONG_UMA_PLA_DXB,
+	LONG_UMA_PLA_KMD,
 };
 
 //enum for the save category parameter

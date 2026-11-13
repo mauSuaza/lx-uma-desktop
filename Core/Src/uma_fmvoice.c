@@ -17,6 +17,7 @@
 #include "uma_voice.h"
 #include "uma_mod.h"
 #include "Soundengine/DSPAudio/MdDrum.h"
+#include "Soundengine/DSPAudio/PlaitsDrum.h"
 #include <math.h>
 
 #define UMA_FMV_DRUMS 3
@@ -44,6 +45,15 @@ static uint8_t umaMd_isOn(uint8_t voiceNr)
 	return voiceNr < UMA_FMV_DRUMS && umaVoice_engine(voiceNr) == UMA_ENG_MDK;
 }
 
+// Plaits (0.2e, the Eurorack's DrumVoice.c): self-enveloped models (the drums) like mdk; the tonal ones take the amp
+// EG and the pitch EG, and aren't run while the EG is shut. Then the wavefolder; the transient layers on top
+static volatile uint8_t umaPla_hitPending[UMA_FMV_DRUMS];
+static uint8_t umaPla_tonal[UMA_FMV_DRUMS];	// the sounding model is tonal (umaVoice_plaSync)
+static uint8_t umaPla_isOn(uint8_t voiceNr)
+{
+	return voiceNr < UMA_FMV_DRUMS && umaVoice_engine(voiceNr) == UMA_ENG_PLA;
+}
+
 // the voice's amp EG is shut: the engine would be silent, so it isn't run (the next hit starts it as always)
 static uint8_t umaFm_closed(uint8_t voiceNr)
 {
@@ -61,6 +71,7 @@ __attribute__((noinline)) void umaFmV_init(void)
 		fmDrum_setParam(&umaFm[v], FMD_SWEEP_AMT, 0);	// the voice's pitch EG does the sweep
 		fmDrum_setParam(&umaFm[v], FMD_LEVEL, 127);		// the voice's mixer sets the volume
 		mdDrum_init(v);
+		plaitsDrum_init(v, REAL_FS);
 	}
 	umaVoice_init();	// the snare, cymbal and hi-hat's engines
 }
@@ -70,7 +81,10 @@ __attribute__((noinline)) void umaFmV_trigger(uint8_t voiceNr)
 	if(voiceNr < UMA_FMV_DRUMS)
 		fmDrum_trigger(&umaFm[voiceNr], 1.f);	// velocity is applied by the voice
 	if(voiceNr < UMA_FMV_DRUMS)
-		umaMd_hitPending[voiceNr] = 1;	// started in umaFmV_block, after randomise drew this block's machine
+	{
+		umaMd_hitPending[voiceNr] = 1;
+		umaPla_hitPending[voiceNr] = 1;
+	}	// started in umaFmV_block, after randomise drew this block's machine
 	umaRnd_hit(voiceNr);	// a modulated randomise setting re-rolls in this block (Phase 3), before the voice renders
 }
 
@@ -188,6 +202,25 @@ __attribute__((noinline)) void umaFmV_block(uint8_t voiceNr, float freqHz)
 	}
 	if(voiceNr < UMA_FMV_DRUMS)
 		umaMd_hitPending[voiceNr] = 0;	// a hit on another engine doesn't wait for mdk
+	if(umaPla_isOn(voiceNr))
+	{
+		umaFm_syncFold(voiceNr);
+		umaPla_tonal[voiceNr] = umaVoice_plaSync(voiceNr);
+		// the voice's pitch in Hz, without the pitch EG for the drums (they sweep their own)
+		const OscInfo* osc = &voiceArray[voiceNr].osc;
+		plaitsDrum_setPitch(voiceNr, freqHz / (!umaPla_tonal[voiceNr] && osc->pitchMod > 0.f ? osc->pitchMod : 1.f));
+		if(umaPla_hitPending[voiceNr])
+		{
+			umaPla_hitPending[voiceNr] = 0;
+			plaitsDrum_trigger(voiceNr, 0.8f);	// Plaits' accent with nothing patched; velocity is the voice's
+		}
+		return;
+	}
+	if(voiceNr < UMA_FMV_DRUMS)
+	{
+		umaPla_hitPending[voiceNr] = 0;
+		umaPla_tonal[voiceNr] = 0;
+	}
 	if(!umaFm_isOn(voiceNr))
 		return;
 	umaFm_syncParams(voiceNr);
@@ -208,6 +241,21 @@ __attribute__((noinline)) uint8_t umaFmV_render(uint8_t voiceNr, int16_t* buf, u
 		for(uint8_t i = 0; i < size; i++)
 		{
 			float x = mdBuf[i] * 32767.f;
+			buf[i] = (int16_t)(x > 32767.f ? 32767.f : x < -32767.f ? -32767.f : x);
+		}
+		return 1;
+	}
+	if(umaPla_isOn(voiceNr))
+	{
+		float plBuf[PL_BLOCK];
+		if(size == PL_BLOCK && !(umaPla_tonal[voiceNr] && umaFm_closed(voiceNr)))
+			plaitsDrum_render(voiceNr, plBuf);
+		else
+			for(uint8_t i = 0; i < PL_BLOCK; i++) plBuf[i] = 0.f;	// a tonal model with the EG shut isn't run
+		fmDrum_foldBlock(&umaFm[voiceNr], plBuf, size);
+		for(uint8_t i = 0; i < size; i++)
+		{
+			float x = plBuf[i] * 32767.f;
 			buf[i] = (int16_t)(x > 32767.f ? 32767.f : x < -32767.f ? -32767.f : x);
 		}
 		return 1;
@@ -233,5 +281,5 @@ __attribute__((noinline)) uint8_t umaFmV_render(uint8_t voiceNr, int16_t* buf, u
 
 __attribute__((noinline)) uint8_t umaFmV_ownEnv(uint8_t voiceNr)
 {
-	return umaMd_isOn(voiceNr);
+	return umaMd_isOn(voiceNr) || (umaPla_isOn(voiceNr) && !umaPla_tonal[voiceNr]);
 }

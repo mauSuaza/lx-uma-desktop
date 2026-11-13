@@ -7,12 +7,12 @@
 #define UMA_H_
 
 // version on the start-up screen and in the update file name (LXR_V2_UMA_V<version>.img, CMakeLists.txt)
-#define UMA_VERSION "0.2d"	// Phase 2 test build: 0.2c + mdk on the snare, cymbal, hi-hat
+#define UMA_VERSION "0.2e"	// Phase 2 test build: 0.2d + Plaits on every voice
 
 // UMA's engines and settings (the Eurorack's flag: the copied code is written around it)
 #define UMA_FM 1
 // the Plaits engine as an eng value (0.2e)
-#define UMA_PLAITS 0
+#define UMA_PLAITS 1
 
 // CPU load readout on the global page (SHIFT + step 12, 3rd press), 2nd sub-page, 4th slot `pk`: the longest
 // sequencer + sound render in the last 2 s, in % of a 64-sample block's time. The main loop renders
