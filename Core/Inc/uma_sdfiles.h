@@ -24,7 +24,7 @@ enum { UMA_SDF_DX7, UMA_SDF_WAVES, UMA_SDF_TERRAIN, UMA_SDF_KINDS };
 #define UMA_SDF_NONE		0xff
 #define UMA_SDF_MAX			64		// files per kind at most: 64 DX7 banks, 32 wavetables, 32 terrains (umaSdf_max)
 #define UMA_SDF_MAX_FOLDERS	16		// the kind's folder and up to 15 subfolders
-#define UMA_SDF_SLOTS		10		// the pool: 10 x 4 KB
+#define UMA_SDF_SLOTS		6		// the pool: 6 x 4 KB (LX_UMA desktop: 10 on the Eurorack; docs/SOURCES.md)
 #define UMA_SDF_DATA		4096	// a file's data (a .syx without its 6-byte header and 2-byte trailer)
 #define UMA_SDF_SYX_SIZE	4104	// a 32-voice DX7 bulk dump
 #define UMA_SDF_BIN_SIZE	4096	// a wavetable (an 8 x 8 map + 15 waves) or a terrain (64 x 64 heights)

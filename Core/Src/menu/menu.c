@@ -32,6 +32,7 @@
 
 #include "Soundengine/Sequencer/sequencer.h"
 #include "Soundengine/Soundengine.h"
+#include "uma_sdreadtest.h" // LX_UMA test 0.1a
 
 
 uint8_t display_refresh_state = 0;
@@ -990,6 +991,10 @@ static uint8_t menu_umaLoadVisible(void)
 	return menu_activePage == MENU_MIDI_PAGE && ((menuIndex&MASK_PAGE)>>PAGE_SHIFT) == 1
 		&& (menuIndex & MASK_PARAMETER) <= 3 && !editModeActive && !screensaver_Active;
 }
+uint8_t menu_umaLoadShown(void)
+{
+	return menu_umaLoadVisible();
+}
 #endif
 void menu_tick()
 {
@@ -1830,6 +1835,12 @@ void menu_repaintGeneric()
 			memcpy(&editDisplayBuffer[0][12],"pk ",3);
 			numtostrpu(readout,umaLoad_peak,' ');
 			memcpy(&editDisplayBuffer[1][12],readout,3);
+#if UMA_SDREAD_TEST
+			// test 0.1a: the card read time in tou's place (0.1 ms)
+			memcpy(&editDisplayBuffer[0][8],"rd ",3);
+			numtostrpu(readout,umaTest_sdReadTime(),' ');
+			memcpy(&editDisplayBuffer[1][8],readout,3);
+#endif
 		}
 #endif
 	} // if editmode not active

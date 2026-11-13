@@ -1,6 +1,6 @@
 # Phase 1: foundation + FM (spec, draft for review)
 
-Status: **draft for review** (2026-11-12). Phase 1 of [port-plan.md](port-plan.md): UMA's settings and kit format on
+Status: **reviewed** (2026-11-12): option A and appended kit files chosen; 0.1a built. Phase 1 of [port-plan.md](port-plan.md): UMA's settings and kit format on
 the desktop, the menu framework, and FM Drum / FM Tone on Drum 1–3. Release **0.1** at the end.
 
 ## 1. What Phase 0 found (the numbers this spec works from)
@@ -82,8 +82,19 @@ Eurorack) and, if still needed, a stock function or two leaves ITCM (CPU measure
 | **0.1d** | FM Drum and FM Tone with their pages; the test hook gone | Same settings sound as on the Eurorack (A/B); `pk` |
 | **0.1** | Release: manual chapter, README, GitHub release | |
 
-## 8. Questions for you
+## 8. Decided (2026-11-12)
 
-1. Kit settings: **A** (from the card, prefetched; recommended), **B** (16 kits), or another idea?
-2. Is a UMA kit loading as a stock sound on the stock desktop firmware (section 4) fine, or should the file be
-   different so the stock firmware ignores it?
+1. Kit settings: **option A** (the UMA part from the card, prefetched). B stays the fallback if 0.1a's read time is
+   too slow.
+2. UMA's settings are **appended** to the stock kit file; on stock firmware a UMA kit plays as a stock sound.
+
+## 9. 0.1a as built
+
+- `-Os` for the HAL, FatFs, USB MIDI, `lxr_ui`, `lxr_io`, the MIDI parsers (not `ParameterArray.c`, ITCM) and
+  `initKit.c`; the sequencer and the sound stay `-O3`. Card pool `UMA_SDF_SLOTS` 6 (`docs/SOURCES.md`).
+- Image 670,176 bytes, ends at 0x080AB9E0: **81.5 KB spare** (0.0c: 57). RAM 336 KB (0.0c: 351). ITCM unchanged.
+- Read test `Core/Src/uma_sdreadtest.c`: twice a second while the CPU screen shows, `NN-*.snd` found, opened,
+  1,055 bytes read, closed, audio from the interrupt; the longest of the last 2 s shows as `rd` in tenths of a ms in
+  `tou`'s place (2nd sub-page: `ptm tin rd pk`).
+- `-Os` shows a stock bug (menu.c, clear-automation dialog: "autom. 1]?" is one byte too long for the line, its
+  terminator lands in the next line's first byte, which is redrawn): left as is.

@@ -49,4 +49,6 @@ target_include_directories(stm32f7_hal PUBLIC
 target_link_libraries(stm32f7_hal PUBLIC lxr_mcu lxr_board_config)
 
 # Vendor code: don't drown the build log in warnings we won't fix.
-target_compile_options(stm32f7_hal PRIVATE -w)
+target_compile_options(stm32f7_hal PRIVATE -w -Os)
+# LX_UMA (0.1a): -Os, for size: peripheral set-up and transfers, no DSP; the firmware must end below flash sector 7
+# (STM32F765VGTX_FLASH.ld)

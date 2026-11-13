@@ -2,7 +2,7 @@
 
 The sound engines are copied unchanged from [LX_UMA](https://github.com/mauSuaza/LX_UMA) (`~/src/eurorack/lxr-fm`).
 When they change there, copy them again and update the commit below. Files changed here for the desktop are listed
-under "Changed on the desktop" (none yet).
+under "Changed on the desktop".
 
 | Files | LX_UMA commit | Copied |
 |---|---|---|
@@ -13,4 +13,5 @@ To check for differences: `diff -r ~/src/eurorack/lxr-fm/Core/Src/Soundengine/DS
 
 ## Changed on the desktop
 
-(none)
+- `Core/Inc/uma_sdfiles.h`: `UMA_SDF_SLOTS` 6 (10 on the Eurorack), to save 16 KB of RAM (0.1a). Keep this when
+  copying the file again.

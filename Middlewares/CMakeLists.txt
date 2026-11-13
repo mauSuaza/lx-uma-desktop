@@ -26,7 +26,7 @@ target_include_directories(fatfs PUBLIC
 )
 
 target_link_libraries(fatfs PUBLIC stm32f7_hal)
-target_compile_options(fatfs PRIVATE -w)
+target_compile_options(fatfs PRIVATE -w -Os)	# LX_UMA (0.1a): for size (SD access only on load / save)
 
 # --- USB device library + USB_DEVICE_MIDI application glue --------------------
 # Note: the "CDC" class in Middlewares/JS was rewritten into a USB-MIDI class and
@@ -51,3 +51,5 @@ target_include_directories(usb_midi PUBLIC
 
 target_link_libraries(usb_midi PUBLIC stm32f7_hal)
 target_compile_options(usb_midi PRIVATE -w)
+# LX_UMA (0.1a): USB MIDI for size (per message, not per sample)
+target_compile_options(usb_midi PRIVATE -Os)

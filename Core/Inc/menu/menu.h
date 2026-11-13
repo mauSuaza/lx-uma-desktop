@@ -712,4 +712,8 @@ void numtostru(char *buf, uint8_t num);
 // non space padded signed
 //void numtostrs(char *buf, int8_t num);
 
+#if UMA_LOAD
+uint8_t menu_umaLoadShown(void);	// LX_UMA: 1 while the CPU readout is on screen
+#endif
+
 #endif

@@ -63,6 +63,7 @@ add_library(lxr_preset OBJECT
     Src/Preset/presetManager.c
     Src/uma_sdfiles.c
     Src/uma_enginetest.c # LX_UMA test 0.0c
+    Src/uma_sdreadtest.c # LX_UMA test 0.1a
 )
 
 # UMA: the pla engine. Plaits' code (Mutable Instruments, MIT, mi/README.md) is included unchanged; it includes its
@@ -226,4 +227,12 @@ set_property(SOURCE Src/Soundengine/DSPAudio/PlaitsDrum.cpp ${UMA_PLAITS_SOURCES
 set_property(SOURCE Src/Soundengine/DSPAudio/PlaitsDrum.cpp ${UMA_PLAITS_SOURCES} APPEND PROPERTY INCLUDE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR}/Src/Soundengine/DSPAudio/mi)
 # UMA: card files are loaded on a button press or at start-up, never per block
 set_property(SOURCE Src/uma_sdfiles.c APPEND PROPERTY COMPILE_OPTIONS -Os)
+# LX_UMA (0.1a, as the Eurorack's 0.33l): the user interface and the inputs are compiled for size, not speed: none of
+# it runs per sample, and the firmware has to end below flash sector 7 (STM32F765VGTX_FLASH.ld). MIDI too, except
+# ParameterArray.c (ITCM code, LXR_ITCM_SOURCES)
+target_compile_options(lxr_ui PRIVATE -Os)
+target_compile_options(lxr_io PRIVATE -Os)
+set_property(SOURCE Src/Soundengine/MIDI/MidiParser.c Src/Soundengine/MIDI/MidiMessages.c Src/Soundengine/MIDI/Uart.c
+	Src/Soundengine/MIDI/CortexParser.c Src/Soundengine/MIDI/MidiVoiceControl.c Src/Preset/initKit.c
+	APPEND PROPERTY COMPILE_OPTIONS -Os)
 

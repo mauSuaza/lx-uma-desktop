@@ -10,6 +10,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "uma_s7test.h" // UMA: test 0.0b
+#include "uma_sdreadtest.h" // UMA: test 0.1a
 #include <stdio.h>
 #include <string.h>
 #include "fatfs.h"
@@ -996,6 +997,9 @@ lcd_process_display_interrupt = 1;
 	  adc_checkFaders();
 	//  menu_tick();
     checkMainLoc = -8;
+#if UMA_SDREAD_TEST
+	umaTest_sdReadTick(menu_umaLoadShown());	// test 0.1a: a kit read from the card twice a second
+#endif
 
 	  //check if we have some usb midi messages and process them
 	  MidiMsg msg;
