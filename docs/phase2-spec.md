@@ -152,3 +152,14 @@ skip their engine (FM, Plaits' tonal models), as on the Eurorack.
 - Options after the numbers: render from the interrupt at all times (fewer clicks near the limit); lighter versions
   of the three heavy models (fewer modes / partials / less oversampling; a small change in sound, A/B first);
   documented limits.
+- **Result of 0.2g (2026-11-13, the user's LXR-02), one voice on the model, a pattern playing:**
+
+  | Drum 1 on | `vc` | `pk` |
+  |---|---|---|
+  | `fmd` | 15 % | 74 % |
+  | `pla` bass drum | 18 % | 74 % |
+  | `pla` harmonic | 26 % | 82 % |
+  | `pla` modal resonator | 28 % | 83 % |
+
+  **The clicks are gone** and `pk` stays below 90: `-ffast-math` on the C++ engines did it (0.2f: 90+ on these models).
+  No option C or D needed for now; the same flag would help the Eurorack firmware's Plaits too.
