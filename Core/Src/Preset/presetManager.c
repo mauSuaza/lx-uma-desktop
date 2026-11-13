@@ -846,6 +846,7 @@ void preset_loadDrumsetRam(uint8_t presetNr, uint8_t isMorph, uint8_t sendImmedi
 	if(isMorph)
 	{
 		morphParameters = mainParameters[presetNr];
+		umaKit_setMorphKit(presetNr);	// LX_UMA: the morph kit's UMA record (0.3e)
 	}
 	else
 	{
@@ -897,6 +898,7 @@ void preset_saveDrumsetRam(uint8_t presetNr, uint8_t isMorph)
 			//f_write((FIL*)&SDFile,&value,1,&bytesWritten);
 			mainParameters[presetNr][i] = value;
 		}
+		umaKit_storeMorphed(presetNr);	// LX_UMA: the UMA settings' blend too (0.3e)
 	}
 	else
 	{
@@ -2876,6 +2878,7 @@ FRESULT preset_loadProject(uint8_t presetNr, uint8_t clearTmp)
 
 	//init morph target to peset 0
 	morphParameters = mainParameters[0];
+	umaKit_setMorphKit(0);	// LX_UMA: its UMA record, from the store just written
 
 
 	//if pattern change mode is 'auto' load corresponding kit

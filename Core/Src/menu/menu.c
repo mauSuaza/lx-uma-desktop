@@ -398,6 +398,7 @@ const Name valueNames[NUM_NAMES] =
 		{SHORT_UMA_TM_PRB_D, CAT_UMA_TM_D, LONG_UMA_PROB},/*TEXT_UMA_TM_PRB_D*/
 		{SHORT_UMA_TM_CLK_D, CAT_UMA_TM_D, LONG_UMA_CLOCK},/*TEXT_UMA_TM_CLK_D*/
 		{SHORT_UMA_TM_DIV_D, CAT_UMA_TM_D, LONG_UMA_DIV},/*TEXT_UMA_TM_DIV_D*/
+		{SHORT_UMA_MORPH_LISTS, CAT_SOUND, LONG_UMA_MORPH_LISTS},/*TEXT_UMA_MORPH_LISTS*/
 };
 
 //---------------------------------------------------------------
@@ -1623,6 +1624,7 @@ const enum Datatypes PROGMEM parameter_dtypes[PAR_UMA_END] = {	// LX_UMA: + the 
 		/*PAR_UMA_DSK_VOCT4*/	DTYPE_0B127,
 		/*PAR_UMA_DSK_VOCT5*/	DTYPE_0B127,
 		/*PAR_UMA_DSK_VOCT6*/	DTYPE_0B127,
+		/*PAR_UMA_DSK_MORPH_LISTS*/	DTYPE_MENU | (MENU_UMA_MORPH_LISTS<<8),
 };
 
 
@@ -4113,6 +4115,8 @@ static uint8_t getMaxEntriesForMenu(uint8_t menuId)
 		return umaLfoBSyncNames[0][0];
 	case MENU_UMA_TM_CLOCK:
 		return umaTmClockNames[0][0];
+	case MENU_UMA_MORPH_LISTS:
+		return umaMorphListNames[0][0];
 	case MENU_UMA_POL:
 		return umaPolNames[0][0];
 	case MENU_FILTER:
@@ -4273,6 +4277,9 @@ static void getMenuItemNameForValue(const uint8_t menuId, const uint8_t curParmV
 		break;
 	case MENU_UMA_TM_CLOCK:
 		p = umaTmClockNames[curParmVal < umaTmClockNames[0][0] ? curParmVal + 1 : 1];
+		break;
+	case MENU_UMA_MORPH_LISTS:
+		p = umaMorphListNames[curParmVal ? 2 : 1];
 		break;
 	case MENU_UMA_POL:
 		p = umaPolNames[curParmVal ? 2 : 1];

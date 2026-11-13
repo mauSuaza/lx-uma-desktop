@@ -369,6 +369,13 @@ const char umaLfoBRtgNames[][4] =
 };
 // LX_UMA (0.3c): a Turing Machine's clock (the Eurorack's list, its byte values): its own voice's hits, another
 // voice's, or the sequencer's sixteenths (the Eurorack's `clk`, UMA_TM_CLOCK_TICK)
+// LX_UMA (0.3e): how list settings morph (the Eurorack's)
+const char umaMorphListNames[][4] =
+{
+	{2},		//number of entries
+	{"stp"},	// step through the values in between
+	{"swt"},	// switch at 50 %
+};
 const char umaTmClockNames[][4] =
 {
 	{8},		//number of entries
@@ -1083,6 +1090,7 @@ const char shortNames[][4]  =
 	{"prD"},	// LX_UMA SHORT_UMA_TM_PRB_D
 	{"ckD"},	// LX_UMA SHORT_UMA_TM_CLK_D
 	{"dvD"},	// LX_UMA SHORT_UMA_TM_DIV_D
+	{"lst"},	// LX_UMA SHORT_UMA_MORPH_LISTS
 };
 //-----------------------------------------------------------------
 // These correspond with the catNamesEnum in menu.h
@@ -1299,6 +1307,7 @@ const char longNames[][16] =
 	{"Prob"},	// LX_UMA LONG_UMA_PROB
 	{"Clock"},	// LX_UMA LONG_UMA_CLOCK
 	{"Div"},	// LX_UMA LONG_UMA_DIV
+	{"MorphLst"},	// LX_UMA LONG_UMA_MORPH_LISTS
 };
 
 

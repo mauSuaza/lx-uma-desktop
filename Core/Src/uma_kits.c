@@ -28,6 +28,9 @@ static uint8_t umaKit_buf[UMA_KIT_BYTES] __attribute__((aligned(4)));		// main l
 static uint8_t umaKit_next[UMA_KIT_BYTES] __attribute__((aligned(4)));		// the prefetched record
 static volatile uint8_t umaKit_nextKit = UMA_KIT_NONE;	// whose record umaKit_next holds
 static volatile uint8_t umaKit_pending = UMA_KIT_NONE;	// a kit loaded from the audio path without its record
+static uint8_t umaKit_morph[UMA_KIT_BYTES] __attribute__((aligned(4)));	// the morph kit's record (0.3e)
+static uint8_t umaKit_morphKit;									// whose (morphParameters' kit)
+static volatile uint8_t umaKit_morphPending = UMA_KIT_NONE;		// to read into umaKit_morph
 
 static uint8_t* umaKit_active(void)
 {
@@ -281,7 +284,48 @@ void umaKit_store(uint8_t kit)
 	const uint8_t was = umaKit_irqOn();
 	umaKit_storeWrite(kit, umaKit_active());
 	umaKit_irqOff(was);
+	if(kit == umaKit_morphKit)
+	{
+		__disable_irq();
+		memcpy(umaKit_morph, umaKit_active(), UMA_KIT_BYTES);	// the morph kit was saved over
+		__enable_irq();
+	}
 	umaRnd_kitSaved();	// saving keeps: randomise at 0 now restores the saved sound
+}
+
+void umaKit_setMorphKit(uint8_t kit)
+{
+	if(kit >= NUM_KIT_SLOTS)
+		return;
+	umaKit_morphKit = kit;
+	umaKit_morphPending = kit;
+}
+
+const uint8_t* umaKit_morphRecord(void)
+{
+	return umaKit_morph[UMA_REC_FORMAT] ? umaKit_morph : 0;
+}
+
+void umaKit_storeMorphed(uint8_t kit)
+{
+	if(kit >= NUM_KIT_SLOTS)
+		return;
+	// the edit buffer's record with each setting that morphs at its blend (as the stock part: preset_getMorphValue)
+	memcpy(umaKit_buf, umaKit_active(), UMA_KIT_BYTES);
+	for(uint16_t p = PAR_UMA_ENG1; p < PAR_UMA_END; p++)
+		umaKit_buf[p - PAR_UMA_BLOCK] = umaMod_morphed(p);
+	umaKit_buf[UMA_REC_FORMAT] = UMA_KIT_FORMAT;
+	const uint8_t was = umaKit_irqOn();
+	umaKit_storeWrite(kit, umaKit_buf);
+	umaKit_irqOff(was);
+	if(kit == umaKit_morphKit)
+	{
+		__disable_irq();
+		memcpy(umaKit_morph, umaKit_buf, UMA_KIT_BYTES);
+		__enable_irq();
+	}
+	if(kit == umaKit_nextKit)
+		umaKit_nextKit = UMA_KIT_NONE;	// the prefetched copy is old now
 }
 
 void umaKit_fromFile(FIL* f, uint8_t kit)
@@ -360,6 +404,23 @@ void umaKit_service(void)
 				umaRnd_kitLoaded();
 				umaMod_kitLoaded();
 			}
+		return;
+	}
+
+	// the morph kit's record (0.3e)
+	const uint8_t m = umaKit_morphPending;
+	if(m != UMA_KIT_NONE)
+	{
+		const uint8_t was = umaKit_irqOn();
+		umaKit_storeRead(m, umaKit_buf);
+		__disable_irq();
+		if(umaKit_morphPending == m)
+		{
+			memcpy(umaKit_morph, umaKit_buf, UMA_KIT_BYTES);
+			umaKit_morphPending = UMA_KIT_NONE;
+		}
+		__enable_irq();
+		umaKit_irqOff(was);
 		return;
 	}
 

@@ -25,6 +25,7 @@
 #include "Soundengine/DSPAudio/MdDrum.h"
 #include "uma_turing.h"	// UMA_ENV_FIRST_SOURCE
 #include "uma_voice.h"	// the snare's, cymbal's and hi-hat's engine settings
+#include "uma_kits.h"	// the morph kit's record (0.3e)
 
 // every UMA setting of the record, PAR_UMA_ENG1 .. PAR_UMA_END
 #define UMA_MOD_COUNT		(PAR_UMA_END - PAR_UMA_ENG1)
@@ -196,9 +197,122 @@ void umaMod_apply(uint16_t param, float amount, float val)
 	umaMod_valid[i] = 1;
 }
 
+// From the Eurorack's uma_mod.c (LX_UMA a179390), with the desktop's v/o.
+// UMA settings that morph (the FM drum's sound, the envelope extras, the LPG, LFO B); not randomise (it would
+// re-roll), the Turing Machines, the mod slots or the kit format
+static uint8_t umaMod_morphs(uint16_t p)
+{
+	return (p >= UMA_FM_FIRST_PAR && p < UMA_RND_FIRST_PAR)
+		|| (p >= UMA_LFOB_FIRST_PAR && p < UMA_LFOB_FIRST_PAR + 6 * UMA_LFOB_PARS)
+		|| (p >= PAR_UMA_FINE_A1 && p <= PAR_UMA_FINE_B3)
+		|| (p >= UMA_ENV_FIRST_PAR && p < UMA_ENV_FIRST_PAR + 3 * UMA_ENV_PARS)
+		|| (p >= UMA_LPG_FIRST_PAR && p < UMA_LPG_FIRST_PAR + 3 * UMA_LPG_PARS)
+		|| (p >= UMA_FOLD_FIRST_PAR && p < UMA_FOLD_FIRST_PAR + 3 * UMA_FOLD_PARS)
+		|| (p >= PAR_UMA_WAVE_C1 && p <= PAR_UMA_WAVE_AB3)
+		|| (p >= UMA_LFOB_SYNC_PAR && p < UMA_LFOB_SYNC_PAR + 6)
+		|| (p >= UMA_DSK_VOCT_PAR && p < UMA_DSK_VOCT_PAR + 6)	// LX_UMA desktop: v/o
+		|| (p >= UMA_TONE_FIRST_PAR && p < UMA_TONE_FIRST_PAR + 3 * UMA_TONE_PARS)
+		|| (p >= UMA_LFOA_FOLD_PAR && p < UMA_LFOB_FOLD_PAR + 6)
+		|| (p >= UMA_B2ENV_FIRST_PAR && p < UMA_B2ENV_FIRST_PAR + 3 * UMA_B2ENV_PARS)
+		|| (p >= UMA_PRK_FIRST_PAR && p < UMA_PRK_FIRST_PAR + 3 * UMA_PRK_PARS)
+		|| (p >= UMA_MD_FIRST_PAR && p < UMA_MD_FIRST_PAR + 3 * UMA_MD_PARS)
+		|| (p >= UMA_VEL_PAR && p < UMA_VEL_PAR + 6)
+		|| (p >= UMA_QUANT_FIRST_PAR && p < UMA_QUANT_FIRST_PAR + UMA_QUANT_VOICES * UMA_QUANT_PARS)	// the pitch screen
+		|| (p >= UMA_PLA_FIRST_PAR && p < UMA_PLA_FIRST_PAR + 6 * UMA_PLA_PARS)	// the Plaits engine
+		|| (p >= UMA_PLA_DXB_PAR && p < UMA_PLA_DXB_PAR + 6)
+		|| (p >= UMA_PLA_KMD_PAR && p < UMA_PLA_KMD_PAR + 6)
+		|| (p >= UMA_PLA_TWI_PAR && p < UMA_PLA_TWI_PAR + 6)	// TWIST
+		|| (p >= UMA_PLA_WVF_PAR && p < UMA_PLA_TRF_PAR + 6)	// the wavetable's and terrain's files
+		|| (p >= UMA_PLA_SUB_PAR && p < UMA_PLA_SBF_PAR + 6)	// the Plaits sub
+		// the snare's, cymbal's and hi-hat's engines; not their randomise or palettes (as the drums')
+		|| (umaMod_vx(p) != 0xff && umaMod_vx(p) != UMA_VX_PRK_PAL && umaMod_vx(p) != UMA_VX_MD_PAL
+			&& (umaMod_vx(p) < UMA_VX_RND_TONE || umaMod_vx(p) > UMA_VX_RND_SEED));
+}
+
+// list settings: engine, algorithm, gate mode, fold type, LFO B's retrigger and sync, the sub's shape and octave (the ratios step; the LFO
+// shapes are a morph since UMA 0.27)
+static uint8_t umaMod_isList(uint16_t p)
+{
+	switch(umaMod_vx(p))
+	{
+	case UMA_VX_ENG: case UMA_VX_PRK_ALG: case UMA_VX_PRK_VAR: case UMA_VX_PRK_PAL:
+	case UMA_VX_MD_TYP: case UMA_VX_MD_MCH: case UMA_VX_MD_PAL: case UMA_VX_FOLD_TYPE:
+		return 1;
+	case 0xff: break;
+	default: return 0;
+	}
+	if(p >= UMA_RPL_PAR && p < UMA_RPL_PAR + 3)
+		return 1;	// the ratio palette (it doesn't morph: randomise would re-roll)
+	if(p >= UMA_QUANT_FIRST_PAR && p < UMA_QUANT_FIRST_PAR + UMA_QUANT_VOICES * UMA_QUANT_PARS)
+		return (p - UMA_QUANT_FIRST_PAR) % UMA_QUANT_PARS != 0;	// key and scale (the octave steps)
+	if(p >= UMA_PLA_FIRST_PAR && p < UMA_PLA_FIRST_PAR + 6 * UMA_PLA_PARS)
+	{
+		const uint16_t k = (uint16_t)((p - UMA_PLA_FIRST_PAR) % UMA_PLA_PARS);
+		return k == 0 || k == 1 || k == 5;	// Plaits' bank, model and output (the knobs blend)
+	}
+	if(p >= UMA_PLA_DXB_PAR && p < UMA_PLA_DXB_PAR + 6)
+		return 1;	// the 6-op's bank (`fil`)
+	if(p >= UMA_PLA_WVF_PAR && p < UMA_PLA_TRF_PAR + 6)
+		return 1;	// the wavetable's and terrain's files
+	if(p >= UMA_PLA_SBS_PAR && p < UMA_PLA_SBO_PAR + 6)
+		return 1;	// the Plaits sub's shape and octave
+	if(p >= UMA_PLA_KMD_PAR && p < UMA_PLA_KMD_PAR + 6)
+		return 1;	// its key mode
+	if(p >= UMA_PRK_FIRST_PAR && p < UMA_PRK_FIRST_PAR + 3 * UMA_PRK_PARS)
+		return (p - UMA_PRK_FIRST_PAR) % UMA_PRK_PARS < 2;	// prk's algorithm and variation
+	if(p >= UMA_PRK_PAL_PAR && p < UMA_PRK_PAL_PAR + 3)
+		return 1;	// prk's palette (doesn't morph, as rpl)
+	if(p >= UMA_MD_FIRST_PAR && p < UMA_MD_FIRST_PAR + 3 * UMA_MD_PARS)
+		return (p - UMA_MD_FIRST_PAR) % UMA_MD_PARS < 2;	// the drum-machine engine's type and machine
+	if(p >= UMA_MD_PAL_PAR && p < UMA_MD_PAL_PAR + 3)
+		return 1;	// its randomise palette (doesn't morph, as rpl)
+	if(p >= PAR_UMA_ENG1 && p < UMA_RND_FIRST_PAR)
+	{
+		const uint16_t k = (uint16_t)((p - PAR_UMA_ENG1) % UMA_FM_PARS_PER_DRUM);
+		return k == PAR_UMA_ENG1 - PAR_UMA_ENG1 || k == PAR_UMA_ALGO1 - PAR_UMA_ENG1;
+	}
+	if(p >= UMA_ENV_FIRST_PAR && p < UMA_ENV_FIRST_PAR + 3 * UMA_ENV_PARS)
+		return (p - UMA_ENV_FIRST_PAR) % UMA_ENV_PARS == PAR_UMA_GATE1 - PAR_UMA_HOLD1;
+	if(p >= UMA_FOLD_FIRST_PAR && p < UMA_FOLD_FIRST_PAR + 3 * UMA_FOLD_PARS)
+		return (p - UMA_FOLD_FIRST_PAR) % UMA_FOLD_PARS == PAR_UMA_FOLD_TYPE1 - PAR_UMA_FOLD1;
+	if(p >= UMA_LFOB_FIRST_PAR && p < UMA_LFOB_FIRST_PAR + 6 * UMA_LFOB_PARS)
+		return (p - UMA_LFOB_FIRST_PAR) % UMA_LFOB_PARS == 3;	// FREQ OFS WAVE | RTG
+	if(p >= UMA_LFOB_SYNC_PAR && p < UMA_LFOB_SYNC_PAR + 6)
+		return 1;
+	if(p >= UMA_TONE_FIRST_PAR && p < UMA_TONE_FIRST_PAR + 3 * UMA_TONE_PARS)	// the sub's shape and octave
+	{
+		const uint16_t t = (uint16_t)((p - UMA_TONE_FIRST_PAR) % UMA_TONE_PARS);
+		return t == PAR_UMA_SBS1 - PAR_UMA_RTC1 || t == PAR_UMA_SBO1 - PAR_UMA_RTC1;
+	}
+	return 0;
+}
+
+// as presetManager.c's interpolate: a blend of a and b at x / 256, rounded
+static uint8_t umaMod_interpolate(uint8_t a, uint8_t b, uint8_t x)
+{
+	const uint16_t v = (uint16_t)(a * 256 + (b - a) * x);
+	const uint8_t r = (uint8_t)(v / 256);
+	return (uint8_t)((v & 0xff) < 0x7f ? r : r + 1);
+}
+
+uint8_t umaMod_morphed(uint16_t param)
+{
+	const uint8_t a = activeParameters[param];
+	const uint8_t x = activeParameters[PAR_MORPH];	// the X-fade (0-255), the morph kit morphParameters' (umaKit_setMorphKit)
+	if(x == 0 || !umaMod_morphs(param))
+		return a;
+	const uint8_t* m = umaKit_morphRecord();
+	if(!m)
+		return a;	// not read yet
+	const uint8_t b = m[param - PAR_UMA_BLOCK];
+	if(umaMod_isList(param) && activeParameters[PAR_UMA_DSK_MORPH_LISTS])
+		return x < 128 ? a : b;	// switch at 50 %
+	return umaMod_interpolate(a, b, x);	// blend, or step through the values in between (lists, ratios)
+}
+
 uint8_t umaMod_knob(uint16_t param)
 {
-	return activeParameters[umaMod_fil(param)];	// `fil`: the file setting of the voice's model (morph: 0.3e)
+	return umaMod_morphed(umaMod_fil(param));	// `fil`: the file setting of the voice's model
 }
 
 uint8_t umaMod_isModulated(uint16_t param)
@@ -249,6 +363,7 @@ void umaMod_apply(uint16_t param, float amount, float val) { (void)param; (void)
 float umaMod_unipolar(uint8_t src, float cv) { (void)src; return cv; }
 uint8_t umaMod_get(uint16_t param) { (void)param; return 0; }
 uint8_t umaMod_knob(uint16_t param) { (void)param; return 0; }
+uint8_t umaMod_morphed(uint16_t param) { (void)param; return 0; }
 uint8_t umaMod_isModulated(uint16_t param) { (void)param; return 0; }
 void umaMod_kitLoaded(void)
 {

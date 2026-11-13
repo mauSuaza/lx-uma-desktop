@@ -409,6 +409,7 @@ enum NamesEnum
 	TEXT_UMA_TM_PRB_D,
 	TEXT_UMA_TM_CLK_D,
 	TEXT_UMA_TM_DIV_D,
+	TEXT_UMA_MORPH_LISTS,
 	NUM_NAMES
 };
 //-----------------------------------------------------------------
@@ -640,6 +641,7 @@ enum shortNamesEnum
 	SHORT_UMA_TM_PRB_D,
 	SHORT_UMA_TM_CLK_D,
 	SHORT_UMA_TM_DIV_D,
+	SHORT_UMA_MORPH_LISTS,
 };
 //-----------------------------------------------------------------
 // These correspond with catNames in MenuText.h
@@ -854,6 +856,7 @@ enum longNamesEnum
 	LONG_UMA_PROB,
 	LONG_UMA_CLOCK,
 	LONG_UMA_DIV,
+	LONG_UMA_MORPH_LISTS,
 };
 
 //enum for the save category parameter

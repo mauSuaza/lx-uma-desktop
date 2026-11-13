@@ -535,6 +535,7 @@ if(sd_card_ok)
 
 		//init morph target to peset 0
 		morphParameters = mainParameters[0];
+		umaKit_setMorphKit(0);	// LX_UMA: its UMA record
 
 #if LOAD_PROJECT_ON_BOOT
 

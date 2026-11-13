@@ -115,3 +115,22 @@ setting comes with the kit, and the step's value moves the setting it points at.
 - **Record format 5:** kits from 0.1–0.3b get the Eurorack's defaults (8 steps, locked, own clock, every hit) and
   random patterns.
 - Image 611,324 bytes, RAM 358.5 KB of 384.
+
+- **Fix (after 0.3c):** the FM drums' code (`uma_fmvoice.c`) and the envelope / LPG / fold code (`uma_env.c`) read
+  the kit directly (a Phase 2 stand-in), so slots on those targets did nothing in 0.3a–0.3c. They read `umaMod_get`
+  now, as on the Eurorack.
+
+## 10. 0.3e as built
+
+- **Kit morph of UMA settings:** the Eurorack's (`uma_mod.c`): with the X-fade (`PAR_MORPH`) above 0 every UMA setting
+  that morphs on the Eurorack (the engines' sounds, envelopes, LPG, fold, LFO B, the pitch screen, Plaits, mdk) and the
+  desktop's `v/o` blends towards the morph kit; modulation moves around the blend. Not morphed (as there): randomise,
+  the Turing Machines, the mod slots.
+- **The morph kit's UMA record** is kept in RAM (+1 KB): read from the card when a morph kit is loaded (load menu,
+  morph), at start-up and after a project load (kit 1, as the stock morph target); kept in step when that kit is saved.
+- **Lists** (engine, algorithm, gate, models, …) step through the values in between, or with **`lst` = `swt`**
+  switch at 50 %. `lst` is on the performance page (slot 6, after shuffle); on the desktop a kit setting (in its UMA
+  record), on the Eurorack a global one.
+- **Saving a morph** (save menu, morph) saves the UMA settings' blend too.
+- The X-fade as a mod slot target stays inactive (the stock morph resends the whole kit).
+- Image 612,984 bytes, RAM 359.6 KB of 384 (~25 KB stack).

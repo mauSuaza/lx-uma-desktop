@@ -824,6 +824,7 @@ enum UmaParams
 	PAR_UMA_DSK_VOCT4,
 	PAR_UMA_DSK_VOCT5,
 	PAR_UMA_DSK_VOCT6,
+	PAR_UMA_DSK_MORPH_LISTS,	// LX_UMA desktop (0.3e): how lists morph, stp / swt (the Eurorack's PAR_UMA_MORPH_LISTS, a global there)
 	PAR_UMA_END	// one past the last: PAR_UMA_END - PAR_UMA_BLOCK bytes of the record are in use
 };
 _Static_assert(PAR_UMA_END - PAR_UMA_BLOCK <= UMA_KIT_BYTES, "UMA settings don't fit in the kit's UMA record");

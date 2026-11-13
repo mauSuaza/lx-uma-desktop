@@ -21,6 +21,7 @@ To check for differences: `diff -r ~/src/eurorack/lxr-fm/Core/Src/Soundengine/DS
 
 | `Core/Src/uma_mod.c`, `Core/Inc/uma_mod.h` (the UMA block's range, no morph yet), `Core/Src/menu/umaModTargets.c` / `.h` (the snare's, cymbal's, hi-hat's base lists embedded; v/o, desktop-inactive entries; no old-format conversions), `modSlots.h` (slots 1-3 in the record), `lfoShapes.c` / `.h`, `uma_turing.h`, `uma_lfo.h` (headers) | `a179390` | 2026-11-13, 0.3a |
 | `Core/Src/uma_turing.c` (unchanged but for `main.h`; CLK `clk` = the sequencer's sixteenths), `Core/Src/Soundengine/DSPAudio/TuringMachine.c` / `.h` (unchanged), the Turing pages (`umaTmPages`, voices 1-6) and the clock list (`seq` for `clk`) | `a179390` | 2026-11-13, 0.3c |
+| `Core/Src/uma_mod.c`: the morph (`umaMod_morphs`, `umaMod_isList`, `umaMod_interpolate`, `umaMod_knob`; + v/o; the morph kit's record from `uma_kits.c`, `lst` a kit setting `PAR_UMA_DSK_MORPH_LISTS`), the `lst` list (`umaMorphListNames`) | `a179390` | 2026-11-13, 0.3e |
 
 ## Changed on the desktop
 

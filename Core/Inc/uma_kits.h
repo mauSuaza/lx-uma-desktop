@@ -37,5 +37,9 @@ void umaKit_toFile(FIL* f, uint8_t kit);	// after a kit file's stock part was wr
 void umaKit_activeToFile(FIL* f);			// tmp.snd: the edit buffer's record
 void umaKit_activeFromFile(FIL* f);			// tmp.snd
 void umaKit_service(void);					// main loop: prefetch the next kit's record, apply a late one
+// kit morph (0.3e): the morph kit's record is kept in RAM too (read from the store in the main loop)
+void umaKit_setMorphKit(uint8_t kit);		// the morph kit changed (morphParameters), or the store was rewritten
+const uint8_t* umaKit_morphRecord(void);	// its record, or NULL until it is read
+void umaKit_storeMorphed(uint8_t kit);		// preset_saveDrumsetRam (morph): the blend's record into the store
 
 #endif /* UMA_KITS_H_ */

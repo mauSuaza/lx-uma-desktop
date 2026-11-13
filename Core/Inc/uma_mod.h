@@ -31,6 +31,8 @@ uint8_t umaMod_get(uint16_t param);
 // a UMA setting's knob value, morphed towards the morph target kit while the morph (PERF page) is above 0;
 // modulation moves around it. Settings that don't morph: the knob value
 uint8_t umaMod_knob(uint16_t param);
+// LX_UMA desktop: a setting's kit value morphed (umaMod_knob without `fil`), for saving a morphed kit
+uint8_t umaMod_morphed(uint16_t param);
 // 1 while a mod matrix slot modulates the setting
 uint8_t umaMod_isModulated(uint16_t param);
 // from the main loop: when a drum's engine changes, point its CV slots at the targets of the new engine

@@ -118,7 +118,7 @@ typedef struct
 	{TEXT_FX_P2, PAR_FX_P2, A}, \
 	{TEXT_FX_P3, PAR_FX_P3, A}, \
 	{TEXT_FX_P4, PAR_FX_P4, A}, \
-	{TEXT_MORPH, PAR_MORPH, 0 /* kit morph: 0.3e */}
+	{TEXT_MORPH, PAR_MORPH, 0 /* the X-fade: not a target on the desktop (its morph resends the whole kit) */}
 
 #define UMA_DRUM_TARGET_COUNT	73
 
@@ -141,7 +141,7 @@ static const UmaModTarget umaTgt_vxBase3[39] =
 	{TEXT_FX_P2, PAR_FX_P2, UMA_TGT_ALL},
 	{TEXT_FX_P3, PAR_FX_P3, UMA_TGT_ALL},
 	{TEXT_FX_P4, PAR_FX_P4, UMA_TGT_ALL},
-	{TEXT_MORPH, PAR_MORPH, 0 /* kit morph: 0.3e */},
+	{TEXT_MORPH, PAR_MORPH, 0 /* the X-fade: not a target on the desktop (its morph resends the whole kit) */},
 	{TEXT_1VOCT, PAR_UMA_DSK_VOCT4, UMA_TGT_ALL},
 	{TEXT_COARSE, PAR_COARSE4, UMA_TGT_ALL},
 	{TEXT_FINE, PAR_FINE4, UMA_TGT_ALL},
@@ -185,7 +185,7 @@ static const UmaModTarget umaTgt_vxBase4[40] =
 	{TEXT_FX_P2, PAR_FX_P2, UMA_TGT_ALL},
 	{TEXT_FX_P3, PAR_FX_P3, UMA_TGT_ALL},
 	{TEXT_FX_P4, PAR_FX_P4, UMA_TGT_ALL},
-	{TEXT_MORPH, PAR_MORPH, 0 /* kit morph: 0.3e */},
+	{TEXT_MORPH, PAR_MORPH, 0 /* the X-fade: not a target on the desktop (its morph resends the whole kit) */},
 	{TEXT_1VOCT, PAR_UMA_DSK_VOCT5, UMA_TGT_ALL},
 	{TEXT_COARSE, PAR_COARSE5, UMA_TGT_ALL},
 	{TEXT_FINE, PAR_FINE5, UMA_TGT_ALL},
@@ -230,7 +230,7 @@ static const UmaModTarget umaTgt_vxBase5[40] =
 	{TEXT_FX_P2, PAR_FX_P2, UMA_TGT_ALL},
 	{TEXT_FX_P3, PAR_FX_P3, UMA_TGT_ALL},
 	{TEXT_FX_P4, PAR_FX_P4, UMA_TGT_ALL},
-	{TEXT_MORPH, PAR_MORPH, 0 /* kit morph: 0.3e */},
+	{TEXT_MORPH, PAR_MORPH, 0 /* the X-fade: not a target on the desktop (its morph resends the whole kit) */},
 	{TEXT_1VOCT, PAR_UMA_DSK_VOCT6, UMA_TGT_ALL},
 	{TEXT_COARSE, PAR_COARSE6, UMA_TGT_ALL},
 	{TEXT_FINE, PAR_FINE6, UMA_TGT_ALL},
