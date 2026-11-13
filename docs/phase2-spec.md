@@ -1,6 +1,6 @@
 # Phase 2: all engines, all voices (spec, draft for review)
 
-Status: **reviewed** (2026-11-12): questions answered (section 5). Phase 2 of [port-plan.md](port-plan.md), after release 0.1 (FM on
+Status: **done** (2026-11-13): released as **0.2**; questions answered (section 5). Phase 2 of [port-plan.md](port-plan.md), after release 0.1 (FM on
 Drum 1–3). Release **0.2** at the end. As in Phase 1, the code is the Eurorack's (LX_UMA `a179390`), the pages are
 the Eurorack's, and each build is checked on the LXR before the next.
 
@@ -163,3 +163,6 @@ skip their engine (FM, Plaits' tonal models), as on the Eurorack.
 
   **The clicks are gone** and `pk` stays below 90: `-ffast-math` on the C++ engines did it (0.2f: 90+ on these models).
   No option C or D needed for now; the same flag would help the Eurorack firmware's Plaits too.
+
+- **Released as 0.2** (2026-11-13): 0.2g with `vc` off (`tou` back), the manual (Phase 2 chapters from the Eurorack's),
+  release notes.

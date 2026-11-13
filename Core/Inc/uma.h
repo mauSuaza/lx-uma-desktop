@@ -7,7 +7,7 @@
 #define UMA_H_
 
 // version on the start-up screen and in the update file name (LXR_V2_UMA_V<version>.img, CMakeLists.txt)
-#define UMA_VERSION "0.2g"	// Phase 2 test build: 0.2f + per-voice load readout, the C++ engines with -ffast-math
+#define UMA_VERSION "0.2"	// release: every engine on every voice, envelopes, LPG, wavefolder, randomise, quantizer
 
 // UMA's engines and settings (the Eurorack's flag: the copied code is written around it)
 #define UMA_FM 1
@@ -19,7 +19,7 @@
 // (soundengine_process); the TIM2 interrupt only during SD saves (USE_INTERRUPT_ONLY_DURING_SAVE_PROJ); both timed
 #define UMA_LOAD 1
 // test build 0.2g: the selected voice's peak load (settings + sound) as `vc` on the CPU screen, in tou's place
-#define UMA_VOICE_LOAD 1
+#define UMA_VOICE_LOAD 0
 
 // test build 0.0c (docs/port-plan.md): the engines linked in, without menus; Drum 1 FM Tone, Drum 2 Plaits
 // wavetable, Drum 3 an mdk kick, fixed settings (Core/Src/uma_enginetest.c)

@@ -4,11 +4,12 @@ Custom firmware for the Erica Synths LXR-02 drum machine: the desktop port of
 [LX_UMA](https://github.com/mauSuaza/LX_UMA), custom firmware for the LXR Eurorack module. It is based on Erica
 Synths' open-source desktop firmware v1.7 and is **not** official Erica Synths firmware.
 
-**Release 0.1:** FM Drum and FM Tone on Drum 1–3, chosen per drum with `eng` on the Osc page; every kit keeps its
-UMA settings, and projects still load on Erica's firmware. See the **[user manual](docs/manual.md)** and the
-[release notes](docs/release-notes-0.1.md). The plan for the rest of the port: [docs/port-plan.md](docs/port-plan.md).
+**Release 0.2:** every engine on every voice: FM Drum and FM Tone (Drum 1–3), the drum machines (mdk) and Plaits
+(all voices), with hold, gate mode, the filter envelope, the low-pass gate, the wavefolder, randomise and the
+quantizer. Every kit keeps its UMA settings, and projects still load on Erica's firmware. See the
+**[user manual](docs/manual.md)** and the release notes ([0.2](docs/release-notes-0.2.md), [0.1](docs/release-notes-0.1.md)). The plan for the rest of the port: [docs/port-plan.md](docs/port-plan.md).
 
-Install: copy `LXR_V2_UMA_V0.1.img` (from the GitHub release) to the SD card, hold the encoder button while
+Install: copy `LXR_V2_UMA_V0.2.img` (from the GitHub release) to the SD card, hold the encoder button while
 switching on, wait for "Update OK!". Back up your card first.
 
 ---
