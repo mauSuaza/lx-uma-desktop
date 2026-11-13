@@ -172,7 +172,7 @@ The Eurorack's voice code (`DrumVoice.c` FM parts, `uma_voice.c` / `uma_voicepar
 block; silent voices skip the engine; the test hook and `uk` go. Test: the same settings on both machines sound
 the same; `pk` with a pattern.
 
-### Questions
+### Decided (2026-11-12)
 
-1. Same page layouts as the Eurorack (above)?
-2. Places for Phase 2 features empty until they work (above), or shown already, doing nothing yet?
+1. The Eurorack's page layouts, unchanged.
+2. Places for Phase 2 features stay empty until they work.
