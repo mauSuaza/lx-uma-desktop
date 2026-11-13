@@ -194,3 +194,11 @@ the same; `pk` with a pattern.
 - Image 676,816 bytes (75 KB spare); RAM unchanged; the sound is still 0.0c's test hook.
 - **Result (2026-11-12, user's LXR-02):** every FM page and extra screen shows (FM Drum, FM Tone, the sub); the
   wavefolder, randomise and the body envelope are absent as planned (Phase 2).
+
+### 0.1d as built
+
+- `Core/Src/uma_fmvoice.c`: the Eurorack's FM voice code (init, trigger, settings → engine each block, the fold and
+  body level, FM Tone's settings and B2 envelope, silence while the amp EG is shut), in flash; `DrumVoice.c` calls it
+  (`umaFmV_*`). A setting's value is the kit's (modulation: Phase 3); the fold follows the amp EG (the LPG: Phase 2).
+- 0.0c's test hook and 0.1b's `uk` stamp are off (`UMA_ENGINE_TEST`, `UMA_KIT_TEST` 0); Plaits and mdk drop out of
+  the image until Phase 2 plays them. Image 419,812 bytes (326 KB spare), RAM 269 KB, ITCM 15,080 B.

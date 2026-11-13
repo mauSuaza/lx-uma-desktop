@@ -7,7 +7,7 @@
 #define UMA_H_
 
 // version on the start-up screen and in the update file name (LXR_V2_UMA_V<version>.img, CMakeLists.txt)
-#define UMA_VERSION "0.1c"	// Phase 1 test build: the FM pages and settings (menus); the sound still 0.0c's test hook
+#define UMA_VERSION "0.1d"	// Phase 1 test build: FM Drum and FM Tone play from their settings
 
 // UMA's engines and settings (the Eurorack's flag: the copied code is written around it)
 #define UMA_FM 1
@@ -19,11 +19,11 @@
 
 // test build 0.0c (docs/port-plan.md): the engines linked in, without menus; Drum 1 FM Tone, Drum 2 Plaits
 // wavetable, Drum 3 an mdk kick, fixed settings (Core/Src/uma_enginetest.c)
-#define UMA_ENGINE_TEST 1
+#define UMA_ENGINE_TEST 0
 
 // test build 0.1b (docs/phase1-spec.md, section 10): saving a kit stamps its UMA record with its number + 1;
 // the playing kit's stamp shows as `uk` on the CPU screen (in tou's place), to check that records follow their kits
-#define UMA_KIT_TEST 1
+#define UMA_KIT_TEST 0
 
 // test build 0.1a (docs/phase1-spec.md, section 3): reads a kit file from the card twice a second while the CPU
 // readout is shown, the audio from the interrupt; the longest read of the last 2 s replaces tou as `rd` (0.1 ms)

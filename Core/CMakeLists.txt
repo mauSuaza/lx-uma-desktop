@@ -63,6 +63,7 @@ add_library(lxr_preset OBJECT
     Src/Preset/presetManager.c
     Src/uma_sdfiles.c
     Src/uma_kits.c
+    Src/uma_fmvoice.c
     Src/uma_enginetest.c # LX_UMA test 0.0c
     Src/uma_sdreadtest.c # LX_UMA test 0.1a
 )

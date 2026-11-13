@@ -26,6 +26,7 @@
 #if UMA_ENGINE_TEST
 #include "uma_enginetest.h" // LX_UMA test 0.0c
 #endif
+#include "uma_fmvoice.h" // LX_UMA: FM Drum and FM Tone on Drum 1-3
 
 INDTCM static float ampSmoothValue = 0.1f;
 //---------------------------------------------------
@@ -116,6 +117,7 @@ void initDrumVoice()
 #if UMA_ENGINE_TEST
 	umaTest_init();
 #endif
+	umaFmV_init();
 }
 //---------------------------------------------------
 void Drum_updatePan(const uint8_t voiceNr)
@@ -179,6 +181,7 @@ void Drum_trigger(const uint8_t voiceNr, const uint8_t vol, const uint8_t note)
 #if UMA_ENGINE_TEST
 	umaTest_trigger(voiceNr);
 #endif
+	umaFmV_trigger(voiceNr);
 
 	SnapEg_trigger(&voiceArray[voiceNr].snapEg);
 
@@ -239,12 +242,14 @@ IN_ITCM_RAM void calcDrumVoiceAsync(const uint8_t voiceNr)
 	//update osc phaseInc
 	osc_setFreq(&voiceArray[voiceNr].osc);
 	osc_setFreq(&voiceArray[voiceNr].modOsc);
-#if UMA_ENGINE_TEST
 	{
 		const OscInfo* osc = &voiceArray[voiceNr].osc;
-		umaTest_block(voiceNr, osc->freq*osc->pitchMod*osc->modNodeValue);
-	}
+		const float freq = osc->freq*osc->pitchMod*osc->modNodeValue;
+#if UMA_ENGINE_TEST
+		umaTest_block(voiceNr, freq);
 #endif
+		umaFmV_block(voiceNr, freq);	// LX_UMA: an FM engine's settings and pitch
+	}
 
 
 
@@ -268,6 +273,10 @@ IN_ITCM_RAM void calcDrumVoiceSyncBlock(const uint8_t voiceNr, int16_t* buf, con
 	}
 	else
 #endif
+	if(umaFmV_render(voiceNr, buf, size))	// LX_UMA: FM Drum / FM Tone instead of the two oscillators
+	{
+	}
+	else
 	{
 	//calc next mod osc sampleBlock - int16_t processing
 	calcNextOscSampleBlock(&voiceArray[voiceNr].modOsc,modBuf,size,voiceArray[voiceNr].fmModAmount, voiceArray[voiceNr].pwm);
