@@ -128,3 +128,51 @@ Eurorack) and, if still needed, a stock function or two leaves ITCM (CPU measure
 - Image 671,328 bytes (80.4 KB spare); RAM 338.6 KB; ITCM +16 B.
 - **Result (2026-11-12, user's LXR-02):** verified: stamps follow their kits through kit save/load, project save, power
   cycle, and pattern changes (prefetch), audio clean ("works great").
+
+## 11. 0.1c and 0.1d: menus and FM (spec, for review)
+
+### What carries over from the Eurorack
+
+The desktop's voice sub-pages are in the Eurorack's order where FM uses them (Osc 1, Amp EG 2, Mod 3, FM 4,
+Transient 5, Filter 6; LFO and Mix are swapped, which matters only in Phase 3), the display is the same 16 × 2,
+the 8 select buttons pick the sub-page and pressing one again flips to its 2nd screen, as on the Eurorack. So the
+**FM pages are the Eurorack's, unchanged**:
+
+| Engine | Page | Screen 1 | Screen 2 | More (the button again) |
+|---|---|---|---|---|
+| `lxr` | Osc | `cor fin eng wav` | `pwm` | |
+| `fmd` (FM Drum) | Osc | `cor fin eng alg` | `rtA fnA rtB fnB` | |
+| | FM | `mdA atA dcA enA` | `mdB atB dcB enB` | `wvC wAB` |
+| | Mod | `pd slp amt` | | |
+| | Transient | `wav vol frq fdb` | | |
+| `fmt` (FM Tone) | Osc | `cor fin eng alg` | `rtC rtA rtB rB2` | `sub sbs sbo sbf` |
+| | FM | `mdA atA dcA enA` | `mdB atB dcB enB` | `mB2 aB2 dB2 eB2`, then `wvC wAB fnA fnB` |
+| | Mod | `pd slp amt` | | |
+| | Transient | `wav vol frq fdb` | | `dtn mix` |
+
+The Eurorack's Mod page 2nd screen (randomise) and Transient 2nd screen (wavefolder), the Amp EG's hold and gate,
+and the Osc page's pitch screen come with their features in Phase 2: **until then those places stay empty**, so
+nothing on screen does nothing.
+
+### Under the hood (0.1c)
+
+- **Settings:** the Eurorack's `PAR_UMA_*` list, in its order, numbered from `PAR_UMA_BLOCK` + 2 (after the record's
+  format and stamp bytes), so the copied engine and voice code keeps its offsets. Left out: the Eurorack-only
+  settings (CV inputs, their calibration) and the globals (clock, MIDI CC channels: the global file, Phase 3).
+  The record holds ~840 of its 1,022 bytes. Defaults: the Eurorack's (`lxr` on every drum).
+- **Menus, ported from the Eurorack's `menu.c`:** 16-bit names (`Page.top*`, the name tables past 255); value types
+  for UMA settings (engine, algorithm, ratio, fine, waveform sweep, sub shape and octave) in a table of their own for
+  the numbers from `PAR_UMA_BLOCK` on; `menu_getPage` choosing a drum's pages by its `eng`; the extra screens.
+- **Pots and encoder** edit UMA settings like stock ones (to check: the pot code takes 16-bit parameter numbers).
+- 0.1c shows and saves the settings; **the sound follows in 0.1d** (0.0c's test hook stays until then).
+
+### 0.1d
+
+The Eurorack's voice code (`DrumVoice.c` FM parts, `uma_voice.c` / `uma_voicepar.c` for FM) reads the settings each
+block; silent voices skip the engine; the test hook and `uk` go. Test: the same settings on both machines sound
+the same; `pk` with a pattern.
+
+### Questions
+
+1. Same page layouts as the Eurorack (above)?
+2. Places for Phase 2 features empty until they work (above), or shown already, doing nothing yet?
