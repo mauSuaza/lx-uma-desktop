@@ -192,3 +192,5 @@ the same; `pk` with a pattern.
 - UMA settings are never sent as MIDI CC (numbers above the sound parameters go to `menu_parseGlobalParam`, which
   ignores them): MIDI and automation for them are Phase 3.
 - Image 676,816 bytes (75 KB spare); RAM unchanged; the sound is still 0.0c's test hook.
+- **Result (2026-11-12, user's LXR-02):** every FM page and extra screen shows (FM Drum, FM Tone, the sub); the
+  wavefolder, randomise and the body envelope are absent as planned (Phase 2).
