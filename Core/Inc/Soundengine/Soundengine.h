@@ -33,4 +33,10 @@
 void soundengine_init();
 void soundengine_process();
 uint8_t soundengine_calcNextSampleBlock();
+#if UMA_LOAD
+// UMA: the audio interrupt's cycles (sequencer + sound + MIDI), added each time it runs
+void soundengine_addLoad(uint32_t cycles);
+// UMA: load since the last call, in % of the time: average, and peak (one interrupt vs a block's time) over 2 s
+void soundengine_takeLoad(uint8_t* avg, uint8_t* peak);
+#endif
 #endif /* INC_SOUNDENGINE_SOUNDENGINE_H_ */

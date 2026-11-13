@@ -18,6 +18,58 @@
 #include "Soundengine/USB/usb_manager.h"
 #include "Soundengine/MIDI/Uart.h"
 
+#if UMA_LOAD
+// UMA: the audio interrupt is timed with the DWT cycle counter (enabled by DWT_Delay_Init in main.c)
+#define UMA_LOAD_WINDOWS 8 // the peak covers the last 8 readouts: 2 s at the menu's 4 per second
+static volatile uint32_t umaLoad_sum, umaLoad_max; // cycles since the last readout
+static uint32_t umaLoad_peaks[UMA_LOAD_WINDOWS];
+static uint8_t umaLoad_window;
+static uint32_t umaLoad_lastTake, umaLoad_lastCycles;
+
+void soundengine_addLoad(uint32_t cycles)
+{
+	umaLoad_sum += cycles;
+	if(cycles > umaLoad_max)
+		umaLoad_max = cycles;
+}
+
+static uint8_t umaLoad_percent(uint64_t cycles, uint64_t total)
+{
+	const uint64_t pct = total ? (cycles*100 + total/2)/total : 0;
+	return pct > 255 ? 255 : (uint8_t)pct;
+}
+
+void soundengine_takeLoad(uint8_t* avg, uint8_t* peak)
+{
+	// one block is OUTPUT_DMA_SIZE stereo samples: about 313000 cycles at 216 MHz
+	const uint32_t blockCycles = (uint32_t)((float)SystemCoreClock * OUTPUT_DMA_SIZE / REAL_FS);
+
+	const uint32_t primask = __get_PRIMASK();
+	__disable_irq();
+	const uint32_t sum = umaLoad_sum, max = umaLoad_max, nowCycles = DWT->CYCCNT;
+	umaLoad_sum = umaLoad_max = 0;
+	__set_PRIMASK(primask);
+
+	const uint32_t elapsed = nowCycles - umaLoad_lastCycles; // the counter wraps after 19.9 s
+	umaLoad_lastCycles = nowCycles;
+	const uint32_t now = HAL_GetTick();
+	const uint8_t fresh = now - umaLoad_lastTake > 1000; // the readout was just opened: old values don't count
+	umaLoad_lastTake = now;
+	if(fresh)
+		memset(umaLoad_peaks, 0, sizeof(umaLoad_peaks));
+	umaLoad_peaks[umaLoad_window] = max;
+	umaLoad_window = (umaLoad_window + 1) % UMA_LOAD_WINDOWS;
+
+	uint32_t peakCycles = 0;
+	for(uint8_t i=0; i<UMA_LOAD_WINDOWS; i++)
+		if(umaLoad_peaks[i] > peakCycles)
+			peakCycles = umaLoad_peaks[i];
+
+	*avg = fresh ? 0 : umaLoad_percent(sum, elapsed);
+	*peak = umaLoad_percent(peakCycles, blockCycles);
+}
+#endif
+
 uint8_t soundengine_calcNextSampleBlock()
 {
 	if(bCurrentSampleValid!= SAMPLE_VALID)

@@ -100,10 +100,20 @@ Goal: before porting any UI, know whether everything fits and what has to give.
 - whether the CPU allows Plaits and FM on every voice with the sequencer running, or a limit (as on the Eurorack's
   CPU guidance).
 
-**To answer before 0.0a:**
-1. **Your LXR desktop for testing:** every build is checked on the hardware. How does its SD card show up on the
-   Mac (the card's name), and is there anything on it to keep (kits, patterns)?
-2. **Names:** the update file `LXR_V2_UMA_V<version>.img` and versions from 0.0a (Phase 0) and 0.1 (the first
-   release with FM)? The start-up screen says "LX_UMA" and that it's modified firmware.
-3. **Keeping the engines in step** with the Eurorack repo: copy the engine files over at each port and record the
-   LX_UMA commit they came from (simple), or a shared repository later if the two keep changing together.
+**Answered (2026-11-12):**
+1. **Test hardware:** the user's LXR-02. Its card mounts as "NO NAME", the same name as the Eurorack module's card, so
+   check the card's contents (`PROJ00`... on the desktop, `DX7/` and `LXRE_*.img` on the Eurorack) before copying.
+   The card's projects were backed up to `~/src/eurorack/backups/desktop-card-2026-11-12/` before the first copy.
+2. **Names:** `LXR_V2_UMA_V<version>.img` (version from `UMA_VERSION` in `Core/Inc/uma.h`); Phase 0 test builds
+   0.0a, 0.0b, 0.0c; the first release with FM is 0.1. Start-up screen: "LX_UMA v<version>" / "base fw V 2.00".
+3. **Engines in step:** copy the engine files at each port and record the LX_UMA commit they came from in
+   `docs/SOURCES.md` (from 0.0c on). A shared repository later if both firmwares keep changing together.
+
+### 0.0a as built
+
+- The readout times the **whole audio interrupt** (TIM2: `seq_tick` + the sound + MIDI), not only the sound as on
+  the Eurorack, so it shows the real headroom with the sequencer. The global page's 1st screen is full on the
+  desktop, so the readout is the 4th slot of the **2nd sub-page** (`ptm tin tou pk`): `pk` = the longest interrupt
+  in the last 2 s in % of a 64-sample block (over 100 = audio drop-outs). The average is computed but not shown
+  (one free slot).
+- Memory after 0.0a: flash 274.5 KB (image 275,400 bytes), RAM 271 KB (.bss), DTCM 107 KB, ITCM 15.0 KB of 16.

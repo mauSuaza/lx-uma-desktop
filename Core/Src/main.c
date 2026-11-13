@@ -351,10 +351,11 @@ int main(void)
 #else
 	//print boot up message
 lcd_clear();
-lcd_string("Sonic Potions");
+// GPL-3.0 7(c) (NOTICE.md): the start-up screen shows the firmware is modified
+lcd_string("LX_UMA v" UMA_VERSION);
 //goto 2nd line
 lcd_setcursor(0,2);
-lcd_string("LXR2 Drums V");
+lcd_string("base fw V");
 lcd_string(FIRMWARE_VERSION);
 #endif
 

@@ -33,6 +33,7 @@ extern "C" {
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "delay.h"
+#include "uma.h" // UMA: version and feature flags
 extern float debugWatch;
 /* USER CODE END Includes */
 

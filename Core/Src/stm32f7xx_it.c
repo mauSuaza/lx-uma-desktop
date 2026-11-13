@@ -268,9 +268,15 @@ void TIM2_IRQHandler(void)
 //#ifndef DEBUG
 
   HAL_GPIO_WritePin(GPIOE, GPIO_PIN_2, GPIO_PIN_SET);
+#if UMA_LOAD
+	const uint32_t umaLoad_start = DWT->CYCCNT;
+#endif
 	seq_tick();
 	soundengine_calcNextSampleBlock();
   uart_processMidi();
+#if UMA_LOAD
+	soundengine_addLoad(DWT->CYCCNT - umaLoad_start);
+#endif
   HAL_GPIO_WritePin(GPIOE, GPIO_PIN_2, GPIO_PIN_RESET);
 
 

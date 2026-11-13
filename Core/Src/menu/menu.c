@@ -982,8 +982,28 @@ uint8_t sendDisplayBuffer()
 	return display_refresh_state;
 }
 //-----------------------------------------------------------------
+#if UMA_LOAD
+// UMA: the CPU load readout sits in the empty 4th slot of the global page's 2nd sub-page (after ptm, tin, tou)
+static uint8_t umaLoad_avg, umaLoad_peak;
+static uint8_t menu_umaLoadVisible(void)
+{
+	return menu_activePage == MENU_MIDI_PAGE && ((menuIndex&MASK_PAGE)>>PAGE_SHIFT) == 1
+		&& (menuIndex & MASK_PARAMETER) <= 3 && !editModeActive && !screensaver_Active;
+}
+#endif
 void menu_tick()
 {
+#if UMA_LOAD
+	// UMA: refresh the readout 4 times a second while it is shown (systick_ticks counts 0.25 ms)
+	static uint32_t umaLoadTimer;
+	if(menu_umaLoadVisible() && systick_ticks - umaLoadTimer >= 1000
+		&& !display_needs_clear_all && display_refresh_state == 0)
+	{
+		umaLoadTimer = systick_ticks;
+		soundengine_takeLoad(&umaLoad_avg, &umaLoad_peak);
+		menu_repaint();
+	}
+#endif
 
 	if((menu_activePage == PATTERN_SAVE_PAGE_OK) || (menu_activePage == KIT_SAVE_PAGE_OK))
 	{
@@ -1803,6 +1823,15 @@ void menu_repaintGeneric()
 			memcpy(&editDisplayBuffer[1][4*i],valueAsText,3);
 
 		}	// for 1 to 4 .. each menu item
+#if UMA_LOAD
+		if(menu_umaLoadVisible())
+		{
+			char readout[5];
+			memcpy(&editDisplayBuffer[0][12],"pk ",3);
+			numtostrpu(readout,umaLoad_peak,' ');
+			memcpy(&editDisplayBuffer[1][12],readout,3);
+		}
+#endif
 	} // if editmode not active
 }
 
