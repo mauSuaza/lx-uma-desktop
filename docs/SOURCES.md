@@ -13,6 +13,9 @@ To check for differences: `diff -r ~/src/eurorack/lxr-fm/Core/Src/Soundengine/DS
 
 | `Core/Inc/uma_params.h` (generated from `Core/Inc/Parameters.h`'s UMA block and helper macros); in `menu.c` / `menu.h` / `MenuText.h` / `menuPages.h`: the FM names, lists, value types (`parameter_dtypes`' UMA block), pages, `menu_getPage`, extra screens, `menu_umaListEntries` (ported, not copied: the desktop's menu code differs) | `a179390` | 2026-11-12, 0.1c |
 
+| `Core/Src/Soundengine/DSPAudio/Lpg.c`, `Core/Inc/Soundengine/DSPAudio/Lpg.h`, `SlopeEg2.c` / `SlopeEg2.h` (UMA's hold and gate mode; the desktop's stock files were identical to the Eurorack's stock ones) | `a179390` | 2026-11-12, 0.2a |
+| `Core/Src/uma_env.c`, `Core/Inc/uma_env.h` (adapted: no trigger jacks, the desktop's mute, settings from the kit) | `a179390` | 2026-11-12, 0.2a |
+
 ## Changed on the desktop
 
 - `Core/Inc/uma_sdfiles.h`: `UMA_SDF_SLOTS` 6 (10 on the Eurorack), to save 16 KB of RAM (0.1a). Keep this when

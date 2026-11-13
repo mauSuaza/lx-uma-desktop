@@ -7,7 +7,7 @@
 #define UMA_H_
 
 // version on the start-up screen and in the update file name (LXR_V2_UMA_V<version>.img, CMakeLists.txt)
-#define UMA_VERSION "0.2a"	// Phase 2 test build: no operator waveforms; hold, gate, filter env, LPG, wavefolder (in progress)
+#define UMA_VERSION "0.2a"	// Phase 2 test build: no operator waveforms; hold, gate mode, filter env, LPG, wavefolder
 
 // UMA's engines and settings (the Eurorack's flag: the copied code is written around it)
 #define UMA_FM 1

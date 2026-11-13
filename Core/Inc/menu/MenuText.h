@@ -189,6 +189,32 @@ const char umaSubOctNames[][4] =
 	{"-3 "},
 	{"-4 "},
 };
+// LX_UMA (0.2a): the body envelope's mode, the drums' filter types with the low-pass gate, the fold type
+const char umaGateNames[][4] =
+{
+	{2},		//number of entries
+	{"trg"},	// attack - hold - decay
+	{"gat"},	// attack - hold - decay - sustain - release while a gate is held
+};
+const char umaDrumFilterTypes[][8]  =
+{
+	{9},		//number of entries
+	{"LP"},
+	{"HP"},
+	{"BP"},
+	{"UBP"},
+	{"Nch"},
+	{"Pek"},
+	{"LP2"},
+	{"off"},
+	{"lpg"},
+};
+const char umaFoldTypeNames[][4] =
+{
+	{2},		//number of entries
+	{"sin"},	// smooth, round (Buchla-style)
+	{"tri"},	// sharper, edgier (Serge-style)
+};
 //-----------------------------------------------------------------
 const char stepFlamNames[][4] =
 {
@@ -634,6 +660,18 @@ const char shortNames[][4]  =
 	{"sbs"},	// LX_UMA SHORT_UMA_SUB_SHAPE
 	{"sbo"},	// LX_UMA SHORT_UMA_SUB_OCT
 	{"sbf"},	// LX_UMA SHORT_UMA_SUB_FOLD
+	{"hld"},	// LX_UMA SHORT_UMA_HOLD
+	{"sus"},	// LX_UMA SHORT_UMA_SUSTAIN
+	{"rel"},	// LX_UMA SHORT_UMA_RELEASE
+	{"gat"},	// LX_UMA SHORT_UMA_GATE
+	{"env"},	// LX_UMA SHORT_UMA_FILTER_ENV
+	{"dcy"},	// LX_UMA SHORT_UMA_LPG_DCY
+	{"col"},	// LX_UMA SHORT_UMA_LPG_COL
+	{"exc"},	// LX_UMA SHORT_UMA_LPG_EXC
+	{"fld"},	// LX_UMA SHORT_UMA_FOLD
+	{"fty"},	// LX_UMA SHORT_UMA_FOLD_TYPE
+	{"sym"},	// LX_UMA SHORT_UMA_FOLD_SYM
+	{"lev"},	// LX_UMA SHORT_UMA_BODY_LEV
 };
 //-----------------------------------------------------------------
 // These correspond with the catNamesEnum in menu.h
@@ -675,6 +713,7 @@ const char catNames[][16] =
 	{"Op C"},	// LX_UMA CAT_UMA_OP_C
 	{"Op B2"},	// LX_UMA CAT_UMA_OP_B2
 	{"Sub"},	// LX_UMA CAT_UMA_SUB
+	{"LPG"},	// LX_UMA CAT_UMA_LPG
 };
 //-----------------------------------------------------------------
 // these must correspond to longNamesEnum
@@ -785,6 +824,16 @@ const char longNames[][16] =
 	{"Shape"},	// LX_UMA LONG_UMA_SHAPE
 	{"Octave"},	// LX_UMA LONG_UMA_OCTAVE
 	{"Fold"},	// LX_UMA LONG_UMA_FOLD
+	{"Hold"},	// LX_UMA LONG_UMA_HOLD
+	{"Sustain"},	// LX_UMA LONG_UMA_SUSTAIN
+	{"Release"},	// LX_UMA LONG_UMA_RELEASE
+	{"Trg/Gate"},	// LX_UMA LONG_UMA_EG_MODE
+	{"Env"},	// LX_UMA LONG_UMA_ENV
+	{"Colour"},	// LX_UMA LONG_UMA_COLOUR
+	{"Excite"},	// LX_UMA LONG_UMA_EXCITE
+	{"FoldType"},	// LX_UMA LONG_UMA_FOLD_TYPE
+	{"Symmetry"},	// LX_UMA LONG_UMA_SYMMETRY
+	{"Body lvl"},	// LX_UMA LONG_UMA_BODY_LEV
 };
 
 

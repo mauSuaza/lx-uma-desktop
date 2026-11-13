@@ -74,3 +74,14 @@ skip their engine (FM, Plaits' tonal models), as on the Eurorack.
    `fna fnb`. Image 294,796 bytes, **448 KB spare**.
 2. **Mod page** (FM, mdk): randomise on screen 2 as on the Eurorack; velocity (`vdt vam vvo`) moves to screen 3.
 3. **Gates:** MIDI notes only; sequencer hits are triggers.
+
+## 6. 0.2a as built
+
+- **No operator waveforms** (section 5): 448 KB spare before the rest of 0.2a.
+- **Envelopes and LPG** (Drum 1–3): the Eurorack's `uma_env.c` (adapted: no trigger jacks, a held MIDI note on DIN or
+  USB is the gate; the desktop's track mute ends a gate), `Lpg.c` and its `SlopeEg2` (hold, sustain, release, gate
+  end) copied unchanged. Pages as on the Eurorack: Amp EG `atk dec slp hld | sus rel gat`; Filter
+  `frq res typ drv | env`, `typ` with `lpg` after `off`, then screen 2 is `dcy col exc`.
+- **Wavefolder** on FM voices: Transient screen 2 `fld fty sym lev`; its drive follows the amp EG or the LPG.
+- `tools/port_names.py`: ports menu names from the Eurorack's tables (used from here on).
+- Image 304,168 bytes (~433 KB spare), RAM 269.5 KB, ITCM 15,224 B (+144: the envelope's hold and release).

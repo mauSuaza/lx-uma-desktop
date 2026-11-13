@@ -12,6 +12,7 @@
  */
 
 
+#include "uma_env.h" // LX_UMA: MIDI notes as gates
 #include <Soundengine/MIDI/CortexParser.h>
 #include "Soundengine/MIDI/MidiParser.h"
 #include "Soundengine/MIDI/MidiNoteNumbers.h"
@@ -1850,9 +1851,11 @@ void midiParser_parseMidiMessage(MidiMsg msg)
 					q=frontParser_activeTrack; // avoid sending it again later if the active track happens to have the same channel set
 											   // (this might not really matter. does sending a note on twice do any harm?)
 					if(msgonly==NOTE_ON && msg.data2) {
+						umaEnv_midiNote((uint8_t)q, msg.data1, 1);	// LX_UMA: a held note is the drum's gate
 						midiParser_noteOn(frontParser_activeTrack, msg.data1, msg.data2, 1);
 					} else { // NOTE_OFF or zero velocity note
 						//midiParser_noteOff(frontParser_activeTrack, msg.data1, msg.data2);
+						umaEnv_midiNote((uint8_t)q, msg.data1, 0);
 					}
 				}
 
@@ -1860,10 +1863,12 @@ void midiParser_parseMidiMessage(MidiMsg msg)
 				for(v=0;v<7;v++) {
 					if(midi_MidiChannels[v]==chanonly && v != q) { // if channel match and we haven't sent it already for the voice
 						if(msgonly==NOTE_ON && msg.data2) {
+							umaEnv_midiNote((uint8_t)v, msg.data1, 1);	// LX_UMA: a held note is the drum's gate
 							midiParser_noteOn(v, msg.data1, msg.data2, 1);
 							//Also used in sequencer trigger note function
 						} else { // NOTE_OFF or zero velocity note
 						//	midiParser_noteOff(v, msg.data1, msg.data2);
+							umaEnv_midiNote((uint8_t)v, msg.data1, 0);
 						}
 					} // if channel matches
 				} // for each voice

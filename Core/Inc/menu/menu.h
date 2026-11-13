@@ -301,6 +301,18 @@ enum NamesEnum
 	TEXT_UMA_SUB_OCT,
 	TEXT_UMA_SUB_FOLD,
 
+	TEXT_UMA_HOLD,
+	TEXT_UMA_SUSTAIN,
+	TEXT_UMA_RELEASE,
+	TEXT_UMA_GATE,
+	TEXT_UMA_FILTER_ENV,
+	TEXT_UMA_LPG_DCY,
+	TEXT_UMA_LPG_COL,
+	TEXT_UMA_LPG_EXC,
+	TEXT_UMA_FOLD,
+	TEXT_UMA_FOLD_TYPE,
+	TEXT_UMA_FOLD_SYM,
+	TEXT_UMA_BODY_LEV,
 	NUM_NAMES
 };
 //-----------------------------------------------------------------
@@ -427,9 +439,19 @@ enum shortNamesEnum
 	SHORT_UMA_SUB,
 	SHORT_UMA_SUB_SHAPE,
 	SHORT_UMA_SUB_OCT,
-	SHORT_UMA_SUB_FOLD
-
-	
+	SHORT_UMA_SUB_FOLD,
+	SHORT_UMA_HOLD,
+	SHORT_UMA_SUSTAIN,
+	SHORT_UMA_RELEASE,
+	SHORT_UMA_GATE,
+	SHORT_UMA_FILTER_ENV,
+	SHORT_UMA_LPG_DCY,
+	SHORT_UMA_LPG_COL,
+	SHORT_UMA_LPG_EXC,
+	SHORT_UMA_FOLD,
+	SHORT_UMA_FOLD_TYPE,
+	SHORT_UMA_FOLD_SYM,
+	SHORT_UMA_BODY_LEV,
 };
 //-----------------------------------------------------------------
 // These correspond with catNames in MenuText.h
@@ -469,7 +491,8 @@ enum catNamesEnum
 	CAT_UMA_OP_B,
 	CAT_UMA_OP_C,
 	CAT_UMA_OP_B2,
-	CAT_UMA_SUB
+	CAT_UMA_SUB,
+	CAT_UMA_LPG,
 };
 //-----------------------------------------------------------------
 // these must correspond with longNames in MenuText.h
@@ -578,8 +601,17 @@ enum longNamesEnum
 	LONG_UMA_LEVEL,
 	LONG_UMA_SHAPE,
 	LONG_UMA_OCTAVE,
-	LONG_UMA_FOLD
-	
+	LONG_UMA_FOLD,
+	LONG_UMA_HOLD,
+	LONG_UMA_SUSTAIN,
+	LONG_UMA_RELEASE,
+	LONG_UMA_EG_MODE,
+	LONG_UMA_ENV,
+	LONG_UMA_COLOUR,
+	LONG_UMA_EXCITE,
+	LONG_UMA_FOLD_TYPE,
+	LONG_UMA_SYMMETRY,
+	LONG_UMA_BODY_LEV,
 };
 
 //enum for the save category parameter

@@ -12,6 +12,7 @@
 #include "Soundengine/config.h"
 #include "Soundengine/DSPAudio/DrumVoice.h"
 #include "Soundengine/DSPAudio/FmDrum.h"
+#include "uma_env.h"
 
 #define UMA_FMV_DRUMS 3
 static FmDrum umaFm[UMA_FMV_DRUMS];
@@ -33,6 +34,8 @@ static uint8_t umaFm_isOn(uint8_t voiceNr)
 // the voice's amp EG is shut: the engine would be silent, so it isn't run (the next hit starts it as always)
 static uint8_t umaFm_closed(uint8_t voiceNr)
 {
+	if(umaEnv_lpgOn(voiceNr))
+		return umaEnv_foldEnv(voiceNr) < 1e-5f;
 	return voiceArray[voiceNr].ampFilterInput <= 0.f && voiceArray[voiceNr].lastGain <= 0.f;
 }
 
@@ -53,7 +56,7 @@ __attribute__((noinline)) void umaFmV_trigger(uint8_t voiceNr)
 		fmDrum_trigger(&umaFm[voiceNr], 1.f);	// velocity is applied by the voice
 }
 
-// wavefolder and body level; the fold's drive follows the amp EG (Phase 2: or the LPG)
+// wavefolder and body level; the fold's drive follows the amp EG, or the LPG's vactrol
 static void umaFm_syncFold(uint8_t voiceNr)
 {
 	FmDrum* d = &umaFm[voiceNr];
@@ -65,7 +68,7 @@ static void umaFm_syncFold(uint8_t voiceNr)
 		if(fmDrum_getParam(d, foldParam[j]) != v)
 			fmDrum_setParam(d, foldParam[j], v);
 	}
-	fmDrum_setFoldEnv(d, voiceArray[voiceNr].ampFilterInput);
+	fmDrum_setFoldEnv(d, umaEnv_foldEnv(voiceNr));
 }
 
 _Static_assert(UMA_FM_RATIO_STEPS == FMD_NUM_RATIOS, "the kit's ratio steps are the engine's ratio table");

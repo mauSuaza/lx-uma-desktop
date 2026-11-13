@@ -64,6 +64,7 @@ add_library(lxr_preset OBJECT
     Src/uma_sdfiles.c
     Src/uma_kits.c
     Src/uma_fmvoice.c
+    Src/uma_env.c
     Src/uma_enginetest.c # LX_UMA test 0.0c
     Src/uma_sdreadtest.c # LX_UMA test 0.1a
 )
@@ -117,6 +118,7 @@ add_library(lxr_dsp OBJECT
     Src/Soundengine/DSPAudio/ResonantFilter.c
     Src/Soundengine/DSPAudio/Samples.c
     Src/Soundengine/DSPAudio/SlopeEg2.c
+    Src/Soundengine/DSPAudio/Lpg.c
     Src/Soundengine/DSPAudio/snapEg.c
     Src/Soundengine/DSPAudio/Snare.c
     Src/Soundengine/DSPAudio/squareRootLut.c

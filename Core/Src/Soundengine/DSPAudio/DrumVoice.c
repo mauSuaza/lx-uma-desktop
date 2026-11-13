@@ -27,6 +27,7 @@
 #include "uma_enginetest.h" // LX_UMA test 0.0c
 #endif
 #include "uma_fmvoice.h" // LX_UMA: FM Drum and FM Tone on Drum 1-3
+#include "uma_env.h" // LX_UMA: hold, gate mode, filter envelope, low-pass gate
 
 INDTCM static float ampSmoothValue = 0.1f;
 //---------------------------------------------------
@@ -175,6 +176,7 @@ void Drum_trigger(const uint8_t voiceNr, const uint8_t vol, const uint8_t note)
 
 	DecayEg_trigger(&voiceArray[voiceNr].oscPitchEg);
 	slopeEg2_trigger(&voiceArray[voiceNr].oscVolEg);
+	umaEnv_trigger(voiceNr);	// LX_UMA gate mode: a hit with a gate (MIDI note) held sustains
 	voiceArray[voiceNr].velo = vol/127.f;
 
 	transient_trigger(&voiceArray[voiceNr].transGen);
@@ -212,6 +214,7 @@ IN_ITCM_RAM void calcDrumVoiceAsync(const uint8_t voiceNr)
 	voiceArray[voiceNr].osc.fmMod = voiceArray[voiceNr].fmModAmount * egPitchVal;
 
 	//calc the osc + noise vol eg
+	umaEnv_block(voiceNr);	// LX_UMA: hold, sustain, release, and the end of a gate
 #if (AMP_EG_SYNC==0)
 
 	//check if in attack phase
@@ -301,7 +304,7 @@ IN_ITCM_RAM void calcDrumVoiceSyncBlock(const uint8_t voiceNr, int16_t* buf, con
 	bufferTool_addBuffersSaturating(buf,modBuf,size);
 
 	//calc filter block - float processing
-	SVF_calcBlockZDF(&voiceArray[voiceNr].filter,voiceArray[voiceNr].filterType,buf,size);
+	umaEnv_filterBlock(voiceNr, buf, size);	// LX_UMA: with the filter envelope, or the low-pass gate
 
 	//attentuate main OSCs by amp EG
 #ifdef USE_AMP_FILTER
@@ -312,6 +315,7 @@ IN_ITCM_RAM void calcDrumVoiceSyncBlock(const uint8_t voiceNr, int16_t* buf, con
 #if UMA_ENGINE_TEST
 	if(!umaTest_selfEnveloped(voiceNr))
 #endif
+	if(!umaEnv_lpgOn(voiceNr))	// LX_UMA: the low-pass gate sets the volume itself; the amp EG then only modulates
 	bufferTool_addGainInterpolated(buf,voiceArray[voiceNr].ampFilterInput, voiceArray[voiceNr].lastGain, size);
 
 	//buf[i] = dither_process(voiceArray[voiceNr].dither, buf[i]

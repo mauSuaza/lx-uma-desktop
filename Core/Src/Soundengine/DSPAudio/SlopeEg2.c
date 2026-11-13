@@ -26,6 +26,10 @@ void slopeEg2_init(SlopeEg2* eg)
 	eg->value 	= 0;
 	eg->state 	= EG_STOPPED;
 	eg->repeat	= 0;
+	eg->holdBlocks = eg->holdCnt = 0;
+	eg->sustain = 1.0;
+	eg->release = 0.01;
+	eg->gated = 0;
 
 	slopeEg2_setSlope(eg,0.5f);
 }
@@ -46,6 +50,8 @@ void slopeEg2_trigger(SlopeEg2* eg)
 		 eg->value = 1.0;
 	}
 	eg->repeatCnt = eg->repeat;
+	eg->holdCnt = eg->holdBlocks;
+	eg->gated = 0;	// the caller sets it for a gated hit
 }
 //--------------------------------------------------
 IN_ITCM_RAM double slopeEg2_calcSlopeValue(double val, double slope)
@@ -83,7 +89,7 @@ IN_ITCM_RAM double slopeEg2_calc(SlopeEg2* eg)
 			else
 			{
 				//repeat counter reached zero -> go to real decay stage
-				eg->state = EG_D;
+				eg->state = eg->holdCnt ? EG_H : EG_D;	// UMA: hold first
 				val = 1.0;
 			}
 		}
@@ -97,7 +103,7 @@ IN_ITCM_RAM double slopeEg2_calc(SlopeEg2* eg)
 		if(val >= 1.0)
 		{
 			val = 1.0;
-			eg->state = EG_D;
+			eg->state = eg->holdCnt ? EG_H : EG_D;	// UMA: hold first
 		}
 
 		eg->value = val;
@@ -105,13 +111,25 @@ IN_ITCM_RAM double slopeEg2_calc(SlopeEg2* eg)
 		return slopeEg2_calcSlopeValue(val,eg->invSlope);
 		break;
 
+	case EG_H:	// UMA: hold at full level
+		if(eg->holdCnt)
+			eg->holdCnt--;
+		if(!eg->holdCnt)
+			eg->state = EG_D;
+		return slopeEg2_calcSlopeValue(val,eg->slope);
+
 	case EG_D:
 
 		if(val>0)
 		{
 			val -= eg->decay;
-			eg->value = val;
-			return slopeEg2_calcSlopeValue(val,eg->slope);
+			if(eg->gated && val <= eg->sustain)	// UMA gate mode: stay at the sustain level while the gate is held
+			{
+				val = eg->sustain;
+				eg->state = EG_S;
+			}
+			eg->value = val > 0 ? val : 0;
+			return val > 0 ? slopeEg2_calcSlopeValue(val,eg->slope) : 0;
 		}
 		else
 		{
@@ -119,6 +137,19 @@ IN_ITCM_RAM double slopeEg2_calc(SlopeEg2* eg)
 			return 0;
 		}
 		break;
+
+	case EG_S:
+		return slopeEg2_calcSlopeValue(val,eg->slope);
+
+	case EG_R:	// UMA: after the gate, from wherever it was
+		if(val>0)
+		{
+			val -= eg->release;
+			eg->value = val > 0 ? val : 0;
+			return val > 0 ? slopeEg2_calcSlopeValue(val,eg->slope) : 0;
+		}
+		eg->value = 0;
+		return 0;
 	}
 	return 0;
 }
@@ -165,6 +196,35 @@ double slopeEg2_calcDecay(uint8_t data2)
 {
 	return slopeEg2_calcTime(data2,TIME_K_DECAY);
 };
+//--------------------------------------------------
+void slopeEg2_setHold(SlopeEg2* eg, uint16_t blocks)
+{
+	eg->holdBlocks = blocks;
+}
+//--------------------------------------------------
+// the value whose curved output is the level: the inverse of slopeEg2_calcSlopeValue on 0..1
+void slopeEg2_setSustain(SlopeEg2* eg, float level)
+{
+	const double y = level < 0.f ? 0.0 : level > 1.f ? 1.0 : level;
+	const double k = eg->slope;
+	const double d = 1.0 + k - k * y;
+	eg->sustain = d > 1e-9 ? y / d : 1.0;
+	if(eg->sustain > 1.0) eg->sustain = 1.0;
+}
+//--------------------------------------------------
+void slopeEg2_setRelease(SlopeEg2* eg, uint8_t data2)
+{
+	eg->release = slopeEg2_calcTime(data2,TIME_K_DECAY);
+}
+//--------------------------------------------------
+void slopeEg2_gateEnd(SlopeEg2* eg)
+{
+	if(!eg->gated)
+		return;
+	eg->gated = 0;
+	if(eg->state != EG_STOPPED)
+		eg->state = EG_R;
+}
 //--------------------------------------------------
 IN_ITCM_RAM void slopeEg2_setSlope(SlopeEg2* eg, uint8_t data2)
 {

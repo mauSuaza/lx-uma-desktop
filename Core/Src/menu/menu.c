@@ -282,6 +282,18 @@ const Name valueNames[NUM_NAMES] =
 		{SHORT_UMA_SUB_SHAPE, CAT_UMA_SUB, LONG_UMA_SHAPE},/*TEXT_UMA_SUB_SHAPE*/
 		{SHORT_UMA_SUB_OCT, CAT_UMA_SUB, LONG_UMA_OCTAVE},/*TEXT_UMA_SUB_OCT*/
 		{SHORT_UMA_SUB_FOLD, CAT_UMA_SUB, LONG_UMA_FOLD},/*TEXT_UMA_SUB_FOLD*/
+		{SHORT_UMA_HOLD, CAT_VELO_EG, LONG_UMA_HOLD},/*TEXT_UMA_HOLD*/
+		{SHORT_UMA_SUSTAIN, CAT_VELO_EG, LONG_UMA_SUSTAIN},/*TEXT_UMA_SUSTAIN*/
+		{SHORT_UMA_RELEASE, CAT_VELO_EG, LONG_UMA_RELEASE},/*TEXT_UMA_RELEASE*/
+		{SHORT_UMA_GATE, CAT_VELO_EG, LONG_UMA_EG_MODE},/*TEXT_UMA_GATE*/
+		{SHORT_UMA_FILTER_ENV, CAT_FILTER, LONG_UMA_ENV},/*TEXT_UMA_FILTER_ENV*/
+		{SHORT_UMA_LPG_DCY, CAT_UMA_LPG, LONG_DECAY},/*TEXT_UMA_LPG_DCY*/
+		{SHORT_UMA_LPG_COL, CAT_UMA_LPG, LONG_UMA_COLOUR},/*TEXT_UMA_LPG_COL*/
+		{SHORT_UMA_LPG_EXC, CAT_UMA_LPG, LONG_UMA_EXCITE},/*TEXT_UMA_LPG_EXC*/
+		{SHORT_UMA_FOLD, CAT_FM, LONG_UMA_FOLD},/*TEXT_UMA_FOLD*/
+		{SHORT_UMA_FOLD_TYPE, CAT_FM, LONG_UMA_FOLD_TYPE},/*TEXT_UMA_FOLD_TYPE*/
+		{SHORT_UMA_FOLD_SYM, CAT_FM, LONG_UMA_SYMMETRY},/*TEXT_UMA_FOLD_SYM*/
+		{SHORT_UMA_BODY_LEV, CAT_FM, LONG_UMA_BODY_LEV},/*TEXT_UMA_BODY_LEV*/
 };
 
 //---------------------------------------------------------------
@@ -478,9 +490,9 @@ const enum Datatypes PROGMEM parameter_dtypes[PAR_UMA_END] = {	// LX_UMA: + the 
 	    /*PAR_OFFSET_LFO4*/ 	DTYPE_0B127,
 	    /*PAR_OFFSET_LFO5*/ 	DTYPE_0B127,
 	    /*PAR_OFFSET_LFO6*/ 	DTYPE_0B127,							//190
-	    /*PAR_FILTER_TYPE_1*/ 	DTYPE_MENU | (MENU_FILTER<<8),
-	    /*PAR_FILTER_TYPE_2*/ 	DTYPE_MENU | (MENU_FILTER<<8),
-	    /*PAR_FILTER_TYPE_3*/ 	DTYPE_MENU | (MENU_FILTER<<8),
+	    /*PAR_FILTER_TYPE_1*/ 	DTYPE_MENU | (MENU_UMA_DRUM_FILTER<<8),	// LX_UMA: with the low-pass gate
+	    /*PAR_FILTER_TYPE_2*/ 	DTYPE_MENU | (MENU_UMA_DRUM_FILTER<<8),	// LX_UMA: with the low-pass gate
+	    /*PAR_FILTER_TYPE_3*/ 	DTYPE_MENU | (MENU_UMA_DRUM_FILTER<<8),	// LX_UMA: with the low-pass gate
 	    /*PAR_FILTER_TYPE_4*/ 	DTYPE_MENU | (MENU_FILTER<<8),
 	    /*PAR_FILTER_TYPE_5*/ 	DTYPE_MENU | (MENU_FILTER<<8),
 	    /*PAR_FILTER_TYPE_6*/ 	DTYPE_MENU | (MENU_FILTER<<8),
@@ -1902,6 +1914,10 @@ const Page* menu_getPage(uint8_t page, uint8_t sub)
 		if(extra)
 			return extra;
 	}
+	// the low-pass gate: its settings on the Filter page's 2nd screen (any engine)
+	if(page <= VOICE3_PAGE && sub == UMA_LPG_PAGE_FILTER
+		&& activeParameters[PAR_FILTER_TYPE_1 + (page - VOICE1_PAGE)] == UMA_LPG_TYPE_INDEX)
+		return &umaLpgPages[page - VOICE1_PAGE];
 	const uint8_t engine = menu_umaEngine(page);
 	if(engine)
 	{
@@ -3545,6 +3561,12 @@ static uint8_t getMaxEntriesForMenu(uint8_t menuId)
 		return umaSubShapeNames[0][0];
 	case MENU_UMA_SUB_OCT:
 		return umaSubOctNames[0][0];
+	case MENU_UMA_GATE:
+		return umaGateNames[0][0];
+	case MENU_UMA_DRUM_FILTER:
+		return umaDrumFilterTypes[0][0];
+	case MENU_UMA_FOLD_TYPE:
+		return umaFoldTypeNames[0][0];
 	case MENU_FILTER:
 		return filterTypes[0][0];
 	case MENU_SYNC_RATES:
@@ -3637,6 +3659,15 @@ static void getMenuItemNameForValue(const uint8_t menuId, const uint8_t curParmV
 		break;
 	case MENU_UMA_SUB_OCT:
 		p = umaSubOctNames[curParmVal + 1];
+		break;
+	case MENU_UMA_GATE:
+		p = umaGateNames[curParmVal + 1];
+		break;
+	case MENU_UMA_DRUM_FILTER:
+		p = umaDrumFilterTypes[curParmVal + 1];
+		break;
+	case MENU_UMA_FOLD_TYPE:
+		p = umaFoldTypeNames[curParmVal + 1];
 		break;
 	case MENU_FILTER:
 		p = filterTypes[curParmVal + 1];
