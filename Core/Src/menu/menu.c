@@ -2324,11 +2324,18 @@ static const Page* menu_umaExtraScreen(uint8_t page, uint8_t sub, uint8_t n)
 
 // the mod view (SHIFT + select 7, 0.3a): a voice page shows its mod slots, select 1-8 = slot 1-8
 static uint8_t menu_umaModView;
+static uint8_t menu_umaModViewFrom;	// the screen it was opened from (menuIndex): leaving goes back to it
 void menu_umaModViewToggle(void)
 {
 	menu_umaModView = !menu_umaModView;
 	menu_umaThird = 0;
-	menuIndex = 0;	// slot 1
+	if(menu_umaModView)
+	{
+		menu_umaModViewFrom = menuIndex;
+		menuIndex = 0;	// slot 1
+	}
+	else
+		menuIndex = (uint8_t)(menu_umaModViewFrom & MASK_PAGE);	// the page it was opened from, its 1st screen
 	editModeActive = 0;
 	menu_repaintAll();
 }
@@ -4831,7 +4838,7 @@ void menu_switchSubPage(uint8_t subPageNr, uint8_t toggle)
 	uint8_t activePage		= (menuIndex&MASK_PAGE)>>PAGE_SHIFT;
 
 	// LX_UMA (as the Eurorack): pages with extra screens: screen 1, screen 2, each extra one, back to screen 1
-	if(toggle && subPageNr == activePage && menu_umaExtraScreen(menu_activePage, activePage, 0))
+	if(toggle && subPageNr == activePage && !menu_umaModViewOn() && menu_umaExtraScreen(menu_activePage, activePage, 0))
 	{
 		if(menu_umaThird && menu_umaThirdPage == menu_activePage && menu_umaThirdSub == activePage)
 		{
