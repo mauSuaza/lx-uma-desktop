@@ -1,6 +1,7 @@
 # Phase 3: modulation and the sequencer (spec, draft for review)
 
-Status: **reviewed** (2026-11-13): questions answered (section 6). Phase 3 of [port-plan.md](port-plan.md), after release 0.2. Release **0.3**
+Status: **built and tested** (0.3a–0.3e2, 2026-11-14): everything but 0.3d (UMA lanes, moved later). Not released
+(the user's call: the release waits for Phase 4's card files). Reviewed 2026-11-13 (section 6). Phase 3 of [port-plan.md](port-plan.md), after release 0.2. Release **0.3**
 at the end. The code is the Eurorack's (LX_UMA `a179390`) where it exists; the desktop's sequencer automation is new.
 
 ## 1. Decided with the user (2026-11-13)
@@ -134,3 +135,9 @@ setting comes with the kit, and the step's value moves the setting it points at.
 - **Saving a morph** (save menu, morph) saves the UMA settings' blend too.
 - The X-fade as a mod slot target stays inactive (the stock morph resends the whole kit).
 - Image 612,984 bytes, RAM 359.6 KB of 384 (~25 KB stack).
+
+## 11. Tested (2026-11-14)
+
+- 0.3e on the LXR: everything works (the user). 0.3e2: leaving the mod view goes back to the page it was opened
+  from (it went to Osc), the select LED follows the view, a slot pressed twice no longer arms a hidden extra screen.
+- Not released (the user): no 0.3 tag; the manual and README cover the 0.3 builds.

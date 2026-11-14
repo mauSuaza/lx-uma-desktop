@@ -9,8 +9,14 @@ Synths' open-source desktop firmware v1.7 and is **not** official Erica Synths f
 quantizer. Every kit keeps its UMA settings, and projects still load on Erica's firmware. See the
 **[user manual](docs/manual.md)** and the release notes ([0.2](docs/release-notes-0.2.md), [0.1](docs/release-notes-0.1.md)). The plan for the rest of the port: [docs/port-plan.md](docs/port-plan.md).
 
-Install: copy `LXR_V2_UMA_V0.2.img` (from the GitHub release) to the SD card, hold the encoder button while
-switching on, wait for "Update OK!". Back up your card first.
+**In progress, 0.3 (test builds, not released):** modulation as on the Eurorack: 8 mod slots per voice
+(SHIFT + LFO), LFO B, four Turing Machines per voice, velocity and envelope sources, `v/o` pitch modulation through
+the quantizer, and kit morph of UMA's settings. The release waits for the card files (DX7 banks, wavetables,
+terrains; Phase 4). The manual already covers it.
+
+Install: there are no prebuilt downloads yet. Build the image (below; it is named `LXR_V2_UMA_V<version>.img`),
+copy it to the SD card, hold the encoder button while switching on, wait for "Update OK!". Back up your card
+first.
 
 ---
 

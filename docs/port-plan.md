@@ -80,7 +80,7 @@ What LX_UMA adds on the Eurorack, by part:
 | **0. Will it fit?** | Below | Boots; the flash cap; CPU and memory with the engines in |
 | **1. Foundation + FM** | Settings and kit format; the menu framework (extra screens, value types); the modulation layer; FM Drum and FM Tone on Drum 1–3, with the smaller waveform tables | Stock kits and patterns unchanged; the FM engines sound as on the Eurorack; kits save and load |
 | **2. All engines, all voices** | mdk and Plaits on every voice (engine choice on the snare, cymbal, hi-hat); quantizer; envelopes, LPG, folder; randomise | Each engine against the Eurorack with the same settings; CPU with a pattern running |
-| **3. Modulation + sequencer** | Mod slots, LFO B, Turing Machines, velocity, MIDI CC sources, kit morph; the sequencer's automation and MIDI reaching UMA's settings | Automation and modulation move UMA settings in time |
+| **3. Modulation + sequencer** (0.3a–0.3e2 built and tested 2026-11-14; not released: it waits for Phase 4; UMA lanes moved later) | Mod slots, LFO B, Turing Machines, velocity, MIDI CC sources, kit morph; the sequencer's automation and MIDI reaching UMA's settings | Automation and modulation move UMA settings in time |
 | **4. Card files + release** | DX7, WAVES, TERRAIN and the Plaits sub; the desktop manual; release | As LX_UMA 0.34's checks |
 
 ## 5. Phase 0, in detail

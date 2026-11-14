@@ -4,9 +4,10 @@ Custom firmware for the Erica Synths LXR-02 drum machine, by the makers of LX_UM
 ([github.com/mauSuaza/LX_UMA](https://github.com/mauSuaza/LX_UMA)). It is not official Erica Synths firmware and
 Erica Synths provides no support for it (see the README).
 
-This manual covers release **0.2**: the FM, drum-machine and Plaits engines, envelopes, the low-pass gate, the
-wavefolder, randomise and the quantizer. Everything else works as on Erica's firmware
-v1.7; see the LXR-02 manual for it.
+This manual covers release **0.2** (the FM, drum-machine and Plaits engines, envelopes, the low-pass gate, the
+wavefolder, randomise and the quantizer) and the **0.3 test builds** (modulation: mod slots, LFO B, Turing
+Machines, kit morph; not released yet, see [What 0.3 adds](#what-03-adds)). Everything else works as on Erica's
+firmware v1.7; see the LXR-02 manual for it.
 
 ## Start here
 
@@ -34,6 +35,20 @@ play as stock sounds).
 | **Quantizer** | Octave, key and scale on every voice |
 | **Kits** | Every kit keeps its UMA settings (below) |
 | **CPU readout** | `pk` on the global page (below) |
+
+### What 0.3 adds
+
+*Test builds (`LXR_V2_UMA_V0.3e2.img`), not released yet: the release waits for Phase 4 (DX7 banks, wavetables and
+terrains from the card).*
+
+| | |
+|---|---|
+| **Mod slots** | 8 per voice, in the mod view: **SHIFT + LFO** ([Modulation](#modulation)) |
+| **Sources** | LFO A and B, four Turing Machines, the envelope (and inverted) and velocity of every voice |
+| **Pitch** | `v/o`: a modulation transposes the note, then the quantizer snaps it |
+| **LFO B** | Every voice: 16 shapes to sweep through, a folder, sync to the tempo, restarts on hits or bars ([LFOs](#lfos)) |
+| **Turing Machines** | Four per voice, on hits or the sequencer's sixteenths; patterns saved with the kit ([Turing Machines](#turing-machines)) |
+| **Kit morph** | The X-fade morphs UMA's settings too; `lst` for list settings ([Kit morph](#kit-morph)) |
 
 ### Getting around
 
@@ -728,6 +743,196 @@ for drums, wrong for a bass. Musical intervals above 2 (×2.25, ×2.67) add a se
 
 ---
 
+## Modulation
+
+*0.3 test builds.* Each voice has **8 mod slots**. A slot takes a source (an LFO, a Turing Machine, the envelope,
+velocity), scales it and moves one of its voice's settings: any UMA setting of the voice, and the stock settings
+on its list.
+
+### The mod view: SHIFT + LFO
+
+Select a voice and press **SHIFT + LFO** (select 7) briefly. The display shows the **mod view**:
+
+- The **8 select buttons pick slot 1–8** (Osc = slot 1 … Mix = slot 8). The slot number shows in the top right
+  corner of the display: when you see it, the select buttons pick slots.
+- The **voice buttons** change the voice; you stay in the mod view.
+- **SHIFT + LFO** again leaves it, back to the page you came from. Going to a page that isn't a voice's (global,
+  performance, step mode…) leaves it too.
+
+Each slot is one screen:
+
+| Short | What it does | Values |
+|---|---|---|
+| `src` | Source | see the sources below |
+| `amt` | Amount | 0 = off |
+| `dst` | Destination | a setting of this voice |
+| `pol` | Polarity | `bi` around the knob, `uni` from the knob up |
+
+- With `pol` **`bi`** the modulation moves a setting **up and down around its own value**: the knob is the centre,
+  `amt` the range either way. With **`uni`** the knob is the **floor**: the source's lowest value plays the knob,
+  its highest the knob + `amt`, nothing goes below.
+- **Editing `src` or `dst`, the edit screen names them in full**: "LFO B Drum2", "TM C Cymbl", "Env Drum1";
+  "Op A Ratio". A target of another engine stays set but does nothing ("fm only", "mdk only"…), so a slot keeps
+  its target when you switch `eng`.
+- New slots (kits from before 0.3) start on their voice's LFO A with `amt` 0: nothing moves until you turn `amt` up.
+- A few targets are on the list but do nothing on the desktop: `vel`, the operator waveforms `wvc` `wvm`, the
+  morph `mrp` and LFO A's fold.
+
+### Sources
+
+The number in a source's name is the voice: 1–3 Drum 1–3, 4 Snare, 5 Cymbal, 6 Hi-hat (both hats). Any slot can use
+any voice's sources.
+
+| Source | What it is |
+|---|---|
+| `LA1`–`LA6` | Each voice's **LFO A**: the stock LFO on its LFO page. Its own target and amount there work as before, separately |
+| `LB1`–`LB6` | Each voice's **LFO B** ([LFOs](#lfos)) |
+| `T1A`–`T6D` | Each voice's four **Turing Machines** ([Turing Machines](#turing-machines)) |
+| `EN1`–`EN6` | Each voice's Amp EG, **adding on top**: the setting's value at rest, up by `amt` at the peak |
+| `EI1`–`EI6` | The same, **inverted**: down by `amt` at the peak (ducking) |
+| `VL1`–`VL6` | Each voice's **last hit velocity**: the step's velocity, or a MIDI note's. 0 to 1, 127 = 1 |
+
+The list also has the Eurorack's CV inputs, accent jacks and MIDI CC sources (`cv1`–`cv5`, `ac1`–`ac6`,
+`MC1`–`MC8`); the desktop has none of them and skips them as you turn `src`. They keep their places so a kit means
+the same on both firmwares.
+
+### Velocity
+
+- **To the volume:** the stock switch `vol` on the Mod page's velocity screen (screen 2 with `lxr`; screen 3 with
+  `fmd` `fmt` `mdk` `pla`, after randomise). On, the step's velocity sets the hit's level; off, every hit plays at
+  full level. It works on every engine.
+- **To the sound:** a slot with `VL` as its source: harder hits brighter (`VL2` → `mA`), more fold, a different
+  Plaits timbre. Plaits plays every hit with the same accent, so this is how its tone follows velocity.
+
+### Pitch: `v/o`
+
+Every voice's target list has `v/o`: a modulation on it **transposes the note** that plays (the step's, or a MIDI
+note's) up to 5 octaves, then the [quantizer](#pitch-octave-key-and-scale) snaps it to the voice's key and scale.
+Its knob is 0, so use `pol` **`uni`**: `amt` is then the span above the note. A Turing Machine on `v/o` with the
+quantizer on plays melodies; with the quantizer off the pitch moves continuously.
+
+### Modulating a modulation (`a1`–`a8`)
+
+Every voice's list ends with `a1`–`a8`, the **amounts of its own 8 slots**: one slot can scale another's depth. For
+example slot 1 `T2A` → `RT` (a pattern of re-rolled tones), slot 2 a slow `LB2` → `a1`: the pattern fades in and out
+over bars.
+
+### When a modulation counts
+
+| Target | Counts |
+|---|---|
+| Randomise settings, LPG `exc` | once, **at the hit** |
+| Everything else | continuously (every audio block, about 1.5 ms) |
+
+### Tips
+
+- **LFO → `mA`** (Op A Mod) or `eA`: the FM brightness pulses.
+- **`VL` → `mA`, `fb` or `exc`**: harder hits are brighter, grittier or stronger.
+- **A locked Turing Machine → `al` or `rA`**: a timbre pattern that repeats with the beat.
+- **`EN` → `fld`**: extra fold on the hit. **`EI1` → `vol`** in a Drum 2 slot: Drum 1 ducks Drum 2.
+
+---
+
+## LFOs
+
+Every voice has **two LFOs**. **LFO A** is the stock LFO, as on Erica's firmware (its shapes, sync and target on the
+LFO page). **LFO B** is the Eurorack's: 16 shapes you can sweep through, a folder and its own sync. Select the voice,
+press **LFO** (select 7), then press it again to step through the screens:
+
+| Press | Screen |
+|---|---|
+| 1, 2 | LFO A (stock) |
+| 3 | LFO B: `frB snB wvB rtB` |
+| 4 | LFO B: `ofB fdB` |
+| 5 | Turing A \| B ([Turing Machines](#turing-machines)) |
+| 6 | Turing C \| D |
+| 7 | back to LFO A |
+
+| Short | What it does |
+|---|---|
+| `frB` | Speed, up to about 200 Hz (while sync is off) |
+| `snB` | `off`, or a division of the sequencer's tempo: the LFO's period follows the BPM |
+| `wvB` | 0–127: a sweep through the shapes below |
+| `rtB` | `off`; `v1`–`v6`: the voice whose hits restart it; `1b` `2b` `4b` `8b`: restart every 1, 2, 4 or 8 bars, counted from when the sequencer starts (free-running in between) |
+| `ofB` | Where the wave restarts when retriggered (only matters with `rtB` on) |
+| `fdB` | A wavefolder after the shape: 0 = off, 1–24 a light bend, then the wave folds back on itself, more turns the higher |
+
+**Shapes.** `wvB` sweeps through the shapes; each has a small flat zone where it is pure, and between two
+neighbours the LFO crossfades from one to the other. The display shows the nearest shape; the edit screen shows the
+pure shape's name, or the blend (`sin>tri 40%` = 40 % of the way from sine to triangle). Because it is a sweep, a
+Turing Machine or another LFO on `wvB` changes the shape continuously.
+
+| # | Name | Shape | | # | Name | Shape |
+|---|---|---|---|---|---|---|
+| 0 | `sin` | Sine | | 8 | `scv` | S-curve: smooth rise and fall |
+| 1 | `tri` | Triangle | | 9 | `bnc` | Bounce: four bounces, falling |
+| 2 | `sup` | Saw up: rises, then drops | | 10 | `hsn` | Half sine, then rest |
+| 3 | `sdn` | Saw down: falls, then jumps up | | 11 | `st4` | 4 stairs up |
+| 4 | `sqr` | Square | | 12 | `st8` | 8 stairs up |
+| 5 | `rnd` | Random, stepped: a new value each cycle | | 13 | `rsm` | Random, gliding to a new value each cycle |
+| 6 | `xup` | Exponential up: rises slowly, then fast | | 14 | `trp` | Trapezoid: rise, hold, fall, rest |
+| 7 | `xdn` | Exponential down: falls fast, then slowly | | | | |
+
+**Fold.** `fdB` folds whatever shape the LFO plays: low values only bend it, from about 30 the peaks fold over and a
+single cycle gets extra turns. A Turing Machine or another LFO can move the fold while the shape stays.
+
+**Sync** divisions, slowest to fastest, in fractions of a bar (one LFO cycle): `4/1` `2/1` `1/1` `1/2`, `4.`
+(dotted quarter), `1/3`, `1/4`, `8.` (dotted eighth), `1/6`, `1/8`, `16.` (dotted sixteenth), `12`, `16`, `24`,
+`32`. `1/3` `1/6` `12` `24` are triplets. With sync on, `frB` does nothing; retrigger still restarts the LFO.
+
+An LFO B does nothing until a slot uses it (`LB1`–`LB6`). New kits start with a slow sine, free-running.
+
+---
+
+## Turing Machines
+
+Every voice has **four Turing Machines**, A–D: looping random sequences after the Music Thing Modular Turing
+Machine. Each moves one step on a hit (or on the sequencer's sixteenths) and gives a value a slot can use
+(`T1A`–`T6D`). On the LFO page: the 5th press of **LFO** shows A | B, the 6th C | D (the first four knobs the first
+machine, the last four the second).
+
+| Short | Values | What it does |
+|---|---|---|
+| `lnA` | 1–64 | Loop length in steps |
+| `prA` | 0–127 | Chance a step changes when it comes round: 0 = locked (repeats exactly), 127 = random every step |
+| `ckA` | `own`, `dr1` `dr2` `dr3` `snr` `cym` `hat`, `seq` | Whose hits move it; `seq`: the sequencer's sixteenths (while it plays) |
+| `dvA` | 1–16 | One step every Nth of those (with `seq`: 4 = every beat, 16 = every bar) |
+
+(B, C, D the same with their letter.) **Patterns are saved with the kit**, all 64 steps: save the kit and a locked
+loop comes back exactly. To find a new locked pattern, turn `prA` up for a few hits, then back to 0. New kits start
+locked, 8 steps long, on their own voice's hits.
+
+Ideas:
+- A locked machine on `v/o` (`pol` `uni`) with the quantizer on: an 8-note melody.
+- `prA` 20–40: a pattern that slowly evolves.
+- Three machines with lengths 3, 5 and 8 on different targets: polyrhythm.
+- `ckA` `dr1` on the snare: the snare's timbre follows the kick.
+- **A new LFO shape every bar:** sync LFO B (`snB` `1/1`), set a machine to `seq` with `dvA` 16 and route it to
+  `wvB`.
+
+---
+
+## Kit morph
+
+The stock **X-fade** (performance page, and the Euklid page) blends the current kit towards the morph kit: load one
+with the load menu's morph type, as on Erica's firmware (after a project loads it is the first kit). On LX_UMA the morph
+reaches **UMA's settings** too: the engines' sounds, envelopes, LPG, fold, LFO B, the pitch screen, Plaits, mdk and
+`v/o`. Modulation moves around the blend.
+
+| How | Settings |
+|---|---|
+| Blend | all FM, mdk and Plaits knobs, fine ratios, fold, LPG, hold, the filter envelope, LFO B's speed, offset, shape and fold, `v/o` |
+| Step through the table | ratios, the octave |
+| Step or switch (`lst`) | `eng`, the algorithm, `gat`, the fold type, Plaits' bank, model and output, mdk's type and machine, LFO B's sync and retrigger, key and scale, the sub's shape and octave |
+| Don't morph | randomise, the mod slots, the Turing Machines |
+
+- **`lst`** (performance page, after shuffle): `stp` steps list settings through every value in between, `swt`
+  switches them once at 50 %. It is saved with the kit (on the Eurorack it is a global setting).
+- The knobs keep showing the current kit; the sound moves.
+- **Saving a morph** (save menu, morph type) saves the blend of UMA's settings too.
+
+---
+
 ## Kits and your projects
 
 - Every kit gets a block of UMA settings (1 KB) **appended** to its kit file. The stock part of the file stays as it
@@ -737,6 +942,7 @@ for drums, wrong for a bass. Musical intervals above 2 (×2.25, ×2.67) add a se
   when a project loads; leave it on the card.
 - A pattern that loads its kit (pattern change mode) gets the kit's UMA settings read from the card ahead of time,
   while the pattern before it plays.
+- The **morph kit's** UMA settings are read from the card when you load a morph kit (and after a project loads).
 - UMA settings are not sent or received as MIDI CC and can't be automated by the sequencer yet (a later release).
 
 ## CPU
@@ -747,8 +953,9 @@ out. A busy stock pattern runs at about 67 %. Each engine voice adds to it while
 about 15–18 %, the heaviest Plaits models 26–28 %); a voice whose sound has died away costs little or nothing.
 With several heavy voices playing at once, check `pk` on your busiest pattern.
 
-## Not in 0.2 yet
+## Not in 0.3 yet
 
-Coming with the next releases, as on the Eurorack firmware: the mod matrix, LFO B, Turing Machines, velocity and MIDI
-CC sources, kit morph; the sequencer's automation and MIDI for UMA settings; DX7 banks, wavetables and terrains from
-the card. Not on the desktop: the prk engine (its memory is the sequencer's) and the FM operator waveforms.
+Coming with the next releases: DX7 banks, wavetables and terrains from the card (Phase 4); the sequencer's
+automation of UMA settings (UMA lanes). Not on the desktop: the prk engine (its memory is the sequencer's), the FM
+operator waveforms, and the Eurorack's CV, accent and MIDI CC sources (no jacks; the desktop isn't meant to be played
+from a MIDI controller).
