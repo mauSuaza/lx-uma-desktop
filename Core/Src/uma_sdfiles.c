@@ -267,6 +267,18 @@ static int8_t umaSdf_oldest(uint8_t keepUsed)
 	return pick;
 }
 
+// LX_UMA desktop: 1 while a voice wants a file that isn't loaded (the main loop then lets the audio interrupt run)
+uint8_t umaSdf_needsLoad(void)
+{
+	for(uint8_t v = 0; v < UMA_SDF_VOICES; v++)
+	{
+		const uint8_t kind = umaSdf_wantKind[v], index = umaSdf_wantIndex[v];
+		if(kind < UMA_SDF_KINDS && index < umaSdf_fileCount[kind] && umaSdf_status(kind, index) == UMA_SDF_LOADING)
+			return 1;
+	}
+	return 0;
+}
+
 uint8_t umaSdf_service(void)
 {
 	for(uint8_t v = 0; v < UMA_SDF_VOICES; v++)
@@ -281,7 +293,7 @@ uint8_t umaSdf_service(void)
 			if(umaSdf_slots[s].index == UMA_SDF_NONE) pick = (int8_t)s;
 		if(pick < 0) pick = umaSdf_oldest(1);
 		if(pick < 0) pick = umaSdf_oldest(0);
-		if(pick < 0) return 0;	// every slot wanted (can't happen with 6 voices and 10 slots)
+		if(pick < 0) return 0;	// every slot wanted (6 voices each wanting a new file while playing from 6 others)
 		UmaSdfSlot* slot = &umaSdf_slots[pick];
 		slot->index = UMA_SDF_NONE;		// empty before writing: the audio side won't read it meanwhile
 		UMA_SDF_BARRIER();

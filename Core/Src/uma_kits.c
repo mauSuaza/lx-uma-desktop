@@ -38,14 +38,14 @@ static uint8_t* umaKit_active(void)
 }
 
 // the audio from the interrupt while the card is busy; returns whether it already was
-static uint8_t umaKit_irqOn(void)
+uint8_t umaKit_irqOn(void)
 {
 	const uint8_t was = (htim2.Instance->CR1 & TIM_CR1_CEN) != 0;
 	if(!was)
 		HAL_TIM_Base_Start_IT(&htim2);
 	return was;
 }
-static void umaKit_irqOff(uint8_t was)
+void umaKit_irqOff(uint8_t was)
 {
 	if(!was)
 		HAL_TIM_Base_Stop_IT(&htim2);

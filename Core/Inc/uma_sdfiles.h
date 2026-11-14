@@ -49,6 +49,7 @@ uint8_t umaSdf_status(uint8_t kind, uint8_t index);			// UMA_SDF_LOADING / READY
 // main loop
 void umaSdf_scan(void);		// list the folders (power-on, card back in); empties the pool
 uint8_t umaSdf_service(void);	// load one wanted file that isn't loaded yet; 1 if it did (good or bad)
+uint8_t umaSdf_needsLoad(void);	// LX_UMA desktop: 1 while there is one to load
 
 // the checks (pure, for the tests): a .syx file's 4,104 bytes -> its 4,096 data bytes; 1 if valid
 uint8_t umaSdf_checkSyx(const uint8_t* file, uint8_t* data);

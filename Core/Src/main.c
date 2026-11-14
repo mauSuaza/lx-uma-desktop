@@ -12,6 +12,7 @@
 #include "uma_s7test.h" // UMA: test 0.0b
 #include "uma_sdreadtest.h" // UMA: test 0.1a
 #include "uma_kits.h" // LX_UMA: the kits' UMA records
+#include "uma_sdfiles.h" // LX_UMA: DX7 banks, wavetables, terrains from the card (Phase 4)
 #include "uma_mod.h" // LX_UMA
 #include <stdio.h>
 #include <string.h>
@@ -493,6 +494,7 @@ if(sd_card_ok)
 
 	if(sd_card_ok)
 	{
+		umaSdf_scan();	// LX_UMA: the card's DX7 banks, wavetables, terrains (names only; loaded when a voice wants one)
 		if(!preset_loadGlobals())
 		{
 			lcd_clear();
@@ -959,6 +961,9 @@ lcd_process_display_interrupt = 1;
 				{
 					preset_loadProjectNames(i);
 				}
+				const uint8_t was = umaKit_irqOn();
+				umaSdf_scan();	// LX_UMA: the card back in: its files again (maybe edited meanwhile)
+				umaKit_irqOff(was);
 			}
 
 	  }
@@ -1004,6 +1009,14 @@ lcd_process_display_interrupt = 1;
 	umaTest_sdReadTick(menu_umaLoadShown());	// test 0.1a: a kit read from the card twice a second
 #endif
 	umaKit_service();	// LX_UMA: the next kit's UMA record, before its pattern starts
+	if(umaSdf_needsLoad())	// LX_UMA: a card file a voice wants (one per pass)
+	{
+		const uint8_t was = umaKit_irqOn();	// the audio keeps going while the card reads
+		const uint8_t loaded = umaSdf_service();
+		umaKit_irqOff(was);
+		if(loaded)
+			menu_repaint();	// its names in place of "loading"
+	}
 	umaMod_tick();	// LX_UMA: a drum's engine changed: its slots' targets follow
 
 	  //check if we have some usb midi messages and process them
